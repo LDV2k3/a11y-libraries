@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "A window resize listener service",
     "keywords": ["window", "resize", "service"],
-    "homepage": "https://github.com/LDV2k3/a11y-libraries#readme",
+    "homepage": "https://github.com/LDV2k3/a11y-libraries/tree/master/projects/a11y-ngx/window-resize#readme",
     "bugs": {
         "url": "https://github.com/LDV2k3/a11y-libraries/issues",
         "email": "lucho.development@gmail.com"
