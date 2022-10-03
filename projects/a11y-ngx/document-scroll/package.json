@@ -1,0 +1,24 @@
+{
+    "name": "@a11y-ngx/document-scroll",
+    "version": "1.0.0",
+    "description": "A document scroll listener service",
+    "keywords": ["document", "scroll", "service"],
+    "homepage": "https://github.com/LDV2k3/a11y-libraries/tree/master/projects/a11y-ngx/document-scroll#readme",
+    "bugs": {
+        "url": "https://github.com/LDV2k3/a11y-libraries/issues",
+        "email": "lucho.development@gmail.com"
+    },
+    "license": "MIT",
+    "author": {
+        "name": "Luciano Del Vacchio",
+        "email": "lucho.development@gmail.com",
+        "url": "https://github.com/LDV2k3/"
+    },
+    "peerDependencies": {
+        "@angular/common": "^9.1.13",
+        "@angular/core": "^9.1.13"
+    },
+    "dependencies": {
+        "tslib": "^1.10.0"
+    }
+}
