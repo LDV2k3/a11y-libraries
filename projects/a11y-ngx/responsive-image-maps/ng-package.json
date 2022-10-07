@@ -1,0 +1,15 @@
+{
+    "$schema": "../../../node_modules/ng-packagr/ng-package.schema.json",
+    "dest": "../../../dist/@a11y-ngx/responsive-image-maps",
+    "lib": {
+        "entryFile": "src/public-api.ts",
+        "umdId": "a11yNGx.responsiveImageMaps",
+        "umdModuleIds": {
+            "@a11y-ngx/responsive-image-maps": "a11yNGx.responsiveImageMaps",
+            "@a11y-ngx/window-resize": "a11yNGx.windowResize"
+        }
+    },
+    "whitelistedNonPeerDependencies": [
+        "@a11y-ngx/window-resize"
+    ]
+}
