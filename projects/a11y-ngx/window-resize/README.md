@@ -2,7 +2,7 @@
 
 A simple window resize listener service.
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.1.13.
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0.
 
 ## Installation
 
