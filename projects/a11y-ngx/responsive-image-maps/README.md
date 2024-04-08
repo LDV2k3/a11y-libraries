@@ -4,7 +4,7 @@ A responsive image map directive that updates the areas' coordinates according t
 
 > ⚠️ **IMPORTANT:** Currently `rect` and `circle` shapes are supported, `poly` will be supported in future releases.
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.1.13.
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0.
 
 ## Installation
 

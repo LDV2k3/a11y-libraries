@@ -12,8 +12,8 @@ import { AreaSize } from './responsive-image-map.type';
     `
 })
 export class ResponsiveImageAreaDirective implements AfterViewInit {
-    @Input() private shape: string;
-    @Input() private set coords(coords: string) {
+    @Input() shape: string;
+    @Input() set coords(coords: string) {
         this.originalCoords = coords.replace(/[^0-9,]/g, '').split(',').map(coord => parseInt(coord, 10));
     }
 

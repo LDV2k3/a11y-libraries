@@ -10,7 +10,7 @@ import { MapSize } from './responsive-image-map.type';
 
 @Directive({ selector: 'map[name]', exportAs: 'responsiveImageMap' })
 export class ResponsiveImageMapDirective implements AfterViewInit, OnDestroy {
-    @Input() readonly name: string;
+    @Input() name: string;
 
     readonly loaded: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
