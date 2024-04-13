@@ -108,7 +108,7 @@ export class MyComponent {
 
         this.imageMap.areas.forEach(area => {
             const areaElement = area.nativeElement;
-            const areaSize: AreaSize = area.AreaSize;
+            const areaSize: AreaSize = area.areaSize;
             ...
         });
     }
