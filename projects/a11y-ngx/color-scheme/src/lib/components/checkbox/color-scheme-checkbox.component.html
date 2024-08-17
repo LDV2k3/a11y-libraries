@@ -1,0 +1,14 @@
+<input
+    type="checkbox"
+    [id]="id"
+    [class.form-check-input]="useBootstrapStyles"
+    [class.color-scheme-check]="!useBootstrapStyles"
+    [(ngModel)]="colorSchemeDark"
+    [disabled]="disabled"
+    (change)="changeColorScheme()" />
+<label
+    [for]="id"
+    [class.form-check-label]="useBootstrapStyles"
+    [class.color-scheme-label]="!useBootstrapStyles">
+    {{ label }}
+</label>

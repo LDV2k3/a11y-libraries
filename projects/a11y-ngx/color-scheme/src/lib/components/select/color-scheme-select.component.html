@@ -1,0 +1,30 @@
+<ng-container *ngIf="!useBootstrapStyles">
+    <ng-container *ngTemplateOutlet="labelTemplate"></ng-container>
+    <ng-container *ngTemplateOutlet="selectTemplate"></ng-container>
+</ng-container>
+
+<ng-container *ngIf="useBootstrapStyles">
+    <ng-container *ngTemplateOutlet="selectTemplate"></ng-container>
+    <ng-container *ngTemplateOutlet="labelTemplate"></ng-container>
+</ng-container>
+
+<ng-template #selectTemplate>
+    <select
+        [id]="id"
+        [class.form-select]="useBootstrapStyles"
+        [class.color-scheme-select]="!useBootstrapStyles"
+        [(ngModel)]="colorScheme"
+        [disabled]="disabled"
+        (change)="changeColorScheme()">
+        <option [value]="scheme.value" *ngFor="let scheme of schemes">{{ scheme.name }}</option>
+    </select>
+</ng-template>
+
+<ng-template #labelTemplate>
+    <label
+        [for]="id"
+        [class.form-label]="useBootstrapStyles"
+        [class.color-scheme-label]="!useBootstrapStyles">
+        {{ label }}
+    </label>
+</ng-template>

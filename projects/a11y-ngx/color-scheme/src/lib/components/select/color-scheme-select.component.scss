@@ -1,0 +1,10 @@
+:host {
+    &:not([use-bs]) {
+        display: inline-flex;
+        flex-direction: column;
+
+        .color-scheme-select {
+            padding: 3px 20px 3px 5px;
+        }
+    }
+}
