@@ -454,7 +454,7 @@ A simple dropdown selector to allow the user to choose between any of the basic,
 </a11y-color-scheme-select>
 ```
 
-![""](src/lib/images/example-select-default-light.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/fd4c7b35a5124c0aa72c4b6dcd8cb45695c93a9b/projects/a11y-ngx/color-scheme/src/lib/images/example-select-default-light.jpg)
 
 #### Dropdown Selector - Custom Label
 
@@ -465,7 +465,7 @@ For this example, two new Color Schemes were added using [the Global Config New 
 </a11y-color-scheme-select>
 ```
 
-![""](src/lib/images/example-select-custom-light.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/fd4c7b35a5124c0aa72c4b6dcd8cb45695c93a9b/projects/a11y-ngx/color-scheme/src/lib/images/example-select-custom-light.jpg)
 
 #### Dropdown Selector - Using Bootstrap
 
@@ -476,7 +476,7 @@ For this example, two new Color Schemes were added using [the Global Config New 
 </a11y-color-scheme-select>
 ```
 
-![""](src/lib/images/example-select-custom-bs-light.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/fd4c7b35a5124c0aa72c4b6dcd8cb45695c93a9b/projects/a11y-ngx/color-scheme/src/lib/images/example-select-custom-bs-light.jpg)
 
 ### The Component: Checkbox
 
@@ -497,14 +497,14 @@ A simple checkbox to allow the user to choose between `light` or `dark` schemes.
 </a11y-color-scheme-checkbox>
 ```
 
-![""](src/lib/images/example-checkbox-default-light.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/fd4c7b35a5124c0aa72c4b6dcd8cb45695c93a9b/projects/a11y-ngx/color-scheme/src/lib/images/example-checkbox-default-light.jpg)
 
 ```html
 <a11y-color-scheme-checkbox [disabled]="true">
 </a11y-color-scheme-checkbox>
 ```
 
-![""](src/lib/images/example-checkbox-default-disabled-light.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/fd4c7b35a5124c0aa72c4b6dcd8cb45695c93a9b/projects/a11y-ngx/color-scheme/src/lib/images/example-checkbox-default-disabled-light.jpg)
 
 #### Checkbox - Using Bootstrap
 
@@ -513,7 +513,7 @@ A simple checkbox to allow the user to choose between `light` or `dark` schemes.
 </a11y-color-scheme-checkbox>
 ```
 
-![""](src/lib/images/example-checkbox-default-bs-light.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/fd4c7b35a5124c0aa72c4b6dcd8cb45695c93a9b/projects/a11y-ngx/color-scheme/src/lib/images/example-checkbox-default-bs-light.jpg)
 
 ## Examples
 
@@ -654,7 +654,7 @@ A11yColorSchemeModule.rootConfig({
 </a11y-color-scheme-select>
 ```
 
-![""](src/lib/images/example-select-spanish-light.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/fd4c7b35a5124c0aa72c4b6dcd8cb45695c93a9b/projects/a11y-ngx/color-scheme/src/lib/images/example-select-spanish-light.jpg)
 
 ### The New Schemes Example
 
