@@ -1,0 +1,39 @@
+{
+    "name": "@a11y-ngx/dom-helper",
+    "version": "1.0.0",
+    "description": "Another set of tools to validate DOM stuff",
+    "keywords": [
+        "angular",
+        "service",
+        "DOM",
+        "interactive",
+        "visible",
+        "hidden",
+        "attribute",
+        "tabbable",
+        "focusable",
+        "styles",
+        "aria-hidden",
+        "inert",
+        "numeric",
+        "boolean"
+    ],
+    "homepage": "https://github.com/LDV2k3/a11y-libraries/tree/master/projects/a11y-ngx/dom-helper#readme",
+    "bugs": {
+        "url": "https://github.com/LDV2k3/a11y-libraries/issues",
+        "email": "lucho.development@gmail.com"
+    },
+    "license": "MIT",
+    "author": {
+        "name": "Luciano Del Vacchio",
+        "email": "lucho.development@gmail.com",
+        "url": "https://github.com/LDV2k3/"
+    },
+    "peerDependencies": {
+        "@angular/common": "^12.2.0",
+        "@angular/core": "^12.2.0"
+    },
+    "dependencies": {
+        "tslib": "^1.10.0"
+    }
+}
