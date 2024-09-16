@@ -20,7 +20,7 @@ export class TabCycleDirective {
 
     @Input()
     get tabindex(): string | number {
-        return this.originalTabIndex ?? this.customTabIndex;
+        return this.originalTabIndex ?? this.customTabIndex ?? '-1';
     }
     set tabindex(tabindex: string | number) {
         this.originalTabIndex = String(this.DOMHelper.getNumericValue(tabindex) ?? '-1');
