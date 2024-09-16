@@ -1,6 +1,6 @@
 {
     "name": "@a11y-ngx/tab-cycle",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "An Angular directive to allow focus trap within a DOM element",
     "keywords": ["tab", "cycle", "focus", "trap", "tabindex", "a11y", "accessibility", "angular", "directive"],
     "homepage": "https://github.com/LDV2k3/a11y-libraries/tree/master/projects/a11y-ngx/tab-cycle#readme",

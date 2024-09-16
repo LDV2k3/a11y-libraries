@@ -47,8 +47,8 @@ describe('Tab Cycle Directive', () => {
     }));
 
     afterAll(() => {
-        /* fixture.nativeElement.remove();
-        fixture.destroy(); */
+        fixture.nativeElement.remove();
+        fixture.destroy();
     });
 
     it('should create', () => {
@@ -57,7 +57,7 @@ describe('Tab Cycle Directive', () => {
     });
 
     it('should check for enabled directives', () => {
-        const directivesEnabled: number = component.directives.filter((directive) => directive.isEnabled).length;
+        const directivesEnabled: number = component.directives.filter((directive) => directive.enabled).length;
         expect(directivesEnabled).toBe(4);
     });
 
@@ -73,7 +73,7 @@ describe('Tab Cycle Directive', () => {
         it('should check the "tabindex" attribute from the getter has the right value', () => {
             expect(getDirective(0).tabindex).toBe('-1');
             expect(getDirective(1).tabindex).toBe('-1');
-            expect(getDirective(2).tabindex).toBeNull();
+            expect(getDirective(2).tabindex).toBe('-1');
             expect(getDirective(3).tabindex).toBe('-1');
             expect(getDirective(4).tabindex).toBe('0');
         });
@@ -97,19 +97,19 @@ describe('Tab Cycle Directive', () => {
 
     describe('Check the Enable/Disable', () => {
         it('should update the attributes accordingly', () => {
-            expect(getDirective(1).isEnabled).toBeTrue();
+            expect(getDirective(1).enabled).toBeTrue();
 
-            getDirective(1).a11yTabCycle = false;
+            getDirective(1).enabled = false;
 
-            expect(getDirective(1).isEnabled).toBeFalse();
+            expect(getDirective(1).enabled).toBeFalse();
 
             expect(getDivElement(1).getAttribute('tabindex')).toBeNull();
             expect(getDivElement(1).getAttribute('role')).toBeNull();
             expect(getDivElement(1).getAttribute('aria-modal')).toBeNull();
 
-            getDirective(1).a11yTabCycle = true;
+            getDirective(1).enabled = true;
 
-            expect(getDirective(1).isEnabled).toBeTrue();
+            expect(getDirective(1).enabled).toBeTrue();
 
             expect(getDivElement(1).getAttribute('tabindex')).toBe('-1');
             expect(getDivElement(1).getAttribute('role')).toBe('dialog');
@@ -120,13 +120,13 @@ describe('Tab Cycle Directive', () => {
             expect(getDirective(4).tabindex).toBe('0');
             expect(getDivElement(4).getAttribute('tabindex')).toBe('0');
 
-            getDirective(4).a11yTabCycle = false;
+            getDirective(4).enabled = false;
 
             expect(getDivElement(4).getAttribute('tabindex')).toBe('0');
             expect(getDivElement(4).getAttribute('role')).toBeNull();
             expect(getDivElement(4).getAttribute('aria-modal')).toBeNull();
 
-            getDirective(4).a11yTabCycle = true;
+            getDirective(4).enabled = true;
 
             expect(getDivElement(4).getAttribute('tabindex')).toBe('0');
             expect(getDivElement(4).getAttribute('role')).toBe('dialog');

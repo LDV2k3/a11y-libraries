@@ -33,7 +33,7 @@ import { A11yTabCycleModule } from '@a11y-ngx/tab-cycle';
     declarations: [...],
     imports: [
         ...
-        A11yTabCycleModule
+        A11yTabCycleModule,
     ]
 })
 export class AppModule { }
@@ -63,19 +63,24 @@ By using the `a11yTabCycle` directive on any HTML element, it will create a focu
 
 | Name | Type | Of Type | Description |
 |:-----|:-----|:--------|:------------|
-| `a11yTabCycle` | `set` | `string` or `boolean` | See [how to set On or Off the Tab-Cycle](#set-on-or-off-the-tab-cycle) |
+| `enabled` | `get`/`set` | `string` or `boolean` | See [how to set On or Off the Tab-Cycle](#set-on-or-off-the-tab-cycle) |
 | `tabindex` | `get`/`set` | `string` or `number` | To specify a custom tabindex value |
 | `nativeElement` | `get` | `HTMLElement` | The host element |
-| `isEnabled` | `get` | `boolean` | If the Tab-Cycle is enabled or not |
 | `tabbableElements` | `get` | `HTMLElement[]` | See [the tabbable elements](#the-tabbable-elements) |
 | `manageKeyDown()` | `method` | `void` | It handles the main logic of the tab-cycle |
 | `focus()` | `method` | `void` | See [how to set the initial focus](#set-initial-focus) |
 
 ### Set On or Off the Tab-Cycle
 
-Given `a11yTabCycle` is the main attribute entry of the directive, by its single presence, it will be considered as an empty `string` and, therefor, it enables the tab-cycle.
+Given `a11yTabCycle` is the main attribute entry of the directive, by its single presence, it will be considered as a `string` (empty in this case) and, therefor, it enables the tab-cycle.
 
 It can also be established by using a `boolean` if you need to enable/disable on demand.
+
+```html
+<div a11yTabCycle></div>            <!-- Enabled (empty string) -->
+<div a11yTabCycle="false"></div>    <!-- Enabled (string) -->
+<div [a11yTabCycle]="false"></div>  <!-- Disabled (boolean) -->
+```
 
 ### Set Initial Focus
 

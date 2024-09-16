@@ -12,7 +12,11 @@ import { TabCycleFirstFocus } from './tab-cycle.type';
     exportAs: 'a11yTabCycle',
 })
 export class TabCycleDirective {
-    @Input() set a11yTabCycle(enabled: string | boolean) {
+    @Input('a11yTabCycle')
+    get enabled(): boolean {
+        return this.tabCycleEnabled;
+    }
+    set enabled(enabled: string | boolean) {
         this.tabCycleEnabled = typeof enabled === 'string' || enabled === true;
         this.setModalAttr();
         this.setTabIndexAttr();
@@ -92,14 +96,6 @@ export class TabCycleDirective {
      */
     get nativeElement(): HTMLElement {
         return this.hostElement?.nativeElement;
-    }
-
-    /**
-     * @description
-     * If the Tab-Cycle is enabled or not.
-     */
-    get isEnabled(): boolean {
-        return this.tabCycleEnabled;
     }
 
     constructor(private hostElement: ElementRef, private DOMHelper: DOMHelperService) {}
