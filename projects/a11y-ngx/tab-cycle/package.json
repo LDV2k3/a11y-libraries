@@ -1,0 +1,25 @@
+{
+    "name": "@a11y-ngx/tab-cycle",
+    "version": "1.0.0",
+    "description": "An Angular directive to allow focus trap within a DOM element",
+    "keywords": ["tab", "cycle", "focus", "trap", "tabindex", "a11y", "accessibility", "angular", "directive"],
+    "homepage": "https://github.com/LDV2k3/a11y-libraries/tree/master/projects/a11y-ngx/tab-cycle#readme",
+    "bugs": {
+        "url": "https://github.com/LDV2k3/a11y-libraries/issues",
+        "email": "lucho.development@gmail.com"
+    },
+    "license": "MIT",
+    "author": {
+        "name": "Luciano Del Vacchio",
+        "email": "lucho.development@gmail.com",
+        "url": "https://github.com/LDV2k3/"
+    },
+    "peerDependencies": {
+        "@angular/common": "^12.2.0",
+        "@angular/core": "^12.2.0"
+    },
+    "dependencies": {
+        "tslib": "^1.10.0",
+        "@a11y-ngx/dom-helper": ">=1.0.0"
+    }
+}
