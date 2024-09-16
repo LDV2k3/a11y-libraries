@@ -10,7 +10,7 @@ This library was generated with [Angular CLI](https://github.com/angular/angular
 
    `npm install @a11y-ngx/window-resize --save`
 
-2. Import `A11yWindowResizeModule` into your module:
+2. Import `A11yWindowResizeModule` into your module or standalone component:
 
 ```typescript
 import { A11yWindowResizeModule } from '@a11y-ngx/window-resize';

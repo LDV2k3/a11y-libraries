@@ -58,7 +58,7 @@ This library was generated with [Angular CLI](https://github.com/angular/angular
 
    `npm install @a11y-ngx/color-scheme --save`
 
-2. Import `A11yColorSchemeModule` into your module:
+2. Import `A11yColorSchemeModule` into your module or standalone component:
 
 ```typescript
 import { A11yColorSchemeModule } from '@a11y-ngx/color-scheme';

@@ -12,7 +12,7 @@ This library was generated with [Angular CLI](https://github.com/angular/angular
 
    `npm install @a11y-ngx/responsive-image-maps --save`
 
-2. Import `A11yResponsiveImageMapsModule` into your module:
+2. Import `A11yResponsiveImageMapsModule` into your module or standalone component:
 
 ```typescript
 import { A11yResponsiveImageMapsModule } from '@a11y-ngx/responsive-image-maps';

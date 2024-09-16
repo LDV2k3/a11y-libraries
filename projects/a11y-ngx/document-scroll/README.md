@@ -10,7 +10,7 @@ This library was generated with [Angular CLI](https://github.com/angular/angular
 
    `npm install @a11y-ngx/document-scroll --save`
 
-2. Import `A11yDocumentScrollModule` into your module:
+2. Import `A11yDocumentScrollModule` into your module or standalone component:
 
 ```typescript
 import { A11yDocumentScrollModule } from '@a11y-ngx/document-scroll';

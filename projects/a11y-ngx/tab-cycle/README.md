@@ -170,6 +170,6 @@ export class MyComponent {
 
 **Result:**
 
-![""](src/lib/images/example-modal.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/master/projects/a11y-ngx/tab-cycle/src/lib/images/example-modal.jpg)
 
-![""](src/lib/images/example-modal-open.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/master/projects/a11y-ngx/tab-cycle/src/lib/images/example-modal-open.jpg)
