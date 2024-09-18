@@ -1,8 +1,8 @@
 {
     "name": "@a11y-ngx/document-scroll",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "A document scroll listener service",
-    "keywords": ["document", "scroll", "service"],
+    "keywords": ["document", "scroll", "service", "angular"],
     "homepage": "https://github.com/LDV2k3/a11y-libraries/tree/master/projects/a11y-ngx/document-scroll#readme",
     "bugs": {
         "url": "https://github.com/LDV2k3/a11y-libraries/issues",

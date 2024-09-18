@@ -1,6 +1,6 @@
 # Document Scroll
 
-A simple document scroll listener service.
+A simple document scroll listener singleton service.
 
 This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0.
 
@@ -10,19 +10,12 @@ This library was generated with [Angular CLI](https://github.com/angular/angular
 
    `npm install @a11y-ngx/document-scroll --save`
 
-2. Import `A11yDocumentScrollModule` into your module or standalone component:
+2. Import `DocumentScrollService` into your typescript file:
 
 ```typescript
-import { A11yDocumentScrollModule } from '@a11y-ngx/document-scroll';
+import { DocumentScrollService } from '@a11y-ngx/document-scroll';
 
-@NgModule({
-    declarations: [...],
-    imports: [
-        ...
-        A11yDocumentScrollModule
-    ]
-})
-export class AppModule { }
+constructor(private documentScroll: DocumentScrollService) {}
 ```
 
 ## Use
@@ -34,12 +27,14 @@ import { DocumentScrollService, DocumentScroll } from '@a11y-ngx/document-scroll
 import { debounceTime } from 'rxjs/operators';
 ...
 @Directive({ selector: '[...]' })
-export class MyDirective {
+export class MyDirective implements OnDestroy {
+    private readonly destroy$: Subject<void> = new Subject<void>();
+
     constructor(
         private documentScroll: DocumentScrollService
     ) {
         this.documentScroll.event
-            .pipe(debounceTime(100))
+            .pipe(debounceTime(100), takeUntil(this.destroy$))
             .subscribe((scroll: DocumentScroll) => this.stickyHeader(scroll));
     }
 
@@ -47,6 +42,11 @@ export class MyDirective {
         const documentX: scroll.x;
         const documentY: scroll.y;
         ...
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }
 ```

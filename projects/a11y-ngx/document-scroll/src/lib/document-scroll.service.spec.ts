@@ -7,7 +7,7 @@ describe('Document Scroll Service', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            providers: [DocumentScrollService]
+            providers: [DocumentScrollService],
         });
         service = TestBed.inject(DocumentScrollService);
     });
