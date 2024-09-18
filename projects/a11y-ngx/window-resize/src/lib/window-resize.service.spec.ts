@@ -11,7 +11,7 @@ describe('Window Resize Service', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            providers: [WindowResizeService]
+            providers: [WindowResizeService],
         });
         service = TestBed.inject(WindowResizeService);
     });

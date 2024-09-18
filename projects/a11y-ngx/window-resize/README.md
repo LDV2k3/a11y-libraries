@@ -1,6 +1,6 @@
 # Window Resize
 
-A simple window resize listener service.
+A simple window resize listener singleton service.
 
 This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0.
 
@@ -10,19 +10,12 @@ This library was generated with [Angular CLI](https://github.com/angular/angular
 
    `npm install @a11y-ngx/window-resize --save`
 
-2. Import `A11yWindowResizeModule` into your module or standalone component:
+2. Import `WindowResizeService` into your typescript file:
 
 ```typescript
-import { A11yWindowResizeModule } from '@a11y-ngx/window-resize';
+import { WindowResizeService } from '@a11y-ngx/window-resize';
 
-@NgModule({
-    declarations: [...],
-    imports: [
-        ...
-        A11yWindowResizeModule
-    ]
-})
-export class AppModule { }
+constructor(private resizeService: WindowResizeService) {}
 ```
 
 ## Use
@@ -34,12 +27,14 @@ import { WindowResizeService, WindowResize } from '@a11y-ngx/window-resize';
 import { debounceTime } from 'rxjs/operators';
 ...
 @Directive({ selector: '[...]' })
-export class MyDirective {
+export class MyDirective implements OnDestroy {
+    private readonly destroy$: Subject<void> = new Subject<void>();
+
     constructor(
         private resizeService: WindowResizeService
     ) {
         this.resizeService.event
-            .pipe(debounceTime(100))
+            .pipe(debounceTime(100), takeUntil(this.destroy$))
             .subscribe((windowSize: WindowResize) => this.updateSize(windowSize));
     }
 
@@ -47,6 +42,11 @@ export class MyDirective {
         const windowWidth: windowSize.width;
         const windowHeight: windowSize.height;
         ...
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }
 ```

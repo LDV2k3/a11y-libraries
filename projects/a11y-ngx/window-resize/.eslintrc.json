@@ -1,0 +1,38 @@
+{
+    "extends": "../../../.eslintrc.json",
+    "ignorePatterns": ["!**/*"],
+    "overrides": [
+        {
+            "files": ["*.ts"],
+            "parserOptions": {
+                "project": [
+                    "projects/a11y-ngx/window-resize/tsconfig.lib.json",
+                    "projects/a11y-ngx/window-resize/tsconfig.spec.json"
+                ],
+                "createDefaultProgram": true
+            },
+            "rules": {
+                "@angular-eslint/directive-selector": [
+                    "error",
+                    {
+                        "type": "attribute",
+                        "prefix": "a11y",
+                        "style": "camelCase"
+                    }
+                ],
+                "@angular-eslint/component-selector": [
+                    "error",
+                    {
+                        "type": "element",
+                        "prefix": "a11y",
+                        "style": "kebab-case"
+                    }
+                ]
+            }
+        },
+        {
+            "files": ["*.html"],
+            "rules": {}
+        }
+    ]
+}
