@@ -1,60 +1,77 @@
 # Responsive Image Maps
 
-A responsive image map directive that updates the areas' coordinates according to the image size.
+A responsive image map Angular directive that updates the areas' coordinates according to the image size.
 
-> ⚠️ **IMPORTANT:** Currently `rect` and `circle` shapes are supported, `poly` will be supported in future releases.
+It will manage all shapes (`rect`, `circle` and `poly`).
 
 This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0.
+
+## Index
+
+- [Installation](#installation)
+- [Use](#use)
+  - [The Map Directive](#the-map-directive)
+    - [The Map public Properties, Getters and Methods](#map-directive-public-properties-getters-and-methods)
+    - [The MapSize Type](#the-mapsize-type)
+  - [The Area Directive](#the-area-directive)
+    - [The Area public Properties, Getters and Methods](#area-directive-public-properties-getters-and-methods)
+    - [The AreaSize Type](#the-areasize-type)
+- [Working Example](#working-example)
 
 ## Installation
 
 1. Install npm package:
 
-   `npm install @a11y-ngx/responsive-image-maps --save`
+    `npm install @a11y-ngx/responsive-image-maps --save`
 
 2. Import `A11yResponsiveImageMapsModule` into your module or standalone component:
 
-```typescript
-import { A11yResponsiveImageMapsModule } from '@a11y-ngx/responsive-image-maps';
+    ```typescript
+    import { A11yResponsiveImageMapsModule } from '@a11y-ngx/responsive-image-maps';
 
-@NgModule({
-    declarations: [...],
-    imports: [
-        ...
-        A11yResponsiveImageMapsModule
-    ]
-})
-export class AppModule { }
-```
+    @NgModule({
+        declarations: [...],
+        imports: [
+            ...
+            A11yResponsiveImageMapsModule,
+        ],
+    })
+    export class AppModule { }
+    ```
 
 ## Use
 
-Create an image map.
+Add an image with a map in your template.
 
 ### The Map Directive
 
 - The Map directive will pick any `<map>` tag with `[name]` attribute in it and search for the `<img>` with `[usemap]` matching that name.
-- When the main `<img>` resize, all `<area>` elements will update their coordinates based on the new image size.
-- The directive can be accessed using a template variable with `responsiveImageMap`.
-- The directive will auto update sizes when the page resize (using [Window Resize Service](https://www.npmjs.com/package/@a11y-ngx/window-resize)).
-- If the image changes size (through window resize), `(sizeChanged)` output will emit the new `MapSize`.
-- If the image changes size (programmatically), sizes can be manually updated using the `update()` method from the exported directive.
+- When the image has been loaded for the first time, it will:
+  - Update `loaded` with `true`.
+  - Emit `sizeChanged`.
+- When the main `<img>` resizes, all `<area>` elements will update their coordinates based on the new image size.
+- The directive can be accessed using a template variable through the exported name of `responsiveImageMap`.
+- The directive will auto update sizes when the page resizes (using [Window Resize Service](https://www.npmjs.com/package/@a11y-ngx/window-resize)).
+- If the image changes its size:
+  - Through window resize, `(sizeChanged)` output will emit the new `MapSize`.
+  - Pogrammatically, the sizes (image and areas) can be manually updated using the `update()` method from the exported directive.
 - The HTML `<map>` element can be reached through the `nativeElement` property.
+- The HTML `<img>` element can be reached through the `imageElement` property.
 
 #### Map Directive public Properties, Getters and Methods
 
 | Property | Type | Returns | Description |
 |:---------|:-----|:--------|:------------|
-| `loaded` | `BehaviorSubject` | `boolean` | Will return `true` when the image has loaded |
-| `sizeChanged` | `EventEmitter` | [`MapSize`](#the-mapsize-interface) | Will emit the new image's size & position when page resize and it changes the width and height values |
+| `loaded` | `BehaviorSubject` | `boolean` | Will return `true` when the image has been loaded |
+| `sizeChanged` | `EventEmitter` | [`MapSize`](#the-mapsize-type) | Will emit the new image's size & position when page resize and it changes the width and height values |
 | `areas` | `QueryList` | `ResponsiveImageAreaDirective` | To access all `<area>` children directives |
-| `scaleFactor` | `getter` | `{ width: number, height: number }` | The scale factor from the image's original full size and the resized size |
-| `imageSize` | [`MapSize`](#the-mapsize-interface) | `object` | To access all the values (size & position) from the main image |
-| `nativeElement` | `getter` | `HTMLMapElement` | To access the HTML `<map>` element |
-| `imageElement` | `getter` | `HTMLImageElement` | To access the HTML `<img>` element that the `<map>` is attached to |
+| `scaleFactor` | `get` | `{ width: number, height: number }` | The scale factor from the image's original full size and the resized size |
+| `imageSize` | [`MapSize`](#the-mapsize-type) | `object` | To access all the values (size & position) from the main image |
+| `nativeElement` | `get` | `HTMLMapElement` | To access the HTML `<map>` element |
+| `imageElement` | `get` | `HTMLImageElement` | To access the HTML `<img>` element that the `<map>` is attached to |
 | `update()` | `method` | `void` | Will update the image new values and all the `<area>`'s new coordinates accordingly |
 
-#### The MapSize Interface
+#### The MapSize Type
 
 | Property | Type | Description |
 |:---------|:----:|:------------|
@@ -67,28 +84,30 @@ Create an image map.
 
 ### The Area Directive
 
-- The Area directive will pick any `<area>` tag with `[shape]` attribute of value `"rect"` or `"circle"`.
+- The Area directive will pick any `<area>` tag with `[shape]` and `[coords]` attributes.
 - This directive will manage the area size (either relative to the image or to the viewport).
-- These directives can be accessed from the [Map directive](#the-map-directive) through the `areas` property, which will return a `QueryList<ResponsiveImageAreaDirective>`.
+- Each directive can be accessed:
+  - Using a template variable through the exported name of `responsiveImageArea`.
+  - From the [Map directive](#the-map-directive) through the `areas` property, which will return a `QueryList<ResponsiveImageAreaDirective>`.
 - The HTML `<area>` element can be reached through the `nativeElement` property.
 
 #### Area Directive public Properties, Getters and Methods
 
 | Property | Type | Returns | Description |
 |:---------|:-----|:--------|:------------|
-| `areaSize` | [`AreaSize`](#the-areasize-interface) | `object` | To access all the values (size & position) from the area (relative to the image) |
-| `nativeElement` | `getter` | `HTMLAreaElement` | To access the HTML `<area>` element |
+| `areaSize` | [`AreaSize`](#the-areasize-type) | `object` | To access all the values (size & position) from the area (relative to the image) |
+| `nativeElement` | `get` | `HTMLAreaElement` | To access the HTML `<area>` element |
 | `getBoundingClientRect()` | `method` | `DOMRect` | To get the calculated position of the `<area>` element (relative to the viewport) |
 | `updateCoords()` | `method` | `void` | Will update the `[coords]` attribute based on the image size. _(**NOTE:** there's no need to trigger this manually, the map directive will update when needed)_ |
 
-#### The AreaSize Interface
+#### The AreaSize Type
 
 | Property | Type | Description |
 |:---------|:----:|:------------|
 | `top` | `number` | The area's (relative to image) top value |
 | `left` | `number` | The area's (relative to image) left value |
-| `width` | `number` | The area's (relative to image) width value |
-| `height` | `number` | The area's (relative to image) height value |
+| `width` | `number` | The area's width value |
+| `height` | `number` | The area's height value |
 
 ## Working Example
 

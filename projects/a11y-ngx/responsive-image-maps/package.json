@@ -1,8 +1,8 @@
 {
     "name": "@a11y-ngx/responsive-image-maps",
-    "version": "1.0.5",
+    "version": "1.1.0",
     "description": "A responsive image map directive that updates the areas' coordinates according to the image size",
-    "keywords": ["responsive", "image", "map", "areas", "size", "directive"],
+    "keywords": ["responsive", "image", "map", "areas", "size", "rect", "circle", "poly", "polygon", "directive", "angular"],
     "homepage": "https://github.com/LDV2k3/a11y-libraries/tree/master/projects/a11y-ngx/responsive-image-maps#readme",
     "bugs": {
         "url": "https://github.com/LDV2k3/a11y-libraries/issues",
@@ -20,6 +20,6 @@
     },
     "dependencies": {
         "tslib": "^1.10.0",
-        "@a11y-ngx/window-resize": ">=1.0.2"
+        "@a11y-ngx/window-resize": ">=1.0.3"
     }
 }

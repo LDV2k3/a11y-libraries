@@ -9,7 +9,5 @@
             "@a11y-ngx/window-resize": "a11yNGx.windowResize"
         }
     },
-    "allowedNonPeerDependencies": [
-        "@a11y-ngx/window-resize"
-    ]
+    "allowedNonPeerDependencies": ["@a11y-ngx/window-resize"]
 }

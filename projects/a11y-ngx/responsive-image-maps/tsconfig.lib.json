@@ -1,6 +1,15 @@
 {
     "extends": "../../../tsconfig.json",
     "compilerOptions": {
+        "strict": true,
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "strictFunctionTypes": true,
+        "strictPropertyInitialization": true,
+        "strictBindCallApply": true,
+        "noImplicitThis": true,
+        "alwaysStrict": true,
+
         "outDir": "../../../out-tsc/lib",
         "target": "es2015",
         "declaration": true,
