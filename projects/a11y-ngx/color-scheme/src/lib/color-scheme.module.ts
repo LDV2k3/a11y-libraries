@@ -6,14 +6,17 @@ import { ColorSchemeSelectComponent } from './components/select/color-scheme-sel
 import { ColorSchemeCheckboxComponent } from './components/checkbox/color-scheme-checkbox.component';
 
 import { ColorSchemeServiceRoot } from './color-scheme.service.root';
-import { formatConsoleMsg } from './color-scheme.service';
 
 import { ColorScheme, ColorSchemeConfig, ColorSchemeGlobalConfig } from './color-scheme.type';
+
+import { ERROR_ROOT_CONFIG_CALLED_MORE_THAN_ONCE } from './color-scheme.errors';
 
 const COLOR_SCHEME_ROOT_CONFIG_INJECTOR = new InjectionToken<ColorScheme | ColorSchemeGlobalConfig>(
     'A11y Color Scheme Root Config'
 );
-const COLOR_SCHEME_CUSTOM_CONFIG_INJECTOR = new InjectionToken<ColorSchemeConfig>('A11y Color Scheme Custom Configs');
+const COLOR_SCHEME_CUSTOM_CONFIG_INJECTOR = new InjectionToken<ColorSchemeConfig | ColorSchemeConfig[]>(
+    'A11y Color Scheme Custom Configs'
+);
 
 @NgModule({
     declarations: [ColorSchemeSelectComponent, ColorSchemeCheckboxComponent],
@@ -21,7 +24,10 @@ const COLOR_SCHEME_CUSTOM_CONFIG_INJECTOR = new InjectionToken<ColorSchemeConfig
     exports: [ColorSchemeSelectComponent, ColorSchemeCheckboxComponent],
 })
 export class A11yColorSchemeModule {
-    constructor(private dummyService: ColorSchemeDummyConfigService) {}
+    constructor(
+        private dummyServiceRoot: ColorSchemeDummyConfigRootService,
+        private dummyServiceCustom: ColorSchemeDummyConfigCustomService
+    ) {}
 
     static rootConfig(config: ColorScheme | ColorSchemeGlobalConfig): ModuleWithProviders<A11yColorSchemeModule> {
         return {
@@ -29,7 +35,7 @@ export class A11yColorSchemeModule {
             providers: [
                 { provide: COLOR_SCHEME_ROOT_CONFIG_INJECTOR, useValue: config },
                 {
-                    provide: ColorSchemeDummyConfigService,
+                    provide: ColorSchemeDummyConfigRootService,
                     useFactory: initColorSchemeRootConfigFactory,
                     deps: [ColorSchemeServiceRoot, COLOR_SCHEME_ROOT_CONFIG_INJECTOR],
                 },
@@ -43,7 +49,7 @@ export class A11yColorSchemeModule {
             providers: [
                 { provide: COLOR_SCHEME_CUSTOM_CONFIG_INJECTOR, useValue: config, multi: true },
                 {
-                    provide: ColorSchemeDummyConfigService,
+                    provide: ColorSchemeDummyConfigCustomService,
                     useFactory: initColorSchemeCustomConfigFactory,
                     deps: [ColorSchemeServiceRoot, COLOR_SCHEME_CUSTOM_CONFIG_INJECTOR],
                 },
@@ -53,20 +59,17 @@ export class A11yColorSchemeModule {
 }
 
 @Injectable({ providedIn: 'root' })
-class ColorSchemeDummyConfigService {}
+class ColorSchemeDummyConfigRootService {}
+
+@Injectable({ providedIn: 'root' })
+class ColorSchemeDummyConfigCustomService {}
 
 export function initColorSchemeRootConfigFactory(
     service: ColorSchemeServiceRoot,
     config: ColorScheme | ColorSchemeGlobalConfig
 ): void {
     if (service.isRootConfigAlreadyProvided) {
-        throw new Error(
-            formatConsoleMsg(`
-                A11y Color Scheme:
-                A11yColorSchemeModule.rootConfig() has been called more than once.
-                Please, use this method just one time at a root level to establish the global config for the Color Schemes used in your project.
-            `)
-        );
+        throw new Error(ERROR_ROOT_CONFIG_CALLED_MORE_THAN_ONCE());
     }
 
     service.initRootConfig(config);

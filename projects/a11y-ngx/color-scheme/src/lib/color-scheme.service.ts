@@ -2,6 +2,8 @@ import { Injectable, Inject, OnDestroy, Optional, SkipSelf } from '@angular/core
 import { DOCUMENT } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
 
+import { ERROR_SERVICE_PROVIDED_MORE_THAN_ONCE, ERROR_FORCED_SCHEME_SELECTOR_NOT_FOUND } from './color-scheme.errors';
+
 import {
     ColorScheme,
     ColorSchemeCSSMap,
@@ -133,14 +135,7 @@ export class ColorSchemeService implements OnDestroy {
         @Inject(DOCUMENT) private document: Document,
         @Optional() @SkipSelf() private parentService: ColorSchemeService
     ) {
-        if (this.parentService)
-            throw Error(
-                formatConsoleMsg(`
-                    A11y Color Scheme:
-                    ColorSchemeService is a singleton and has been provided more than once.
-                    Please remove the service from any 'providers' array you may have added it to.
-                `)
-            );
+        if (this.parentService) throw Error(ERROR_SERVICE_PROVIDED_MORE_THAN_ONCE('ColorSchemeService'));
 
         this.initColorSchemeDefaults();
         this.initColorScheme();
@@ -278,14 +273,14 @@ export class ColorSchemeService implements OnDestroy {
                         }
                     } else {
                         // If not forced scheme, it will search for each scheme and update the property within
-                        // a given scheme only (`applyToScheme`), or `light` by default and remove it from the rest.
+                        // a given scheme only (`applyToScheme`), or the current scheme by default and remove it from the rest.
                         Object.keys(currentConfigSchemes)
                             .filter((colorScheme: ColorScheme) => !applyToScheme || applyToScheme === colorScheme)
                             .forEach((colorScheme: ColorScheme) => {
                                 const scheme: ColorSchemeProperties | undefined = currentConfigSchemes[colorScheme];
                                 if (scheme) {
-                                    if (applyToScheme || colorScheme === 'light') {
-                                        // If there's a specific scheme to apply the value or, by default, apply it to `light`.
+                                    if (applyToScheme || colorScheme === this.colorScheme) {
+                                        // If there's a specific scheme to apply the value or, by default, apply it to current scheme.
                                         scheme[property] = propertyValue;
                                     } else {
                                         // If there's no specific scheme to apply, it will remove the property from the other schemes.
@@ -323,13 +318,7 @@ export class ColorSchemeService implements OnDestroy {
 
                     // Shows an error if a forced scheme was chosen to be used but it doesn't exist within the given config.
                     if (forceColorScheme && !['light', 'dark'].includes(forceColorScheme) && !schemesToUpdate.length) {
-                        console.error(
-                            formatConsoleMsg(`
-                                A11y Color Scheme:
-                                The chosen forced scheme '${forceColorScheme}' for the selector '${selector}' was not found in the schemes object within the given config.
-                                The 'light' scheme will be used instead as default.
-                            `)
-                        );
+                        console.error(ERROR_FORCED_SCHEME_SELECTOR_NOT_FOUND(forceColorScheme, selector));
                     }
 
                     // Updates the schemes.
@@ -481,6 +470,17 @@ export class ColorSchemeService implements OnDestroy {
         }
 
         (this.rootConfig.styles.schemes as ColorSchemes)[newScheme.value as ColorScheme] = newSchemeValues;
+    }
+
+    /**
+     * @description
+     * To check if a selector is already set within the configurations.
+     *
+     * @param { string } selector - The given selector
+     * @returns { boolean }
+     */
+    isSelectorInConfig(selector: string): boolean {
+        return selector in this.allConfigs;
     }
 
     /**
@@ -674,8 +674,8 @@ export class ColorSchemeService implements OnDestroy {
 
     /** @description Find the matching properties between the given updated config and the selector's config. */
     private findMatchingProperties(selector: string, properties: Record<string, unknown>): string[] {
-        return Object.keys(properties).filter((property: string) =>
-            Object.keys(this.getConfig(selector).stylesMap).includes(property)
+        return Object.keys(properties ?? {}).filter((property: string) =>
+            Object.keys(this.getConfig(selector).stylesMap ?? {}).includes(property)
         );
     }
 

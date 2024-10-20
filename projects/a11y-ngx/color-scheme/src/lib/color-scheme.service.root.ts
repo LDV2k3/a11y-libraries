@@ -1,6 +1,11 @@
 import { Injectable, Optional, SkipSelf } from '@angular/core';
 
-import { ColorSchemeService, formatConsoleMsg } from './color-scheme.service';
+import { ColorSchemeService } from './color-scheme.service';
+
+import {
+    ERROR_SERVICE_PROVIDED_MORE_THAN_ONCE,
+    ERROR_INIT_CUSTOM_CONFIG_SELECTOR_NOT_ALLOWED,
+} from './color-scheme.errors';
 
 import {
     ColorScheme,
@@ -26,14 +31,7 @@ export class ColorSchemeServiceRoot {
         private service: ColorSchemeService,
         @Optional() @SkipSelf() private parentService: ColorSchemeServiceRoot
     ) {
-        if (this.parentService)
-            throw Error(
-                formatConsoleMsg(`
-                    A11y Color Scheme:
-                    ColorSchemeServiceRoot is a singleton and has been provided more than once.
-                    Please remove the service from any 'providers' array you may have added it to.
-                `)
-            );
+        if (this.parentService) throw Error(ERROR_SERVICE_PROVIDED_MORE_THAN_ONCE('ColorSchemeServiceRoot'));
     }
 
     /**
@@ -94,13 +92,7 @@ export class ColorSchemeServiceRoot {
             ?.filter((userConfig: ColorSchemeConfig) => !this.customConfigsInitiated.includes(userConfig.selector))
             .forEach((userConfig: ColorSchemeConfig) => {
                 if (this.service.selectorNotAllowed(userConfig.selector)) {
-                    throw new Error(
-                        formatConsoleMsg(`
-                            A11y Color Scheme:
-                            You can not use 'root' or ':root' as a selector.
-                            Please choose another name for it.
-                        `)
-                    );
+                    throw new Error(ERROR_INIT_CUSTOM_CONFIG_SELECTOR_NOT_ALLOWED());
                 }
 
                 this.customConfigsInitiated.push(userConfig.selector);
