@@ -1,4 +1,4 @@
-import { formatConsoleMsg } from './color-scheme.service';
+const formatConsoleMsg = (msg: string): string => msg.replace(/ {2,}/g, '');
 
 const PROJECT_NAME: string = 'A11y Color Scheme';
 
@@ -34,6 +34,14 @@ export const ERROR_FORCED_SCHEME_SELECTOR_NOT_FOUND = (forceColorScheme: string,
         ${PROJECT_NAME}:
         The chosen forced scheme '${forceColorScheme}' for the selector '${selector}' was not found in the schemes object within the given config.
         The 'light' scheme will be used instead as default.
+    `;
+    return formatConsoleMsg(msg);
+};
+
+export const ERROR_EDIT_CONFIG_NOT_FOUND = (selector: string): string => {
+    const msg: string = `
+        ${PROJECT_NAME}:
+        You are trying to update a configuration for the selector '${selector}' that doesn't exist.
     `;
     return formatConsoleMsg(msg);
 };

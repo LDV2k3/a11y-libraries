@@ -1,37 +1,36 @@
 import {
     ColorSchemeConfig,
     ColorSchemeGlobalConfig,
-    ColorSchemeCSSMap,
     ColorSchemeItem,
+    ColorSchemeCSSMap,
     ColorSchemesObject,
+    ColorSchemeProperties,
 } from './color-scheme.type';
 
 export const COLOR_SCHEME_STYLE_CLASS: string = 'a11y-color-scheme-styles';
 export const COLOR_SCHEME_TAG_ID: string = 'a11y-color-scheme-root';
+export const COLOR_SCHEME_SELECTOR_MATCH: string = 'color-scheme';
+
+export enum SCHEME {
+    LIGHT = 'light',
+    DARK = 'dark',
+    AUTO = 'auto',
+}
 
 export const COLOR_SCHEME_GLOBAL_CONFIG_DEFAULT: Required<ColorSchemeGlobalConfig> = {
-    useScheme: 'light',
+    useScheme: SCHEME.AUTO,
     appendStylesMap: {},
     allowUserToChangeScheme: true,
-    attributeSelectorMatch: 'color-scheme',
+    attributeSelectorMatch: COLOR_SCHEME_SELECTOR_MATCH,
     newSchemes: [],
-    defaultNames: {},
+    defaults: {},
 };
 
 export const COLOR_SCHEME_ITEMS_DEFAULTS: ColorSchemeItem[] = [
-    { value: 'light', name: 'Light', scheme: {} },
-    { value: 'dark', name: 'Dark', scheme: {} },
-    { value: 'auto', name: 'Same as System', scheme: {} },
+    { value: SCHEME.LIGHT, name: 'Light', scheme: {} },
+    { value: SCHEME.DARK, name: 'Dark', scheme: {} },
+    { value: SCHEME.AUTO, name: 'Same as System', scheme: {} },
 ];
-
-export const COLOR_SCHEME_GENERICS: ColorSchemeStylesGenerics = {
-    a11yBackgroundColor: '',
-    a11yTextColor: '',
-    a11yBorderColor: '',
-    a11yShadow: '',
-    a11yShadowColor: '',
-    a11yFocusVisible: '',
-};
 
 export type ColorSchemeStylesGenerics = {
     a11yBackgroundColor: string;
@@ -76,12 +75,29 @@ export type ColorSchemeCSSProperty = {
     ignoreIfUsingBS?: boolean;
 };
 
-export type ColorSchemeDefaultNames = {
-    light?: string;
-    dark?: string;
-    auto?: string;
+export type ColorSchemeSchemeDefaults = Partial<ColorSchemeStylesGenerics> &
+    ColorSchemeSchemeDefaultName &
+    ColorSchemeProperties;
+
+export type ColorSchemeSchemeDefaultName = Partial<{
+    name: string;
+}>;
+
+export type ColorSchemeDefaults = Partial<{
+    generics: ColorSchemeProperties;
+    light: ColorSchemeSchemeDefaults;
+    dark: ColorSchemeSchemeDefaults;
+    auto: ColorSchemeSchemeDefaultName;
+}>;
+
+export type ColorSchemeCSS = {
+    [id: string]: string;
 };
 
 export type RecursivePartial<T> = {
     [P in keyof T]?: T[P] extends Record<string, unknown> ? RecursivePartial<T[P]> : T[P];
+};
+
+export type RecursiveReadonly<T> = {
+    readonly [P in keyof T]: T[P] extends Record<string, unknown> ? RecursiveReadonly<T[P]> : T[P];
 };

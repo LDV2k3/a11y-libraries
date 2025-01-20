@@ -7,14 +7,7 @@ import {
     ERROR_INIT_CUSTOM_CONFIG_SELECTOR_NOT_ALLOWED,
 } from './color-scheme.errors';
 
-import {
-    ColorScheme,
-    ColorSchemeCSSMap,
-    ColorSchemeConfig,
-    ColorSchemeGlobalConfig,
-    ColorSchemeItem,
-} from './color-scheme.type';
-import { COLOR_SCHEME_BASE_MAP, ColorSchemeDefaultNames } from './color-scheme.type.private';
+import { ColorScheme, ColorSchemeConfig, ColorSchemeGlobalConfig, ColorSchemeItemNew } from './color-scheme.type';
 
 @Injectable({ providedIn: 'root' })
 export class ColorSchemeServiceRoot {
@@ -22,7 +15,10 @@ export class ColorSchemeServiceRoot {
         return this.rootConfigAlreadyProvided;
     }
 
-    /** @description To block any possible repeated use of `A11yColorSchemeModule.rootConfig()` */
+    /**
+     * @description
+     * To block any possible repeated use of `A11yColorSchemeModule.rootConfig()`.
+     */
     private rootConfigAlreadyProvided: boolean = false;
 
     private readonly customConfigsInitiated: string[] = [];
@@ -42,43 +38,39 @@ export class ColorSchemeServiceRoot {
      */
     initRootConfig(userRootConfig: ColorScheme | ColorSchemeGlobalConfig): void {
         this.rootConfigAlreadyProvided = true;
-        let useScheme: ColorScheme | undefined;
 
         if (typeof userRootConfig === 'object') {
-            if ('useScheme' in userRootConfig) {
-                this.service.globalConfig.useScheme = userRootConfig.useScheme as string;
-                useScheme = userRootConfig.useScheme;
-            }
-            if ('defaultNames' in userRootConfig) {
-                const defaultNames = userRootConfig.defaultNames as ColorSchemeDefaultNames;
-                this.service.globalConfig.defaultNames = defaultNames;
+            const {
+                useScheme,
+                allowUserToChangeScheme,
+                attributeSelectorMatch,
+                appendStylesMap,
+                newSchemes,
+                defaults,
+            } = userRootConfig;
 
-                Object.keys(defaultNames).forEach((defaultName: string) => {
-                    const name: string | undefined = defaultNames[defaultName as keyof ColorSchemeDefaultNames]?.trim();
-                    const item: ColorSchemeItem | undefined = this.service.colorSchemes.find(
-                        (scheme) => scheme.value === defaultName
-                    );
-                    if (name?.length && item) item.name = name;
-                });
-            }
-            if ('allowUserToChangeScheme' in userRootConfig)
-                this.service.globalConfig.allowUserToChangeScheme = userRootConfig.allowUserToChangeScheme as boolean;
-            if ('newSchemes' in userRootConfig)
-                this.service.globalConfig.newSchemes = userRootConfig.newSchemes as ColorSchemeItem[];
-            if ('appendStylesMap' in userRootConfig)
-                this.service.globalConfig.appendStylesMap = userRootConfig.appendStylesMap as ColorSchemeCSSMap;
-            if ('attributeSelectorMatch' in userRootConfig)
-                this.service.globalConfig.attributeSelectorMatch = userRootConfig.attributeSelectorMatch as string;
+            if (useScheme !== undefined) this.service.globalConfig.useScheme = useScheme;
 
-            userRootConfig.newSchemes?.forEach((newScheme: ColorSchemeItem) => this.service.newScheme(newScheme));
+            if (typeof allowUserToChangeScheme === 'boolean')
+                this.service.globalConfig.allowUserToChangeScheme = allowUserToChangeScheme;
 
-            this.service.rootConfig.stylesMap = { ...userRootConfig.appendStylesMap, ...COLOR_SCHEME_BASE_MAP };
+            if (attributeSelectorMatch !== undefined)
+                this.service.globalConfig.attributeSelectorMatch = attributeSelectorMatch;
+
+            if (appendStylesMap !== undefined)
+                this.service.rootConfig.stylesMap = {
+                    ...appendStylesMap,
+                    ...this.service.rootConfig.stylesMap,
+                };
+
+            newSchemes?.forEach((newScheme: ColorSchemeItemNew) => this.service.newScheme(newScheme));
+
+            if (defaults && Object.keys(defaults ?? {}).length) this.service.updateColorSchemeDefaults(defaults);
         } else {
             this.service.globalConfig.useScheme = userRootConfig;
-            useScheme = userRootConfig;
         }
 
-        this.service.initColorScheme(useScheme);
+        this.service.initColorScheme();
     }
 
     /**
@@ -89,7 +81,7 @@ export class ColorSchemeServiceRoot {
      */
     initCustomConfigs(userCustomConfigs: ColorSchemeConfig[]): void {
         userCustomConfigs
-            ?.filter((userConfig: ColorSchemeConfig) => !this.customConfigsInitiated.includes(userConfig.selector))
+            ?.filter(({ selector }: ColorSchemeConfig) => !this.customConfigsInitiated.includes(selector))
             .forEach((userConfig: ColorSchemeConfig) => {
                 if (this.service.selectorNotAllowed(userConfig.selector)) {
                     throw new Error(ERROR_INIT_CUSTOM_CONFIG_SELECTOR_NOT_ALLOWED());

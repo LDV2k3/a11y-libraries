@@ -1,11 +1,13 @@
 import {
+    SCHEME,
     RecursivePartial,
     ColorSchemeCSSType,
     ColorSchemeCSSProperty,
-    ColorSchemeDefaultNames,
+    ColorSchemeDefaults,
+    ColorSchemeStylesGenerics,
 } from './color-scheme.type.private';
 
-export type ColorScheme = 'light' | 'dark' | 'auto' | string;
+export type ColorScheme = `${SCHEME}` | string;
 
 export const COLOR_SCHEME_GENERICS_DEFAULTS: ColorSchemeProperties = {
     a11yShadow: '5px 5px 10px -5px',
@@ -22,9 +24,9 @@ export const COLOR_SCHEME_DEFAULTS: ColorSchemes = {
     dark: {
         a11yBackgroundColor: 'rgb(31 31 31 / 98%)',
         a11yTextColor: '#FFF',
-        a11yBorderColor: '#555',
+        a11yBorderColor: '#666',
         a11yShadowColor: '#444',
-        a11yFocusVisible: '0 0 0 2px #555, 0 0 0 4px #FFF',
+        a11yFocusVisible: '0 0 0 2px #FFF, 0 0 0 4px #666',
     },
 };
 
@@ -46,9 +48,7 @@ export type ColorSchemes = {
     [customScheme: string]: ColorSchemeProperties | undefined;
 };
 
-export type ColorSchemeProperties = {
-    [property: string]: ColorSchemeCSSType;
-};
+export type ColorSchemeProperties = Record<string, ColorSchemeCSSType>;
 
 export type ColorSchemesStyles = ColorSchemeProperties | RecursivePartial<ColorSchemesObject>;
 
@@ -71,20 +71,20 @@ export type ColorSchemesObject = {
 };
 
 export type ColorSchemeGlobalConfig = {
-    /** @description To set which Color Scheme to be used. @default 'light' */
+    /** @description To set which Color Scheme to be used. @default 'auto' */
     useScheme?: ColorScheme;
     /** @description To allow the user to change the Color Scheme. @default true */
     allowUserToChangeScheme?: boolean;
-    /** @description To provide the default names for the basic Schemes. */
-    defaultNames?: ColorSchemeDefaultNames;
+    /** @description To override the default values for the basic Schemes. */
+    defaults?: ColorSchemeDefaults;
     /** @description To provide new Color Schemes. */
-    newSchemes?: ColorSchemeItem[];
+    newSchemes?: ColorSchemeItemNew[];
     /** @description To provide new properties to the current styles map. */
     appendStylesMap?: ColorSchemeCSSMap;
     /**
      * @description The CSS attribute's name to match the Color Scheme.
      *
-     * The default is 'color-scheme', which will result on `[color-scheme="dark"]` applied to the `<body>`.
+     * The default is 'color-scheme', which will result on `[color-scheme="dark"]` applied to the `<html>` tag.
      *
      * For instance, if you want to use Bootstrap (5.3 or above), they make use of 'data-bs-theme' => `[data-bs-theme="dark"]`.
      *
@@ -99,8 +99,14 @@ export type ColorSchemeItem = {
     /** @description The readable name of the Color Scheme. */
     name: string;
     /** @description The properties for the Color Scheme. */
-    scheme: ColorSchemeProperties;
+    scheme: Partial<ColorSchemeStylesGenerics> & ColorSchemeProperties;
 };
+
+export type ColorSchemeItemNew = ColorSchemeItem &
+    Partial<{
+        /** @description To indicate where to take the default properties from, if not provided. @default 'light' */
+        useMissingPropsFrom: ColorScheme;
+    }>;
 
 export type ColorSchemeStylesConfig = {
     /** @description Force to use the given Color Scheme. */

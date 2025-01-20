@@ -27,7 +27,8 @@
                         "prefix": "a11y",
                         "style": "kebab-case"
                     }
-                ]
+                ],
+                "@angular-eslint/no-host-metadata-property": ["off"]
             }
         },
         {

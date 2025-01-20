@@ -64,6 +64,7 @@ export class ColorSchemeSelectComponent implements OnDestroy {
     }
 
     changeColorScheme(): void {
+        if (this.disabled) return;
         this.service.userChosen = this.colorScheme;
     }
 }
