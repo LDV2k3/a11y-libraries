@@ -145,7 +145,7 @@ To establish whether a `fixed` or `absolute` strategy positioning is used in CSS
 
 The `absolute` strategy was designed mainly to be utilized inside containers (aka [the boundary](#the-custom-boundary)) with overflow and to avoid the overlay to be visible in case of scrolling and the trigger being visually hidden.
 
-![""](src/lib/images/example-boundary-fixed-absolute.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay-base/src/lib/images/example-boundary-fixed-absolute.jpg)
 
 ### The Custom Boundary
 
@@ -174,7 +174,7 @@ In this scenario we can see two different overlays with the default position/ali
 
 Both overlays have enough space at the top and can be centered.
 
-![""](src/lib/images/example-safe-space-off.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay-base/src/lib/images/example-safe-space-off.jpg)
 
 #### The Safe Space On
 
@@ -193,15 +193,15 @@ this.setBaseConfig({
 
 The overlay at the left doesn't have enough space to be centered anymore and it will analyze where can be aligned, which will result at `start`.
 
-![""](src/lib/images/example-safe-space-on-no-scroll.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay-base/src/lib/images/example-safe-space-on-no-scroll.jpg)
 
 Now we start scrolling down and, the moment the left overlay reaches the top safe space limit, it will need to check the best side to reposition itself, which will result at `bottom`.
 
-![""](src/lib/images/example-safe-space-on-scroll.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay-base/src/lib/images/example-safe-space-on-scroll.jpg)
 
 We keep scrolling down and we can see the right overlay not repositioning and overlapping the header. This can be **an issue** depending on what `z-index` your landmarks are set.
 
-![""](src/lib/images/example-safe-space-on-scroll-overlapping.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay-base/src/lib/images/example-safe-space-on-scroll-overlapping.jpg)
 
 ### The Offset Size
 
@@ -213,7 +213,7 @@ It defines the space between the overlay and its trigger.
 - **Accepts:** positives and negatives.
 - **Translated to:** _pixels_.
 
-![""](src/lib/images/example-offset-size.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay-base/src/lib/images/example-offset-size.jpg)
 
 ### The Fluid Alignment
 
@@ -229,7 +229,7 @@ If `fluidAlignment` is on, and the overlay width (or height) exceeds both, the t
 
 In the next example, both overlays can't be centered and they have to decide where to be aligned. The one on the left is the only one that has `fluidAlignment` set to `true`, which means that it's going to be aligned to the left side of the viewport, while the one on the right should respect either `start`, `center` or `end` (in this case) of its trigger.
 
-![""](src/lib/images/example-fluid-alignment-on-off.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay-base/src/lib/images/example-fluid-alignment-on-off.jpg)
 
 When this option is on, and the overlay is sticked to one of the viewport's sides (the left one in this case), as shown in the example above, you can access the property `overlayOutside` with the side that it is _out_, as its value (`'left'`).
 
@@ -283,7 +283,7 @@ In this case, the _safe size_ will be the result of:
 - the viewport's `width` minus the `left` safe space: `755 - 50 = 705px`.
 - the viewport's `height` minus the `top` safe space `415 - 65 = 350px`.
 
-![""](src/lib/images/example-viewport-safe-size-without-boundary.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay-base/src/lib/images/example-viewport-safe-size-without-boundary.jpg)
 
 #### The Viewport Safe Size With a Boundary
 
@@ -291,7 +291,7 @@ Now imagine having the same viewport (`755px` by `415px`), the same safe spaces 
 
 Now, the _safe size_ will be the result of the custom boundary size minus the safe space area that is overlapping at its left side.
 
-![""](src/lib/images/example-viewport-safe-size-with-boundary.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay-base/src/lib/images/example-viewport-safe-size-with-boundary.jpg)
 
 ## The Types
 
@@ -308,7 +308,7 @@ Means the relative position to the trigger.
   - `'left'`.
   - `'right'`.
 
-![""](src/lib/images/example-position.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay-base/src/lib/images/example-position.jpg)
 
 #### The Overlay Reposition
 
@@ -336,8 +336,8 @@ Given the current overlay's maximum size is set to `300px` by `262px`, its heigh
 - top: `770 x 205 = 157850` ✔️.
 - bottom: `770 x 147 = 113190` ❌.
 
-![""](src/lib/images/example-square-areas.jpg)
-![""](src/lib/images/example-square-areas-result.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay-base/src/lib/images/example-square-areas.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay-base/src/lib/images/example-square-areas-result.jpg)
 
 ### The Overlay Alignment
 
@@ -359,7 +359,7 @@ This applies for `top` and `bottom` positions.
 - `center`: means aligned to the center of the trigger.
 - `end`: means aligned to the right side of the trigger.
 
-![""](src/lib/images/example-alignment-horizontal.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay-base/src/lib/images/example-alignment-horizontal.jpg)
 
 #### The Overlay Alignment Vertically
 
@@ -369,7 +369,7 @@ This applies for `left` and `right` positions.
 - `center`: means aligned to the center of the trigger.
 - `end`: means aligned to the bottom side of the trigger.
 
-![""](src/lib/images/example-alignment-vertical.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay-base/src/lib/images/example-alignment-vertical.jpg)
 
 #### The Overlay Realignment
 
@@ -625,8 +625,8 @@ Add `MyCustomTooltip` to your component or module `import` array, and add it to 
 
 The tooltip will open with position 'bottom' (as it was defined in the config) and alignment 'start' because it's respecting the boundary limit.
 
-![""](src/lib/images/example-tooltip-with-boundary.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay-base/src/lib/images/example-tooltip-with-boundary.jpg)
 
 If we had chosen not to set the boundary, the tooltip alignment would have been centered by default.
 
-![""](src/lib/images/example-tooltip-with-no-boundary.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay-base/src/lib/images/example-tooltip-with-no-boundary.jpg)
