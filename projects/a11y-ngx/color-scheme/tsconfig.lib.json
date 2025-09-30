@@ -15,10 +15,7 @@
         "declaration": true,
         "inlineSources": true,
         "types": [],
-        "lib": [
-            "dom",
-            "es2018"
-        ]
+        "lib": ["dom", "es2018"]
     },
     "angularCompilerOptions": {
         "strictTemplates": true,
@@ -26,8 +23,5 @@
         "strictMetadataEmit": true,
         "enableResourceInlining": true
     },
-    "exclude": [
-        "src/test.ts",
-        "**/*.spec.ts"
-    ]
+    "exclude": ["src/test.ts", "**/*.spec.ts"]
 }

@@ -1,14 +1,25 @@
 {
     "name": "@a11y-ngx/color-scheme",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "description": "An easy way to manage the defaults and custom Color Schemes for your components, libraries and web sites",
-    "keywords": ["color", "scheme", "schemes", "theme", "light", "dark", "custom", "component", "service", "angular"],
+    "keywords": [
+        "color",
+        "scheme",
+        "schemes",
+        "theme",
+        "light",
+        "dark",
+        "custom",
+        "component",
+        "service",
+        "angular"
+    ],
     "homepage": "https://github.com/LDV2k3/a11y-libraries/tree/master/projects/a11y-ngx/color-scheme#readme",
     "bugs": {
         "url": "https://github.com/LDV2k3/a11y-libraries/issues",
         "email": "lucho.development@gmail.com"
     },
-    "license": "MIT",
+    "license": "MPL-2.0",
     "author": {
         "name": "Luciano Del Vacchio",
         "email": "lucho.development@gmail.com",

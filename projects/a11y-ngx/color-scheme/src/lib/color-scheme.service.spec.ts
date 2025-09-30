@@ -654,14 +654,15 @@ describe('Color Scheme Service', () => {
 
     describe('Check "setConfig()", "updateConfig()" & "getConfig()" Method', () => {
         const newConfigSetUpdateGetSelector: string = 'set-update-get-selector';
+        const newConfigGenerics: ColorSchemeProperties = {
+            genericProp: 10,
+            genericPropTwo: 'blue',
+            genericPropThree: 'tail',
+        };
         const newConfigFull: ColorSchemeConfig = {
             selector: newConfigSetUpdateGetSelector,
             styles: {
-                generics: {
-                    genericProp: 10,
-                    genericPropTwo: 'blue',
-                    genericPropThree: 'tail',
-                },
+                generics: newConfigGenerics,
                 schemes: {
                     light: { schemePropLight: 'white' },
                     dark: { schemePropDark: 'gray' },
@@ -772,6 +773,18 @@ describe('Color Scheme Service', () => {
 
                 expect(schemes.light).toEqual(Object.assign({}, updatedConfigThreeLight.light));
                 expect(schemes.dark).toEqual(Object.assign({}, updatedConfigThreeDark.dark));
+            });
+
+            it('should update the generics when passing a loose property', () => {
+                service.updateConfig(newConfigSetUpdateGetSelector, { schemePropLight: 'non-existing-generic' });
+
+                const { generics } = service.getConfig(newConfigSetUpdateGetSelector).styles as {
+                    generics: ColorSchemeProperties;
+                };
+
+                expect(generics).toEqual(
+                    Object.assign({}, newConfigGenerics, { schemePropLight: 'non-existing-generic' })
+                );
             });
         });
     });

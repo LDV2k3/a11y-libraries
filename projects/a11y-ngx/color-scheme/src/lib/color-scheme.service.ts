@@ -327,7 +327,7 @@ export class ColorSchemeService implements OnDestroy {
             updateCSS = true;
         }
 
-        const { generics: currentConfigGenerics, schemes: currentConfigSchemes } =
+        const { generics: currentConfigGenerics = {}, schemes: currentConfigSchemes } =
             currentConfig.styles as ColorSchemesObject;
         const { forceScheme } = currentConfig;
 
@@ -342,8 +342,8 @@ export class ColorSchemeService implements OnDestroy {
         ) => {
             const propertyValue: ColorSchemeCSSType = properties[property];
 
-            if (currentConfigGenerics && property in currentConfigGenerics) {
-                // If there's a 'generic' object within the current config and the property is also within that object.
+            if (property in currentConfigGenerics) {
+                // If the property is within the 'generic' object in the current config.
                 currentConfigGenerics[property] = propertyValue;
                 updateCSS = true;
             } else if (currentConfigSchemes) {
@@ -453,6 +453,14 @@ export class ColorSchemeService implements OnDestroy {
                 }
             }
         }
+
+        // Check if any loose properties regarding Color Scheme are present
+        // within the given config to apply it as a generic and process it as such.
+        this.findMatchingProperties(selector, config)
+            // Filter the current non-generic properties.
+            .filter((property) => !(property in currentConfigGenerics))
+            // Add the property and its value to the generics.
+            .forEach((property) => (currentConfigGenerics[property] = config[property]));
 
         if (updateCSS) this.createCSS(selector);
     }
@@ -968,14 +976,14 @@ export class ColorSchemeService implements OnDestroy {
         const map: ColorSchemeCSSMap = this.getStylesMap(selector, colorScheme, stylesMap);
         const properties: ColorSchemeProperties = {};
 
-        Object.keys(map).forEach((property: string) => {
-            if ('schemes' in styles) {
-                const theSchemes: ColorSchemes = (styles.schemes ??
-                    this.colorSchemes.reduce(
-                        (schemes: ColorSchemes, item: ColorSchemeItem) => Object.assign(schemes, item.scheme),
-                        {} as ColorSchemes
-                    )) as ColorSchemes;
+        if ('schemes' in styles) {
+            const theSchemes: ColorSchemes = (styles.schemes ??
+                this.colorSchemes.reduce(
+                    (schemes: ColorSchemes, item: ColorSchemeItem) => Object.assign(schemes, item.scheme),
+                    {} as ColorSchemes
+                )) as ColorSchemes;
 
+            Object.keys(map).forEach((property: string) => {
                 let propertyValue: ColorSchemeCSSType | undefined;
 
                 if (!forceScheme) {
@@ -986,10 +994,12 @@ export class ColorSchemeService implements OnDestroy {
                 }
 
                 if (propertyValue) properties[property] = propertyValue;
-            } else {
-                properties[property] = (styles as ColorSchemeProperties)[property];
-            }
-        });
+            });
+        } else {
+            Object.keys(map).forEach(
+                (property: string) => (properties[property] = (styles as ColorSchemeProperties)[property])
+            );
+        }
 
         return properties;
     }
