@@ -1,0 +1,15 @@
+{
+    "$schema": "../../../node_modules/ng-packagr/ng-package.schema.json",
+    "dest": "../../../dist/@a11y-ngx/overlay",
+    "lib": {
+        "entryFile": "src/public-api.ts",
+        "umdId": "a11yNGx.overlay",
+        "umdModuleIds": {
+            "@a11y-ngx/overlay": "a11yNGx.overlay",
+            "@a11y-ngx/tab-cycle": "a11yNGx.tabCycle",
+            "@a11y-ngx/dom-helper": "a11yNGx.domHelper",
+            "@a11y-ngx/color-scheme": "a11yNGx.colorScheme"
+        }
+    },
+    "allowedNonPeerDependencies": ["@a11y-ngx/tab-cycle", "@a11y-ngx/dom-helper", "@a11y-ngx/color-scheme"]
+}

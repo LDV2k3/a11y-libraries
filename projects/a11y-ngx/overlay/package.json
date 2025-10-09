@@ -1,0 +1,42 @@
+{
+    "name": "@a11y-ngx/overlay",
+    "version": "1.0.0",
+    "description": "A floating overlay-style element that stays within the visible area of the viewport or a given custom boundary (like containers with overflow), preventing it from going off-screen during scroll or window resize",
+    "keywords": [
+        "overlay",
+        "position",
+        "positioning",
+        "reposition",
+        "viewport",
+        "boundary",
+        "overflow",
+        "component",
+        "directive",
+        "scroll",
+        "scrolling",
+        "resize",
+        "accessibility",
+        "angular"
+    ],
+    "homepage": "https://github.com/LDV2k3/a11y-libraries/tree/master/projects/a11y-ngx/overlay#readme",
+    "bugs": {
+        "url": "https://github.com/LDV2k3/a11y-libraries/issues",
+        "email": "lucho.development@gmail.com"
+    },
+    "license": "MPL-2.0",
+    "author": {
+        "name": "Luciano Del Vacchio",
+        "email": "lucho.development@gmail.com",
+        "url": "https://github.com/LDV2k3/"
+    },
+    "peerDependencies": {
+        "@angular/common": "^12.2.0",
+        "@angular/core": "^12.2.0"
+    },
+    "dependencies": {
+        "tslib": "^1.10.0",
+        "@a11y-ngx/tab-cycle": ">=1.0.1",
+        "@a11y-ngx/dom-helper": ">=1.0.0",
+        "@a11y-ngx/color-scheme": ">=1.0.6"
+    }
+}

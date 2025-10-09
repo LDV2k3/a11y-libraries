@@ -1,0 +1,160 @@
+$arrow-bg-color: var(--arrow-bg-color, inherit);
+$arrow-border-size: var(--arrow-border-size, 0px); // 0px by default in case BS styles are being used.
+$arrow-border-color: var(--arrow-border-color, inherit);
+$arrow-size: var(--arrow-size);
+$arrow-calc-size: calc(#{$arrow-size} * 2);
+$arrow-fix: var(--arrow-fix, 0px);
+$arrow-inset-position: calc(#{$arrow-border-size} * -1);
+$arrow-and-border: calc(#{$arrow-size} + calc(#{$arrow-border-size} * var(--arrow-scale, 1.5)));
+
+:host {
+    display: inline-block;
+    position: absolute;
+
+    &::before,
+    &::after {
+        content: '';
+        position: absolute;
+        display: block;
+        border: $arrow-size solid transparent;
+        box-sizing: border-box;
+    }
+
+    &[top],
+    &[bottom] {
+        &::before,
+        &::after {
+            width: auto;
+            height: $arrow-and-border;
+            transform: translate(-50%, 0);
+        }
+
+        &::before {
+            border-width: $arrow-and-border;
+        }
+
+        &::after {
+            width: $arrow-calc-size;
+        }
+
+        &[start] {
+            left: 0;
+        }
+        &[center] {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        &[end] {
+            right: 0;
+        }
+    }
+
+    &[top] {
+        top: calc(100% + #{$arrow-fix});
+
+        &::before {
+            border-color: transparent;
+            border-top-color: $arrow-border-color;
+            border-bottom-width: 0;
+        }
+
+        &::after {
+            border-color: transparent;
+            border-top-color: $arrow-bg-color;
+        }
+
+        &::before,
+        &::after {
+            inset: $arrow-inset-position auto auto 50%;
+        }
+    }
+
+    &[bottom] {
+        bottom: calc(100% + #{$arrow-fix});
+
+        &::before {
+            border-color: transparent;
+            border-bottom-color: $arrow-border-color;
+            border-top-width: 0;
+        }
+
+        &::after {
+            border-color: transparent;
+            border-bottom-color: $arrow-bg-color;
+        }
+
+        &::before,
+        &::after {
+            inset: auto auto $arrow-inset-position 50%;
+        }
+    }
+
+    &[left],
+    &[right] {
+        &::before,
+        &::after {
+            height: auto;
+            width: $arrow-and-border;
+            transform: translate(0, -50%);
+        }
+
+        &::before {
+            border-width: $arrow-and-border;
+        }
+
+        &::after {
+            height: $arrow-calc-size;
+        }
+
+        &[start] {
+            top: 0;
+        }
+        &[center] {
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        &[end] {
+            bottom: 0;
+        }
+    }
+
+    &[left] {
+        left: calc(100% + #{$arrow-fix});
+
+        &::before {
+            border-color: transparent;
+            border-left-color: $arrow-border-color;
+            border-right-width: 0;
+        }
+
+        &::after {
+            border-color: transparent;
+            border-left-color: $arrow-bg-color;
+        }
+
+        &::before,
+        &::after {
+            inset: 50% auto auto $arrow-inset-position;
+        }
+    }
+
+    &[right] {
+        right: calc(100% + #{$arrow-fix});
+
+        &::before {
+            border-color: transparent;
+            border-right-color: $arrow-border-color;
+            border-left-width: 0;
+        }
+
+        &::after {
+            border-color: transparent;
+            border-right-color: $arrow-bg-color;
+        }
+
+        &::before,
+        &::after {
+            inset: 50% $arrow-inset-position auto auto;
+        }
+    }
+}
