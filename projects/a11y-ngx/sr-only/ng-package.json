@@ -1,0 +1,11 @@
+{
+    "$schema": "../../../node_modules/ng-packagr/ng-package.schema.json",
+    "dest": "../../../dist/@a11y-ngx/sr-only",
+    "lib": {
+        "entryFile": "src/public-api.ts",
+        "umdId": "a11yNGx.SROnly",
+        "umdModuleIds": {
+            "@a11y-ngx/sr-only": "a11yNGx.SROnly"
+        }
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "name": "@a11y-ngx/sr-only",
+    "version": "1.0.0",
+    "description": "A component and CSS rule that provides a way to insert visually hidden text that is still reached and announced by screen reader",
+    "keywords": [
+        "screen reader",
+        "visuall hidden",
+        "accessibility",
+        "a11y",
+        "component",
+        "angular"
+    ],
+    "homepage": "https://github.com/LDV2k3/a11y-libraries/tree/master/projects/a11y-ngx/sr-only#readme",
+    "bugs": {
+        "url": "https://github.com/LDV2k3/a11y-libraries/issues",
+        "email": "lucho.development@gmail.com"
+    },
+    "license": "MPL-2.0",
+    "author": {
+        "name": "Luciano Del Vacchio",
+        "email": "lucho.development@gmail.com",
+        "url": "https://github.com/LDV2k3/"
+    },
+    "peerDependencies": {
+        "@angular/common": ">=12.2.0",
+        "@angular/core": ">=12.2.0"
+    },
+    "dependencies": {
+        "tslib": "^1.10.0"
+    }
+}

@@ -1,0 +1,6 @@
+{
+    "extends": "../../../tslint.json",
+    "rules": {
+        "component-selector": [true, "element", "a11y", "kebab-case"]
+    }
+}
