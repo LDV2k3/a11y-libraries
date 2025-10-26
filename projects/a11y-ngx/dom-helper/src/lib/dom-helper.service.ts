@@ -1,6 +1,16 @@
 import { Injectable, Optional, SkipSelf, RendererFactory2, Renderer2 } from '@angular/core';
 
-import { TABBABLE_ELEMENTS_SELECTOR } from './dom-helper.type';
+import {
+    TABBABLE_ELEMENTS_SELECTOR,
+    TABBABLE_ELEMENT_TABINDEX_SELECTOR,
+    CONTENTEDITABLE_ELEMENT_SELECTOR,
+    ARIA_LABEL_ROLES_NOT_SUPPORTED,
+    ARIA_LABEL_ROLES_SUPPORTED_INTERACTIVE,
+    ARIA_LABEL_ROLES_SUPPORTED_NON_INTERACTIVE,
+    ARIA_LABEL_TAGS_SUPPORTED,
+    ARIA_LABEL_TAGS_NOT_SUPPORTED,
+    ARIA_LABEL_INTERACTIVE_SUPPORTED_SELECTOR,
+} from './dom-helper.type';
 
 @Injectable({ providedIn: 'root' })
 export class DOMHelperService {
@@ -218,6 +228,65 @@ export class DOMHelperService {
     tabbableElements(hostElement: HTMLElement): HTMLElement[] {
         const tabbableElements = Array.from(hostElement.querySelectorAll(TABBABLE_ELEMENTS_SELECTOR)) as HTMLElement[];
         return tabbableElements.filter(this.isVisible.bind(this));
+    }
+
+    /**
+     * @description
+     * Check if the element is an image.
+     *
+     * @param { HTMLElement } element - The HTML Element to check.
+     */
+    isImageElement(element: HTMLElement): boolean {
+        return (
+            element.matches('img, area') ||
+            this.getAttributeValue(element, 'role') === 'img' ||
+            (element.nodeName.toLowerCase() === 'input' && this.getAttributeValue(element, 'type') === 'image')
+        );
+    }
+
+    /**
+     * @description
+     * Check if the element is interactive.
+     *
+     * @param { HTMLElement } element - The HTML Element to check.
+     */
+    isInteractiveElement(element: HTMLElement): boolean {
+        const role: string | null = this.getAttributeValue(element, 'role');
+
+        const isInteractiveNative: boolean =
+            role === null && element.matches(ARIA_LABEL_INTERACTIVE_SUPPORTED_SELECTOR);
+        if (isInteractiveNative) return true;
+
+        const isInteractiveByRole: boolean =
+            role !== null &&
+            ARIA_LABEL_ROLES_SUPPORTED_INTERACTIVE.includes(role) &&
+            element.matches(TABBABLE_ELEMENT_TABINDEX_SELECTOR);
+        if (isInteractiveByRole) return true;
+
+        return false;
+    }
+
+    /**
+     * @description
+     * Check if the element can use `aria-label`/`aria-labelledby` attribute.
+     *
+     * @param { HTMLElement } element - The HTML Element to check.
+     */
+    canBeAriaLabelled(element: HTMLElement): boolean {
+        if (this.isInteractiveElement(element)) return true;
+
+        const nodeName: string = element.nodeName.toLowerCase();
+        const role: string | null = this.getAttributeValue(element, 'role');
+
+        if (role === null) {
+            if (ARIA_LABEL_TAGS_SUPPORTED.includes(nodeName)) return true;
+            if (ARIA_LABEL_TAGS_NOT_SUPPORTED.includes(`${nodeName}${CONTENTEDITABLE_ELEMENT_SELECTOR}`)) return false;
+        } else {
+            if (ARIA_LABEL_ROLES_SUPPORTED_NON_INTERACTIVE.includes(role)) return true;
+            if (ARIA_LABEL_ROLES_NOT_SUPPORTED.includes(role)) return false;
+        }
+
+        return false;
     }
 
     private filterNonFormElementOrFormElementNotDisabled(element: HTMLElement): boolean {

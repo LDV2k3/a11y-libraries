@@ -23,6 +23,9 @@ This library was generated with [Angular CLI](https://github.com/angular/angular
   - [The `getBooleanValue()` Method](#the-getbooleanvalue-method)
   - [The `getNumericValue()` Method](#the-getnumericvalue-method)
   - [The `tabbableElements()` Method](#the-tabbableelements-method)
+  - [The `isImageElement()` Method](#the-isimageelement-method)
+  - [The `isInteractiveElement()` Method](#the-isinteractiveelement-method)
+  - [The `canBeAriaLabelled()` Method](#the-canbearialabelled-method)
 
 ## Installation
 
@@ -283,4 +286,54 @@ It will retrieve all possible tabbable elements and validate their visibility us
 
 ```typescript
 this.DOMHelper.tabbableElements(hostElement); // => [button, input, select, etc.]
+```
+
+### The `isImageElement()` Method
+
+Check if an element is an image.
+
+Accepts a single parameter `element` of type `HTMLElement`.
+
+It will verify if the given element is:
+
+- An `<img>` tag
+- An `<area>` tag
+- An `<input>` tag of `type="image"`
+- Has a `role="img"`
+
+```typescript
+this.DOMHelper.isImageElement(element); // => true / false
+```
+
+### The `isInteractiveElement()` Method
+
+Check if an element is interactive, meaning that the user can interact with it.
+
+Accepts a single parameter `element` of type `HTMLElement`.
+
+It will verify if the given element is:
+
+- A native interactive element: `a[href]`, `button`, `textarea`, etc.
+- A _role_ interactive element: `<div role="button" tabindex="0">`
+
+```typescript
+this.DOMHelper.isInteractiveElement(element); // => true / false
+```
+
+### The `canBeAriaLabelled()` Method
+
+Check if an element can use `aria-label`/`aria-labelledby` attribute.
+
+Accepts a single parameter `element` of type `HTMLElement`.
+
+It will verify if the given element:
+
+- Is interactive (`isInteractiveElement()` method).
+- Is one of the allowed native tag elements (`header`, `nav`, `article`, etc.)
+- Is **not** one of the disallowed native tag elements (`caption`, `code`, `strong`, etc.)
+- Has one of the allowed ARIA roles (`group`, `status`, `img`, etc.)
+- Does **not** have a disallowed ARIA role (`definition`, `deletion`, `emphasis`, etc.)
+
+```typescript
+this.DOMHelper.canBeAriaLabelled(element); // => true / false
 ```

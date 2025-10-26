@@ -1,6 +1,6 @@
 {
     "name": "@a11y-ngx/dom-helper",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Another set of tools to validate DOM stuff",
     "keywords": [
         "angular",
@@ -14,6 +14,7 @@
         "focusable",
         "styles",
         "aria-hidden",
+        "aria-label",
         "inert",
         "numeric",
         "boolean"
@@ -23,7 +24,7 @@
         "url": "https://github.com/LDV2k3/a11y-libraries/issues",
         "email": "lucho.development@gmail.com"
     },
-    "license": "MIT",
+    "license": "MPL-2.0",
     "author": {
         "name": "Luciano Del Vacchio",
         "email": "lucho.development@gmail.com",

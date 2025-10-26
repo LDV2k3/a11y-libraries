@@ -1,6 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
 import { DOMHelperService } from './dom-helper.service';
+import {
+    ARIA_LABEL_ROLES_NOT_SUPPORTED,
+    ARIA_LABEL_ROLES_SUPPORTED_INTERACTIVE,
+    ARIA_LABEL_ROLES_SUPPORTED_NON_INTERACTIVE,
+    ARIA_LABEL_TAGS_SUPPORTED,
+    ARIA_LABEL_TAGS_NOT_SUPPORTED,
+} from './dom-helper.type';
 
 describe('DOM Helper', () => {
     let containerElement: HTMLElement;
@@ -491,6 +498,239 @@ describe('DOM Helper', () => {
 
             // input type checkbox
             expect(DOMHelper.getAttributeValue(tabbableElements[9], 'type')).toBe('checkbox');
+        });
+    });
+
+    describe('isImageElement()', () => {
+        it('should check that an <img> element is an image', () => {
+            const imgTag: HTMLImageElement = document.createElement('img');
+            expect(DOMHelper.isImageElement(imgTag)).toBeTrue();
+            imgTag.remove();
+        });
+
+        it('should check that an <area> element is an image', () => {
+            const areaTag: HTMLAreaElement = document.createElement('area');
+            expect(DOMHelper.isImageElement(areaTag)).toBeTrue();
+            areaTag.remove();
+        });
+
+        it('should check that an element with role="img" is an image', () => {
+            const roleImgElement: HTMLSpanElement = document.createElement('span');
+            roleImgElement.setAttribute('role', 'img');
+            expect(DOMHelper.isImageElement(roleImgElement)).toBeTrue();
+            roleImgElement.remove();
+        });
+
+        it('should check that an <input> element with type="image" is an image', () => {
+            const inputImgElement: HTMLInputElement = document.createElement('input');
+            inputImgElement.setAttribute('type', 'image');
+            expect(DOMHelper.isImageElement(inputImgElement)).toBeTrue();
+            inputImgElement.remove();
+        });
+
+        it('should check that an <input> element with type="text" is not an image', () => {
+            const inputImgElement: HTMLInputElement = document.createElement('input');
+            inputImgElement.setAttribute('type', 'text');
+            expect(DOMHelper.isImageElement(inputImgElement)).toBeFalse();
+            inputImgElement.remove();
+        });
+
+        it('should check that an <i> element is not an image', () => {
+            const iTag: HTMLElement = document.createElement('i');
+            expect(DOMHelper.isImageElement(iTag)).toBeFalse();
+            iTag.remove();
+        });
+    });
+
+    describe('isInteractiveElement()', () => {
+        let elementToBeLabelled: HTMLElement;
+
+        afterEach(() => elementToBeLabelled.remove());
+
+        it('should check that an anchor element with "href" is interactive', () => {
+            elementToBeLabelled = document.createElement('a');
+            elementToBeLabelled.setAttribute('href', '');
+            expect(DOMHelper.isInteractiveElement(elementToBeLabelled)).toBeTrue();
+        });
+
+        it('should check that an anchor element with no "href" is not interactive', () => {
+            elementToBeLabelled = document.createElement('a');
+            expect(DOMHelper.isInteractiveElement(elementToBeLabelled)).toBeFalse();
+        });
+
+        it('should check that an area element with "href" is interactive', () => {
+            elementToBeLabelled = document.createElement('area');
+            elementToBeLabelled.setAttribute('href', '');
+            expect(DOMHelper.isInteractiveElement(elementToBeLabelled)).toBeTrue();
+        });
+
+        it('should check that an area element with no "href" is not interactive', () => {
+            elementToBeLabelled = document.createElement('area');
+            expect(DOMHelper.isInteractiveElement(elementToBeLabelled)).toBeFalse();
+        });
+
+        it('should check that an input element with type="submit" is interactive', () => {
+            elementToBeLabelled = document.createElement('input');
+            elementToBeLabelled.setAttribute('type', 'submit');
+            expect(DOMHelper.isInteractiveElement(elementToBeLabelled)).toBeTrue();
+        });
+
+        it('should check that an input element with type="hidden" is not interactive', () => {
+            elementToBeLabelled = document.createElement('input');
+            elementToBeLabelled.setAttribute('type', 'hidden');
+            expect(DOMHelper.isInteractiveElement(elementToBeLabelled)).toBeFalse();
+        });
+
+        it('should check that an element with [contenteditable] is interactive', () => {
+            elementToBeLabelled = document.createElement('div');
+            elementToBeLabelled.setAttribute('contenteditable', '');
+            expect(DOMHelper.isInteractiveElement(elementToBeLabelled)).toBeTrue();
+        });
+
+        it('should check that an element with [contenteditable]="false" is not interactive', () => {
+            elementToBeLabelled = document.createElement('div');
+            elementToBeLabelled.setAttribute('contenteditable', 'false');
+            expect(DOMHelper.isInteractiveElement(elementToBeLabelled)).toBeFalse();
+        });
+
+        describe('should check the given "interactive" roles', () => {
+            it('should check that a <div> element with no tabindex is not interactive', () => {
+                ARIA_LABEL_ROLES_SUPPORTED_INTERACTIVE.forEach((role: string) => {
+                    elementToBeLabelled = document.createElement('div');
+                    elementToBeLabelled.setAttribute('role', role);
+                    expect(DOMHelper.isInteractiveElement(elementToBeLabelled)).toBeFalse();
+                });
+            });
+
+            it('should check that a <div> element with tabindex="-1" is not interactive', () => {
+                ARIA_LABEL_ROLES_SUPPORTED_INTERACTIVE.forEach((role: string) => {
+                    elementToBeLabelled = document.createElement('div');
+                    elementToBeLabelled.setAttribute('role', role);
+                    elementToBeLabelled.setAttribute('tabindex', '-1');
+                    expect(DOMHelper.isInteractiveElement(elementToBeLabelled)).toBeFalse();
+                });
+            });
+
+            it('should check that a <div> element with tabindex="0" is interactive', () => {
+                ARIA_LABEL_ROLES_SUPPORTED_INTERACTIVE.forEach((role: string) => {
+                    elementToBeLabelled = document.createElement('div');
+                    elementToBeLabelled.setAttribute('role', role);
+                    elementToBeLabelled.setAttribute('tabindex', '0');
+                    expect(DOMHelper.isInteractiveElement(elementToBeLabelled)).toBeTrue();
+                });
+            });
+        });
+    });
+
+    describe('canBeAriaLabelled()', () => {
+        let elementToBeLabelled: HTMLElement;
+
+        afterEach(() => elementToBeLabelled.remove());
+
+        it('should check that a given landmark element can be labelled', () => {
+            ARIA_LABEL_TAGS_SUPPORTED.forEach((landmark: string) => {
+                elementToBeLabelled = document.createElement(landmark);
+                expect(DOMHelper.canBeAriaLabelled(elementToBeLabelled)).toBeTrue();
+            });
+        });
+
+        it('should check that a <div> element with a given non-interactive role can be labelled', () => {
+            ARIA_LABEL_ROLES_SUPPORTED_NON_INTERACTIVE.forEach((role: string) => {
+                elementToBeLabelled = document.createElement('div');
+                elementToBeLabelled.setAttribute('role', role);
+                expect(DOMHelper.canBeAriaLabelled(elementToBeLabelled)).toBeTrue();
+            });
+        });
+
+        it('should check that a <div> element with a given role can not be labelled', () => {
+            ARIA_LABEL_ROLES_NOT_SUPPORTED.forEach((role: string) => {
+                elementToBeLabelled = document.createElement('div');
+                elementToBeLabelled.setAttribute('role', role);
+                expect(DOMHelper.canBeAriaLabelled(elementToBeLabelled)).toBeFalse();
+            });
+        });
+
+        it(`should check that the given tag element can not be labelled`, () => {
+            ARIA_LABEL_TAGS_NOT_SUPPORTED.forEach((tag: string) => {
+                elementToBeLabelled = document.createElement(tag);
+                expect(DOMHelper.canBeAriaLabelled(elementToBeLabelled)).toBeFalse();
+            });
+        });
+
+        describe('should check interactive elements', () => {
+            it('should check that an anchor element with "href" can be labelled', () => {
+                elementToBeLabelled = document.createElement('a');
+                elementToBeLabelled.setAttribute('href', '');
+                expect(DOMHelper.canBeAriaLabelled(elementToBeLabelled)).toBeTrue();
+            });
+
+            it('should check that an anchor element with no "href" can not be labelled', () => {
+                elementToBeLabelled = document.createElement('a');
+                expect(DOMHelper.canBeAriaLabelled(elementToBeLabelled)).toBeFalse();
+            });
+
+            it('should check that an area element with "href" can be labelled', () => {
+                elementToBeLabelled = document.createElement('area');
+                elementToBeLabelled.setAttribute('href', '');
+                expect(DOMHelper.canBeAriaLabelled(elementToBeLabelled)).toBeTrue();
+            });
+
+            it('should check that an area element with no "href" can not be labelled', () => {
+                elementToBeLabelled = document.createElement('area');
+                expect(DOMHelper.canBeAriaLabelled(elementToBeLabelled)).toBeFalse();
+            });
+
+            it('should check that an input element with type="submit" can be labelled', () => {
+                elementToBeLabelled = document.createElement('input');
+                elementToBeLabelled.setAttribute('type', 'submit');
+                expect(DOMHelper.canBeAriaLabelled(elementToBeLabelled)).toBeTrue();
+            });
+
+            it('should check that an input element with type="hidden" can not be labelled', () => {
+                elementToBeLabelled = document.createElement('input');
+                elementToBeLabelled.setAttribute('type', 'hidden');
+                expect(DOMHelper.canBeAriaLabelled(elementToBeLabelled)).toBeFalse();
+            });
+
+            it('should check that an element with [contenteditable] can be labelled', () => {
+                elementToBeLabelled = document.createElement('div');
+                elementToBeLabelled.setAttribute('contenteditable', '');
+                expect(DOMHelper.canBeAriaLabelled(elementToBeLabelled)).toBeTrue();
+            });
+
+            it('should check that an element with [contenteditable]="false" can not be labelled', () => {
+                elementToBeLabelled = document.createElement('div');
+                elementToBeLabelled.setAttribute('contenteditable', 'false');
+                expect(DOMHelper.canBeAriaLabelled(elementToBeLabelled)).toBeFalse();
+            });
+
+            describe('should check the given "interactive" roles', () => {
+                it('should check that a <div> element with no tabindex can not be labelled', () => {
+                    ARIA_LABEL_ROLES_SUPPORTED_INTERACTIVE.forEach((role: string) => {
+                        elementToBeLabelled = document.createElement('div');
+                        elementToBeLabelled.setAttribute('role', role);
+                        expect(DOMHelper.canBeAriaLabelled(elementToBeLabelled)).toBeFalse();
+                    });
+                });
+
+                it('should check that a <div> element with tabindex="-1" can not be labelled', () => {
+                    ARIA_LABEL_ROLES_SUPPORTED_INTERACTIVE.forEach((role: string) => {
+                        elementToBeLabelled = document.createElement('div');
+                        elementToBeLabelled.setAttribute('role', role);
+                        elementToBeLabelled.setAttribute('tabindex', '-1');
+                        expect(DOMHelper.canBeAriaLabelled(elementToBeLabelled)).toBeFalse();
+                    });
+                });
+
+                it('should check that a <div> element with tabindex="0" can be labelled', () => {
+                    ARIA_LABEL_ROLES_SUPPORTED_INTERACTIVE.forEach((role: string) => {
+                        elementToBeLabelled = document.createElement('div');
+                        elementToBeLabelled.setAttribute('role', role);
+                        elementToBeLabelled.setAttribute('tabindex', '0');
+                        expect(DOMHelper.canBeAriaLabelled(elementToBeLabelled)).toBeTrue();
+                    });
+                });
+            });
         });
     });
 });
