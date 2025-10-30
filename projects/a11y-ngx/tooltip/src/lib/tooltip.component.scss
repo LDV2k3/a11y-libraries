@@ -1,0 +1,68 @@
+$tooltip-arrow: var(--tooltip-arrow);
+$tooltip-bg-color: var(--tooltip-bg-color);
+$tooltip-text-color: var(--tooltip-text-color);
+$tooltip-padding: var(--tooltip-padding);
+$tooltip-zindex: var(--tooltip-zindex);
+$tooltip-fade-ms: var(--tooltip-fade-ms);
+$tooltip-border-size: var(--tooltip-border-size);
+$tooltip-border-color: var(--tooltip-border-color);
+$tooltip-border-radius: var(--tooltip-border-radius);
+$tooltip-shadow: var(--tooltip-shadow);
+$tooltip-shadow-color: var(--tooltip-shadow-color, currentColor);
+
+:host {
+    --overlay-fade-ms: #{$tooltip-fade-ms};
+
+    --arrow-size: #{$tooltip-arrow};
+    --arrow-border-color: #{$tooltip-border-color};
+    --arrow-border-size: #{$tooltip-border-size};
+    --arrow-bg-color: #{$tooltip-bg-color};
+
+    &[animate] {
+        transition-property: opacity, transform;
+
+        &[top] { transform: translateY(15px); }
+        &[bottom] { transform: translateY(-15px); }
+        &[left] { transform: translateX(15px); }
+        &[right] { transform: translateX(-15px); }
+
+        &[fade] {
+            &[top], &[bottom] {
+                transform: translateY(0);
+            }
+            &[left], &[right] {
+                transform: translateX(0);
+            }
+        }
+    }
+
+    &:not([use-bs]) {
+        z-index: $tooltip-zindex;
+    }
+
+    &[use-bs] {
+        --tooltip-zindex: var(--bs-tooltip-zindex) !important;
+        --tooltip-bg-color: var(--bs-tooltip-bg) !important;
+        --tooltip-text-color: var(--bs-tooltip-color) !important;
+        --tooltip-border-size: 0px !important;
+        --tooltip-border-color: var(--bs-tooltip-bg) !important;
+        --tooltip-border-radius: var(--bs-tooltip-border-radius) !important;
+        --tooltip-padding: var(--bs-tooltip-padding-y) var(--bs-tooltip-padding-x) !important;
+        --tooltip-shadow: none !important;
+    }
+}
+
+[overlay-wrapper] {
+    background-color: $tooltip-bg-color;
+    border: $tooltip-border-size solid $tooltip-border-color;
+    border-radius: $tooltip-border-radius;
+    box-shadow: $tooltip-shadow $tooltip-shadow-color;
+
+    & > [overlay-content] {
+        color: $tooltip-text-color;
+        padding: $tooltip-padding;
+        text-align: center;
+        user-select: none;
+        line-height: 1.5;
+    }
+}
