@@ -1,7 +1,7 @@
 {
     "name": "@a11y-ngx/tooltip",
-    "version": "1.0.0",
-    "description": "A floating overlay-style element that stays within the visible area of the viewport or a given custom boundary (like containers with overflow), preventing it from going off-screen during scroll or window resize",
+    "version": "1.0.1",
+    "description": "A fully accessible Angular directive that provides a standards-compliant tooltip experience across mouse, keyboard and touch interactions",
     "keywords": [
         "tooltip",
         "overlay",
@@ -14,6 +14,7 @@
         "scroll",
         "scrolling",
         "resize",
+        "a11y",
         "accessibility",
         "angular"
     ],
