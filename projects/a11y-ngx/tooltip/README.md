@@ -225,11 +225,11 @@ To establish whether the tooltip's alignment will stick to the edges of the view
 
 As you can see in the next example, the fluid alignment is set to `false` (by default), which will make the tooltip to be aligned to the "end" of its trigger since it's too close to the viewport's right side and doesn't have enough space to be centered (default alignment).
 
-![""](src/lib/images/example-fluid-alignment-off.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay/src/lib/images/example-fluid-alignment-off.jpg)
 
 If we turn fluid alignment on, then the tooltip will stick to the right side of the viewport.
 
-![""](src/lib/images/example-fluid-alignment-on.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay/src/lib/images/example-fluid-alignment-on.jpg)
 
 > For more details and examples, check from the Overlay library
 >
@@ -246,7 +246,7 @@ It defines the size of the arrow.
 - **Accepts:** zero or greater.
 - **Translated to:** _pixels_.
 
-![""](src/lib/images/example-arrow-size.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay/src/lib/images/example-arrow-size.jpg)
 
 ### The Offset Size
 
@@ -258,7 +258,7 @@ It defines the space between the tooltip's arrow and its trigger.
 - **Accepts:** positives and negatives.
 - **Translated to:** _pixels_.
 
-![""](src/lib/images/example-offset-size.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay/src/lib/images/example-offset-size.jpg)
 
 ### The Fade Timeout
 
@@ -304,7 +304,7 @@ It defines the `padding` CSS value.
 - **Type:** `string`.
 - **Default:** `'3px 7px'` (`3px` top & bottom, `7px` left & right).
 
-![""](src/lib/images/example-padding-size.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay/src/lib/images/example-padding-size.jpg)
 
 ### The Shadow
 
@@ -317,7 +317,7 @@ It defines the `box-shadow` CSS value, by combining two properties:
   - **Type:** `string`.
   - **Default:** `var(--a11y-shadow-color)` _(coming from the [Color Scheme library](https://www.npmjs.com/package/@a11y-ngx/color-scheme#user-content-global-config-basic-properties))_.
 
-![""](src/lib/images/example-shadow.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay/src/lib/images/example-shadow.jpg)
 
 ### The Background Color
 
@@ -327,7 +327,7 @@ It defines the `background-color` CSS value.
 - **Type:** `string`.
 - **Default:** `var(--a11y-bg-color)` _(coming from the [Color Scheme library](https://www.npmjs.com/package/@a11y-ngx/color-scheme#user-content-global-config-basic-properties))_.
 
-![""](src/lib/images/example-background-color.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay/src/lib/images/example-background-color.jpg)
 
 ### The Text Color
 
@@ -337,7 +337,7 @@ It defines the `color` CSS value.
 - **Type:** `string`.
 - **Default:** `var(--a11y-text-color)` _(coming from the [Color Scheme library](https://www.npmjs.com/package/@a11y-ngx/color-scheme#user-content-global-config-basic-properties))_.
 
-![""](src/lib/images/example-text-color.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay/src/lib/images/example-text-color.jpg)
 
 ### The Border Size
 
@@ -348,7 +348,7 @@ It defines the `border-width` CSS value.
 - **Default:** `1`.
 - **Translated to:** _pixels_.
 
-![""](src/lib/images/example-border-size.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay/src/lib/images/example-border-size.jpg)
 
 ### The Border Color
 
@@ -358,7 +358,7 @@ It defines the `border-color` CSS value.
 - **Type:** `string`.
 - **Default:** `var(--a11y-border-color)` _(coming from the [Color Scheme library](https://www.npmjs.com/package/@a11y-ngx/color-scheme#user-content-global-config-basic-properties))_.
 
-![""](src/lib/images/example-border-color.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay/src/lib/images/example-border-color.jpg)
 
 ### The Border Radius
 
@@ -369,7 +369,7 @@ It defines the `border-radius` CSS value.
 - **Default:** `4` (same for each corner).
 - **Translated to:** _pixels_.
 
-![""](src/lib/images/example-border-radius.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay/src/lib/images/example-border-radius.jpg)
 
 ### The Max Width
 
@@ -480,7 +480,7 @@ changeMonth(monthToAdd: number): void {
 
 By default, the tooltip will stay where it was, being now misaligned from its trigger as you can see in the next example at the left, while the one at the right did recalculate its position and is perfectly aligned to the button.
 
-![""](src/lib/images/example-recalculate.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay/src/lib/images/example-recalculate.jpg)
 
 ## The Color Schemes
 
@@ -533,7 +533,7 @@ Even when the color scheme is set to a specific value (globally), you can force 
 
 I've added a couple color schemes for testing purposes, called `'red-velvet'` and `'blue-sky'`.
 
-![""](src/lib/images/example-force-scheme.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay/src/lib/images/example-force-scheme.jpg)
 
 ### How to add a New Color Scheme
 
@@ -597,7 +597,7 @@ In the example below:
 </button>
 ```
 
-![""](src/lib/images/example-use-bootstrap.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay/src/lib/images/example-use-bootstrap.jpg)
 
 ## The Use with Image Maps
 
@@ -625,7 +625,7 @@ As seen in the next screenshot, there are two issues:
 - The _beautiful_ (for visual purpose) red square is the focus ring for the monitor (since the coordinates of the polygon were genrated for its original size), so the focused element is respecting _that_ size
 - The tooltip has no "surface" to attach to, so it's kind of "floating around"
 
-![""](src/lib/images/example-image-map-off.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay/src/lib/images/example-image-map-off.jpg)
 
 To fix this, you can make use of the [Responsive Image Maps library](https://www.npmjs.com/package/@a11y-ngx/responsive-image-maps) (if you have Image Maps in your website, of course).
 
@@ -652,7 +652,7 @@ Now, we can observe that:
 ✔️ The focus ring matches the original coordinates in the new downsized image<br />
 ✔️ The tooltip is correctly located to its default position/alignment (top-center)
 
-![""](src/lib/images/example-image-map-on.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay/src/lib/images/example-image-map-on.jpg)
 
 ## The Use with Abbreviation Elements
 
@@ -670,11 +670,11 @@ Both are essential to creating intuitive digital experiences.
 
 **Result for the Tooltip:**
 
-![""](src/lib/images/example-abbr.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay/src/lib/images/example-abbr.jpg)
 
 **Result for the NVDA Screen Reader:**
 
-![""](src/lib/images/example-abbr-screen-reader.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay/src/lib/images/example-abbr-screen-reader.jpg)
 
 ## The Use with Non-Interactive Elements
 
@@ -692,10 +692,10 @@ You can use any of the available alignments:
 
 **Result for the Tooltip:**
 
-![""](src/lib/images/example-non-interactive.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay/src/lib/images/example-non-interactive.jpg)
 
 **Result for the NVDA Screen Reader:**
 
-![""](src/lib/images/example-non-interactive-screen-reader.jpg)
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay/src/lib/images/example-non-interactive-screen-reader.jpg)
 
 > **IMPORTANT:** Remember that this is **NOT** recommended, since keyboard users can't reach the tooltip at all. Making the element focusable (`tabindex="0"`) might seem to "fix" the keyboard scenario, but it's **NOT** accessible, since users expect that focusable elements to be interactive.
