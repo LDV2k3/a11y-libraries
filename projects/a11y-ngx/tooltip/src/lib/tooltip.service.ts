@@ -62,7 +62,7 @@ export class TooltipService implements OnDestroy {
         this.tooltipText = text?.replace(/<(?!\/?b>|\/?strong>|\/?i>|\/?em>)[^>]+>/gi, '').trim();
         this.tooltipPlainText = text
             ?.replace(/<[^>]*>/g, '')
-            .replace(/[^\w.,¡!¿? ]/g, '')
+            .replace(/[^\w.,¡!¿? -]/g, '')
             .trim();
         this.setSROnlyText(this.tooltipPlainText);
 
@@ -254,7 +254,9 @@ export class TooltipService implements OnDestroy {
         // If it is an image with no text, set "alt"
         if (this.hostData.is.imgWithNoAlt) this.setAttrValue('alt', this.tooltipPlainText);
         // If can't be labelled, create the sr-only element after the host
-        else if (!this.canBeAriaLabelled) this.createSROnlyElement();
+        else if (!this.canBeAriaLabelled) {
+            if (!this.isSameInnerTextAsTooltip) this.createSROnlyElement();
+        }
         // If asked to be forced as label, set "aria-label"
         else if (this.asLabel) this.setAttrValue('aria-label', this.tooltipPlainText);
     }
@@ -263,12 +265,12 @@ export class TooltipService implements OnDestroy {
         const hostFocused: boolean = this.document.activeElement === this.hostElement;
         if (!hostFocused) return;
 
-        const ariaDescribedBy: string | null =
-            this.hostData.text.inner &&
-            this.hostData.text.inner.toLocaleLowerCase() !== this.tooltipPlainText.toLocaleLowerCase()
-                ? this.tooltipId
-                : null;
+        const ariaDescribedBy: string | null = !this.isSameInnerTextAsTooltip ? this.tooltipId : null;
         this.setAttrValue('aria-describedby', ariaDescribedBy);
+    }
+
+    private get isSameInnerTextAsTooltip(): boolean {
+        return (this.hostData.text.inner ?? '').toLocaleLowerCase() === this.tooltipPlainText.toLocaleLowerCase();
     }
 
     private killDestroyTimeout(): void {
