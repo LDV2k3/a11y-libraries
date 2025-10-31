@@ -85,8 +85,19 @@ Serves to establish and override the global default configuration.
 
 Accepts a single parameter `config` of type [`TooltipRootConfig`](#the-tooltip-config).
 
+**On Angular v12 - v14:**
+
 ```typescript
 A11yTooltipModule.rootConfig({
+    offsetSize: 10,
+    safeSpace: { top: 65, left: 50 },
+}),
+```
+
+**On Angular v15+:**
+
+```typescript
+provideA11yTooltip({
     offsetSize: 10,
     safeSpace: { top: 65, left: 50 },
 }),

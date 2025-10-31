@@ -1,6 +1,6 @@
 {
     "name": "@a11y-ngx/sr-only",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "A component and CSS rule that provides a way to insert visually hidden text that is still reached and announced by screen reader",
     "keywords": [
         "screen reader",
@@ -22,8 +22,8 @@
         "url": "https://github.com/LDV2k3/"
     },
     "peerDependencies": {
-        "@angular/common": ">=12.2.0",
-        "@angular/core": ">=12.2.0"
+        "@angular/common": ">=12.2.0 <21.0.0",
+        "@angular/core": ">=12.2.0 <21.0.0"
     },
     "dependencies": {
         "tslib": "^1.10.0"

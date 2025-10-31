@@ -1,6 +1,6 @@
 {
     "name": "@a11y-ngx/tooltip",
-    "version": "1.0.1",
+    "version": "1.0.3",
     "description": "A fully accessible Angular directive that provides a standards-compliant tooltip experience across mouse, keyboard and touch interactions",
     "keywords": [
         "tooltip",
@@ -30,8 +30,8 @@
         "url": "https://github.com/LDV2k3/"
     },
     "peerDependencies": {
-        "@angular/common": "^12.2.0",
-        "@angular/core": "^12.2.0"
+        "@angular/common": ">=12.2.0 <21.0.0",
+        "@angular/core": ">=12.2.0 <21.0.0"
     },
     "peerDependenciesMeta": {
         "@a11y-ngx/responsive-image-maps": {
@@ -39,14 +39,14 @@
         }
     },
     "devDependencies": {
-        "@a11y-ngx/overlay-base": ">=1.0.0",
-        "@a11y-ngx/responsive-image-maps": ">=1.1.0"
+        "@a11y-ngx/overlay-base": ">=1.0.1",
+        "@a11y-ngx/responsive-image-maps": ">=1.1.1"
     },
     "dependencies": {
         "tslib": "^1.10.0",
-        "@a11y-ngx/overlay": ">=1.0.1",
-        "@a11y-ngx/dom-helper": ">=1.1.0",
-        "@a11y-ngx/color-scheme": ">=1.0.6",
-        "@a11y-ngx/sr-only": ">=1.0.0"
+        "@a11y-ngx/overlay": ">=1.0.2",
+        "@a11y-ngx/dom-helper": ">=1.1.1",
+        "@a11y-ngx/color-scheme": ">=1.0.7",
+        "@a11y-ngx/sr-only": ">=1.0.1"
     }
 }

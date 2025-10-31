@@ -152,8 +152,20 @@ Serves to establish and override the global default configuration.
 
 Accepts a single parameter `config` of type [`OverlayRootConfig`](#the-overlay-config).
 
+**On Angular v12 - v14:**
+
 ```typescript
 A11yOverlayModule.rootConfig({
+    arrowSize: 5,
+    offsetSize: 10,
+    safeSpace: { top: 65, left: 50 },
+}),
+```
+
+**On Angular v15+:**
+
+```typescript
+provideA11yOverlay({
     arrowSize: 5,
     offsetSize: 10,
     safeSpace: { top: 65, left: 50 },
@@ -168,8 +180,20 @@ Serves to establish a sub level configuration based on a given `selector`.
 
 Accepts a single parameter `config` of type [`OverlayCustomConfig`](#the-overlay-custom-config).
 
+**On Angular v12 - v14:**
+
 ```typescript
 A11yOverlayModule.customConfig({
+    selector: 'my-custom-component',
+    arrowSize: 0,
+    positionStrategy: 'absolute',
+}),
+```
+
+**On Angular v15+:**
+
+```typescript
+provideA11yOverlayFeature({
     selector: 'my-custom-component',
     arrowSize: 0,
     positionStrategy: 'absolute',

@@ -8,4 +8,5 @@ export * from './lib/overlay.component.base';
 export * from './lib/overlay-arrow.component';
 export * from './lib/overlay.type';
 export * from './lib/overlay.color-scheme';
+export * from './lib/overlay.providers';
 export * from './lib/overlay.module';

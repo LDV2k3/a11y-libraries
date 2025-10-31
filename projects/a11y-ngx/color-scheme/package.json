@@ -1,6 +1,6 @@
 {
     "name": "@a11y-ngx/color-scheme",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "description": "An easy way to manage the defaults and custom Color Schemes for your components, libraries and web sites",
     "keywords": [
         "color",
@@ -26,8 +26,8 @@
         "url": "https://github.com/LDV2k3/"
     },
     "peerDependencies": {
-        "@angular/common": ">=12.2.0",
-        "@angular/core": ">=12.2.0"
+        "@angular/common": ">=12.2.0 <21.0.0",
+        "@angular/core": ">=12.2.0 <21.0.0"
     },
     "dependencies": {
         "tslib": "^1.10.0"
