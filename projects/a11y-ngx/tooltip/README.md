@@ -1,6 +1,6 @@
 # Tooltip
 
-A fully accessible Angular directive that provides a standards-compliant tooltip experience across mouse, keyboard and touch interactions.
+A fully accessible tooltip directive for Angular that provides a standards-compliant experience across mouse, keyboard and touch interactions.
 
 It's built with WCAG 2.1/2.2 AA compliance in mind:
 
@@ -14,6 +14,8 @@ It's built with WCAG 2.1/2.2 AA compliance in mind:
 ✔️ It will reposition itself, if needed, in case of page scroll or resize<br />
 
 > ⚠️ **IMPORTANT:** Think carefully at what you are adding a tooltip to, remember that there are people with disabilities who can't use a mouse and rely on a keyboard for navigation, so adding a tooltip to non-interactive elements (`<i>`, `<span>`, etc.) won't be reachable by keyboard and thus the tooltip won't appear.
+>
+> 📘 **NOTE:** Since tooltips are meant to provide purely informational content, only basic inline tags (`<b>`, `<strong>`, `<i>`, `<em>` and `<br>`) are allowed. All other markup will be removed for consistency and accessibility.
 
 This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0.
 

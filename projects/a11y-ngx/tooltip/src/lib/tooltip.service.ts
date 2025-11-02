@@ -59,7 +59,7 @@ export class TooltipService implements OnDestroy {
     private destroyTimeoutID: ReturnType<typeof setTimeout> | undefined = undefined;
 
     set tooltip(text: string) {
-        this.tooltipText = text?.replace(/<(?!\/?b>|\/?strong>|\/?i>|\/?em>)[^>]+>/gi, '').trim();
+        this.tooltipText = text?.replace(/<(?!\/?b>|\/?strong>|\/?i>|\/?em>|br\s*\/?>)[^>]+>/gi, '').trim();
         this.tooltipPlainText = text
             ?.replace(/<[^>]*>/g, '')
             .replace(/[^\w.,¡!¿? -]/g, '')
