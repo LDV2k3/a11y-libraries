@@ -57,7 +57,7 @@ export class TooltipDirective implements AfterViewInit {
         this.service.tooltipComponent?.recalculate();
     }
 
-    private onTooltipToggle(event: KeyboardEvent): void {
+    protected onTooltipToggle(event: KeyboardEvent): void {
         if (!this.service.tooltipComponent) return;
 
         if (event.code === KEY.ESCAPE && this.service.tooltipComponent.isVisible) {
@@ -70,7 +70,7 @@ export class TooltipDirective implements AfterViewInit {
         }
     }
 
-    private onTooltipShowHide(event: PointerEvent | KeyboardEvent): void {
+    protected onTooltipShowHide(event: MouseEvent | FocusEvent): void {
         if (this.service.tooltipEmpty) return;
 
         const isBlur: boolean = event.type === 'blur';
@@ -96,7 +96,7 @@ export class TooltipDirective implements AfterViewInit {
         }
     }
 
-    private onTooltipTouchStart(): void {
+    protected onTooltipTouchStart(): void {
         this.isLongPress = false;
 
         this.longPressTimeoutID = setTimeout(() => {
@@ -110,7 +110,7 @@ export class TooltipDirective implements AfterViewInit {
         }, TOOLTIP_TOUCH_DELAY);
     }
 
-    private onTooltipTouchEnd(event: TouchEvent): void {
+    protected onTooltipTouchEnd(event: TouchEvent): void {
         clearTimeout(this.longPressTimeoutID);
 
         if (!this.isLongPress) return;
@@ -120,7 +120,7 @@ export class TooltipDirective implements AfterViewInit {
         this.isLongPress = false;
     }
 
-    private onTooltipTouchCancel(event: TouchEvent): void {
+    protected onTooltipTouchCancel(event: TouchEvent): void {
         const killTooltip = (): void => {
             clearTimeout(this.longPressTimeoutID);
             this.service.destroyTooltip();

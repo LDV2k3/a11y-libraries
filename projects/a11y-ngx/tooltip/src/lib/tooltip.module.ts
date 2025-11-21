@@ -10,6 +10,7 @@ import { TooltipDirective } from './tooltip.directive';
 import { TOOLTIP_SCHEME_CONFIG } from './tooltip.color-scheme';
 
 import { TooltipDummyConfigService, provideA11yTooltip } from './tooltip.providers';
+import { TooltipWindowProvider } from './tooltip.window.providers';
 
 import { TooltipRootConfig } from './tooltip.type';
 import { TOOLTIP_CONFIG } from './tooltip.type.private';
@@ -22,6 +23,7 @@ import { TOOLTIP_CONFIG } from './tooltip.type.private';
         A11yColorSchemeModule.setColorScheme(TOOLTIP_SCHEME_CONFIG),
         A11yOverlayModule.customConfig(TOOLTIP_CONFIG),
     ],
+    providers: [TooltipWindowProvider],
 })
 export class A11yTooltipModule {
     constructor(private dummyService: TooltipDummyConfigService) {}

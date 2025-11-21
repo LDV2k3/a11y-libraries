@@ -1,11 +1,13 @@
 import { waitForAsync, ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { Component, NgModule } from '@angular/core';
+import { Component, NgModule, ViewChildren, QueryList } from '@angular/core';
 import { forceElementsCleanup, forceStylesCleanup } from '../test';
 
 import { DOMHelperService } from '@a11y-ngx/dom-helper';
+import { A11yResponsiveImageMapsModule } from '@a11y-ngx/responsive-image-maps';
 
 import { A11yTooltipModule } from './tooltip.module';
+import { TooltipDirective } from './tooltip.directive';
 
 import { TooltipConfig } from './tooltip.type';
 import { TOOLTIP_CONFIG as CONFIG, TOOLTIP_TOUCH_DELAY } from './tooltip.type.private';
@@ -396,4 +398,160 @@ describe('Tooltip Component', () => {
             expect(DOMHelper.getAttributeValue(getImage(), 'alt')).toEqual('Image tooltip');
         });
     });
+});
+
+// Image Area Directive Testing
+
+@Component({
+    selector: 'a11y-test-tooltip-with-image-area-installed-component',
+    template: `
+        <img src="https://www.w3schools.com/html/workplace.jpg" alt="" usemap="#image-map" />
+
+        <map name="image-map">
+            <area tooltip="Monitor" href="" coords="322,114,359,370" shape="rect" />
+            <area tooltip="Laptop" href="" coords="17,338,75,527" shape="rect" />
+        </map>
+    `,
+    styles: [
+        `
+            img {
+                position: fixed;
+                inset: auto 50% 50% auto;
+                width: 50%;
+                height: auto;
+            }
+        `,
+    ],
+})
+export class CustomTooltipAreaTestComponent {
+    @ViewChildren(TooltipDirective) readonly tooltips: QueryList<TooltipDirective>;
+}
+
+@NgModule({
+    declarations: [CustomTooltipAreaTestComponent],
+    imports: [A11yTooltipModule, A11yResponsiveImageMapsModule],
+})
+export class CustomTooltipAreaTestModule {}
+
+describe('Tooltip Component on Image Area with ResponsiveImageMap Installed', () => {
+    let component: CustomTooltipAreaTestComponent;
+    let fixture: ComponentFixture<CustomTooltipAreaTestComponent>;
+
+    const showCloseDelayMs: number = CONFIG.fadeDelayMs + CONFIG.fadeMs;
+    const getTrigger = (idx: number): HTMLElement => fixture.debugElement.queryAll(By.css('area'))[idx].nativeElement;
+    const focusTrigger = (idx: number): boolean => getTrigger(idx).dispatchEvent(new KeyboardEvent('focus'));
+
+    beforeEach(waitForAsync(() => {
+        TestBed.configureTestingModule({
+            declarations: [CustomTooltipAreaTestComponent],
+            imports: [CustomTooltipAreaTestModule],
+            ...(forceStylesCleanup ? { teardown: { destroyAfterEach: true } } : {}),
+        }).compileComponents();
+
+        fixture = TestBed.createComponent(CustomTooltipAreaTestComponent);
+        component = fixture.componentInstance;
+        fixture.autoDetectChanges();
+
+        localStorage.removeItem('a11y.colorScheme');
+    }));
+
+    afterEach(() => {
+        if (!forceElementsCleanup) return;
+
+        fixture.nativeElement.remove();
+        fixture.destroy();
+        TestBed.resetTestingModule();
+    });
+
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
+
+    it('should have the image area defined as DOMRect', fakeAsync(() => {
+        getTrigger(0).focus();
+        focusTrigger(0);
+        tick(showCloseDelayMs);
+
+        const tooltipImageArea: DOMRect | undefined = component.tooltips.get(0)['service']['tooltipImageArea'];
+
+        expect(tooltipImageArea instanceof DOMRect).toBe(true);
+        expect(tooltipImageArea).not.toBe(undefined);
+    }));
+});
+
+@Component({
+    selector: 'a11y-test-tooltip-with-no-image-area-installed-component',
+    template: `
+        <img src="https://www.w3schools.com/html/workplace.jpg" alt="" usemap="#image-map" />
+
+        <map name="image-map">
+            <area tooltip="Monitor" href="" coords="322,114,359,370" shape="rect" />
+            <area tooltip="Laptop" href="" coords="17,338,75,527" shape="rect" />
+        </map>
+    `,
+    styles: [
+        `
+            img {
+                position: fixed;
+                inset: auto 50% 50% auto;
+                width: 50%;
+                height: auto;
+            }
+        `,
+    ],
+})
+export class CustomTooltipAreaInstalledTestComponent {
+    @ViewChildren(TooltipDirective) readonly tooltips: QueryList<TooltipDirective>;
+}
+
+@NgModule({
+    declarations: [CustomTooltipAreaInstalledTestComponent],
+    imports: [A11yTooltipModule],
+})
+export class CustomTooltipAreaInstalledTestModule {}
+
+describe('Tooltip Component on Image Area with ResponsiveImageMap not Installed', () => {
+    let component: CustomTooltipAreaInstalledTestComponent;
+    let fixture: ComponentFixture<CustomTooltipAreaInstalledTestComponent>;
+
+    const showCloseDelayMs: number = CONFIG.fadeDelayMs + CONFIG.fadeMs;
+    const getTrigger = (idx: number): HTMLElement => fixture.debugElement.queryAll(By.css('area'))[idx].nativeElement;
+    const focusTrigger = (idx: number): boolean => getTrigger(idx).dispatchEvent(new KeyboardEvent('focus'));
+
+    beforeEach(waitForAsync(() => {
+        TestBed.configureTestingModule({
+            declarations: [CustomTooltipAreaInstalledTestComponent],
+            imports: [CustomTooltipAreaInstalledTestModule],
+            ...(forceStylesCleanup ? { teardown: { destroyAfterEach: true } } : {}),
+        }).compileComponents();
+
+        fixture = TestBed.createComponent(CustomTooltipAreaInstalledTestComponent);
+        component = fixture.componentInstance;
+        fixture.autoDetectChanges();
+
+        localStorage.removeItem('a11y.colorScheme');
+    }));
+
+    afterEach(() => {
+        if (!forceElementsCleanup) return;
+
+        fixture.nativeElement.remove();
+        fixture.destroy();
+        TestBed.resetTestingModule();
+    });
+
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
+
+    it('should have the image area not defined', fakeAsync(() => {
+        getTrigger(0).focus();
+        focusTrigger(0);
+        tick(showCloseDelayMs);
+
+        const tooltipImageArea: DOMRect | undefined = component.tooltips.get(0)['service']['tooltipImageArea'];
+
+        expect(tooltipImageArea instanceof DOMRect).toBe(false);
+        expect(tooltipImageArea).toBe(undefined);
+    }));
 });

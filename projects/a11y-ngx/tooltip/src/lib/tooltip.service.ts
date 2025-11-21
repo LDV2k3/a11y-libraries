@@ -17,6 +17,7 @@ import { DOMHelperService, KEY } from '@a11y-ngx/dom-helper';
 import { ScreenReaderOnlyComponent } from '@a11y-ngx/sr-only';
 import type { ResponsiveImageAreaDirective } from '@a11y-ngx/responsive-image-maps';
 
+import { WINDOW } from './tooltip.window.providers';
 import { TooltipCreateService } from './tooltip.create.service';
 
 import { TooltipComponent } from './tooltip.component';
@@ -130,6 +131,7 @@ export class TooltipService implements OnDestroy {
         private injector: Injector,
         private DOMHelper: DOMHelperService,
         private tooltipCreateService: TooltipCreateService,
+        @Inject(WINDOW) private window: Window | undefined,
         @Inject(DOCUMENT) public document: Document
     ) {
         this.config = this.tooltipCreateService.globalConfig;
@@ -374,13 +376,13 @@ export class TooltipService implements OnDestroy {
     }
 
     private initImageAreaListeners(): void {
-        if (!this.tooltipImageArea || !this.tooltipComponent) return;
+        if (!this.window || !this.tooltipImageArea || !this.tooltipComponent) return;
 
-        fromEvent(window, 'scroll')
+        fromEvent(this.window, 'scroll')
             .pipe(auditTime(10), takeUntil(this.tooltipComponent.destroy$))
             .subscribe(() => this.updateImageArea());
 
-        fromEvent(window, 'resize')
+        fromEvent(this.window, 'resize')
             .pipe(auditTime(10), takeUntil(this.tooltipComponent.destroy$))
             .subscribe(() => this.updateImageArea());
     }
@@ -400,8 +402,10 @@ export class TooltipService implements OnDestroy {
     }
 
     private get responsiveImageAreaDirective(): ResponsiveImageAreaDirective | null {
+        if (!this.window) return null;
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const ngGlobal: any = (window as any).ng;
+        const ngGlobal: any = (this.window as any).ng;
 
         try {
             const directives: unknown[] | undefined = ngGlobal?.getDirectives(this.hostElement) as

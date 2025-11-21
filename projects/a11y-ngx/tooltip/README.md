@@ -635,7 +635,7 @@ For the next example, we are working with an image with an original size of 1344
 
 As seen in the next screenshot, there are two issues:
 
-- The _beautiful_ (for visual purpose) red square is the focus ring for the monitor (since the coordinates of the polygon were genrated for its original size), so the focused element is respecting _that_ size
+- The _beautiful_ (for visual purpose) red square is the focus ring for the monitor (since the coordinates of the polygon were generated for its original size), so the focused element is respecting _that_ size
 - The tooltip has no "surface" to attach to, so it's kind of "floating around"
 
 ![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/tooltip/src/lib/images/example-image-map-off.jpg)
