@@ -1,13 +1,18 @@
-import { Injectable, OnDestroy, Optional, SkipSelf } from '@angular/core';
+import { Injectable, Inject, OnDestroy, Optional, SkipSelf } from '@angular/core';
 import { Subject } from 'rxjs';
+
+import { WINDOW } from './window-resize.providers';
 
 import { WindowResize } from './window-resize.type';
 
 @Injectable({ providedIn: 'root' })
 export class WindowResizeService implements OnDestroy {
-    event: Subject<WindowResize> = new Subject<WindowResize>();
+    readonly event: Subject<WindowResize> = new Subject<WindowResize>();
 
-    constructor(@Optional() @SkipSelf() private parentService: WindowResizeService) {
+    constructor(
+        @Inject(WINDOW) private window: Window | undefined,
+        @Optional() @SkipSelf() private parentService: WindowResizeService
+    ) {
         if (this.parentService) {
             const errorMsg: string = `
                 A11y Window Resize:
@@ -17,11 +22,11 @@ export class WindowResizeService implements OnDestroy {
             throw Error(errorMsg.replace(/ {2,}/g, ''));
         }
 
-        window.addEventListener('resize', this.windowResizeCallback.bind(this));
+        this.window?.addEventListener('resize', this.windowResizeCallback.bind(this));
     }
 
     ngOnDestroy(): void {
-        window.removeEventListener('resize', this.windowResizeCallback.bind(this));
+        this.window?.removeEventListener('resize', this.windowResizeCallback.bind(this));
     }
 
     private windowResizeCallback(e: Event): void {
