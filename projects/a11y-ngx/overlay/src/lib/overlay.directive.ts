@@ -110,7 +110,7 @@ export class OverlayDirective extends OverlayBase implements OnChanges, OnDestro
         this.isDirective = typeof isDirective === 'string';
     }
 
-    private get cssCustomVariables(): CSSStyleDeclaration {
+    protected get cssCustomVariables(): CSSStyleDeclaration {
         const alignJustifyFlex: string = this.isTop || this.isLeft ? 'flex-end' : 'flex-start';
         return {
             flexDirection: 'column',
@@ -120,16 +120,17 @@ export class OverlayDirective extends OverlayBase implements OnChanges, OnDestro
         } as CSSStyleDeclaration;
     }
 
-    private styleWidth: string | null = null;
-    private styleMaxWidth: string | null = null;
-    private styleMaxHeight: string | null = null;
+    protected styleWidth: string | null = null;
+    protected styleMaxWidth: string | null = null;
+    protected styleMaxHeight: string | null = null;
 
     @Output() readonly overlayOpen: EventEmitter<void> = new EventEmitter<void>();
     @Output() readonly overlayClose: EventEmitter<void> = new EventEmitter<void>();
     @Output() readonly overlayToggle: EventEmitter<string> = new EventEmitter<string>();
 
-    private readonly directiveConfig: Partial<OverlayCustomConfig & OverlayDirectiveConfig & ColorSchemeStylesConfig> =
-        {};
+    protected readonly directiveConfig: Partial<
+        OverlayCustomConfig & OverlayDirectiveConfig & ColorSchemeStylesConfig
+    > = {};
 
     /**
      * @description
@@ -159,7 +160,7 @@ export class OverlayDirective extends OverlayBase implements OnChanges, OnDestro
      * @description
      * To handle things on 1st calculations.
      */
-    private firstCalc: boolean = true;
+    protected firstCalc: boolean = true;
 
     /**
      * @description
@@ -195,7 +196,7 @@ export class OverlayDirective extends OverlayBase implements OnChanges, OnDestro
      * @description
      * If the `maxWidth` input is set to 'auto' (`true`) or customized by the user (`false`).
      */
-    private get isMaxWidthAuto(): boolean {
+    protected get isMaxWidthAuto(): boolean {
         return this.inputMaxWidth === 'auto';
     }
 

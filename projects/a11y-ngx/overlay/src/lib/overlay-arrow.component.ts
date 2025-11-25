@@ -25,39 +25,39 @@ import { OverlayPosition } from './overlay.type';
     },
 })
 export class OverlayArrowComponent implements OnInit, OnDestroy {
-    private get scaleFactor(): number | null {
+    protected get scaleFactor(): number | null {
         return this.hostDirective.borderSize === 1 ? 2.5 : null;
     }
 
-    private get isTop(): string | null {
+    protected get isTop(): string | null {
         return this.hostDirective.isTop ? '' : null;
     }
 
-    private get isBottom(): string | null {
+    protected get isBottom(): string | null {
         return this.hostDirective.isBottom ? '' : null;
     }
 
-    private get isLeft(): string | null {
+    protected get isLeft(): string | null {
         return this.hostDirective.isLeft ? '' : null;
     }
 
-    private get isRight(): string | null {
+    protected get isRight(): string | null {
         return this.hostDirective.isRight ? '' : null;
     }
 
-    private get isStart(): string | null {
+    protected get isStart(): string | null {
         return !this.hostDirective.overlayOutside && this.hostDirective.isStart ? '' : null;
     }
 
-    private get isCenter(): string | null {
+    protected get isCenter(): string | null {
         return !this.hostDirective.overlayOutside && this.hostDirective.isCenter ? '' : null;
     }
 
-    private get isEnd(): string | null {
+    protected get isEnd(): string | null {
         return !this.hostDirective.overlayOutside && this.hostDirective.isEnd ? '' : null;
     }
 
-    private attrStyle!: CSSStyleDeclaration;
+    protected attrStyle!: CSSStyleDeclaration;
 
     private readonly destroy$: Subject<void> = new Subject<void>();
 

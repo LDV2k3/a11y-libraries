@@ -18,7 +18,7 @@ export class OverlayBaseComponent extends OverlayDirective implements OnInit {
     // To extend custom components
     customContent!: TemplateRef<unknown> | string;
 
-    private attrUpdating!: string | null;
+    protected attrUpdating!: string | null;
 
     ngOnInit(): void {
         if (this.fluidSize) {
