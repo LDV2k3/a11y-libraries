@@ -17,7 +17,7 @@ import { DOMHelperService, KEY } from '@a11y-ngx/dom-helper';
 import { ScreenReaderOnlyComponent } from '@a11y-ngx/sr-only';
 import type { ResponsiveImageAreaDirective } from '@a11y-ngx/responsive-image-maps';
 
-import { WINDOW } from './tooltip.window.providers';
+import { WINDOW } from './tooltip.providers.private';
 import { TooltipCreateService } from './tooltip.create.service';
 
 import { TooltipComponent } from './tooltip.component';

@@ -27,16 +27,16 @@ import { TOOLTIP_SELECTOR } from './tooltip.type.private';
     },
 })
 export class TooltipComponent extends OverlayBaseComponent {
-    get attrPositionTop(): string | null {
+    protected get attrPositionTop(): string | null {
         return this.attrAnimate && this.isTop ? '' : null;
     }
-    get attrPositionBottom(): string | null {
+    protected get attrPositionBottom(): string | null {
         return this.attrAnimate && this.isBottom ? '' : null;
     }
-    get attrPositionLeft(): string | null {
+    protected get attrPositionLeft(): string | null {
         return this.attrAnimate && this.isLeft ? '' : null;
     }
-    get attrPositionRight(): string | null {
+    protected get attrPositionRight(): string | null {
         return this.attrAnimate && this.isRight ? '' : null;
     }
 
