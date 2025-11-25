@@ -2,6 +2,8 @@ import { Injectable, Inject, OnDestroy, Optional, SkipSelf } from '@angular/core
 import { DOCUMENT } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
 
+import { WINDOW, LOCAL_STORAGE } from './color-scheme.providers';
+
 import {
     ERROR_SERVICE_PROVIDED_MORE_THAN_ONCE,
     ERROR_FORCED_SCHEME_SELECTOR_NOT_FOUND,
@@ -109,7 +111,8 @@ export class ColorSchemeService implements OnDestroy {
      * Whether the current system's scheme is set to `dark`.
      */
     get isSystemThemeDark(): boolean {
-        return window.matchMedia && window.matchMedia(this.matchMediaDark).matches;
+        if (!this.window) return false;
+        return this.window.matchMedia && this.window.matchMedia(this.matchMediaDark).matches;
     }
 
     /**
@@ -185,11 +188,13 @@ export class ColorSchemeService implements OnDestroy {
      * To save the Scheme in the local storage.
      */
     private set saveColorScheme(colorScheme: ColorScheme) {
-        localStorage.setItem(this.localStorageKey, colorScheme);
+        this.localStorage?.setItem(this.localStorageKey, colorScheme);
     }
 
     constructor(
         @Inject(DOCUMENT) private document: Document,
+        @Inject(WINDOW) private window: Window | undefined,
+        @Inject(LOCAL_STORAGE) private localStorage: Storage | undefined,
         @Optional() @SkipSelf() private parentService: ColorSchemeService
     ) {
         if (this.parentService) throw Error(ERROR_SERVICE_PROVIDED_MORE_THAN_ONCE('ColorSchemeService'));
@@ -554,7 +559,7 @@ export class ColorSchemeService implements OnDestroy {
             return;
         }
 
-        const storageValue: string | null = localStorage.getItem(this.localStorageKey);
+        const storageValue: string | null = this.localStorage?.getItem(this.localStorageKey) || null;
         const useStorageValue: boolean = storageValue !== null && availableSchemes.includes(storageValue);
 
         this.userChosen = useStorageValue ? (storageValue as ColorScheme) : SCHEME.AUTO;
@@ -768,8 +773,8 @@ export class ColorSchemeService implements OnDestroy {
      * To set the Color Scheme in the `<html>` tag.
      */
     private updatePageColorScheme(): void {
-        this.document.documentElement.removeAttribute(COLOR_SCHEME_SELECTOR_MATCH);
-        this.document.documentElement.setAttribute(this.globalConfig.attributeSelectorMatch, this.colorScheme);
+        this.document?.documentElement.removeAttribute(COLOR_SCHEME_SELECTOR_MATCH);
+        this.document?.documentElement.setAttribute(this.globalConfig.attributeSelectorMatch, this.colorScheme);
     }
 
     /**
@@ -779,6 +784,8 @@ export class ColorSchemeService implements OnDestroy {
      * @param { string } selector - The given selector.
      */
     private createCSS(selector: string): void {
+        if (!this.document) return;
+
         const theCSS: ColorSchemeCSS = this.processCSS(selector);
 
         Object.keys(theCSS).forEach((id: string) => {
@@ -808,6 +815,8 @@ export class ColorSchemeService implements OnDestroy {
      * @param { ColorScheme } scheme - The given scheme.
      */
     private removeCSS(scheme: ColorScheme): void {
+        if (!this.document) return;
+
         const styleID: string = `style#${COLOR_SCHEME_TAG_ID}-${scheme}`;
         const style: HTMLStyleElement = this.document.head.querySelector(styleID) as HTMLStyleElement;
         if (style) style.remove();
@@ -1102,7 +1111,7 @@ export class ColorSchemeService implements OnDestroy {
      * To start the listener for when system's Scheme changes.
      */
     private initSystemColorSchemeListener(): void {
-        window.matchMedia(this.matchMediaDark)?.addEventListener('change', this.onColorSchemeChange);
+        this.window?.matchMedia(this.matchMediaDark)?.addEventListener('change', this.onColorSchemeChange);
     }
 
     /**
@@ -1110,7 +1119,7 @@ export class ColorSchemeService implements OnDestroy {
      * To stop the listener for when system's Scheme changes.
      */
     private stopSystemColorSchemeListener(): void {
-        window.matchMedia(this.matchMediaDark)?.removeEventListener('change', this.onColorSchemeChange);
+        this.window?.matchMedia(this.matchMediaDark)?.removeEventListener('change', this.onColorSchemeChange);
     }
 
     /**
