@@ -1,4 +1,5 @@
-import { Injectable, OnDestroy, Optional, SkipSelf } from '@angular/core';
+import { Injectable, Inject, OnDestroy, Optional, SkipSelf } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { Subject } from 'rxjs';
 
 import { DocumentScroll } from './document-scroll.type';
@@ -7,7 +8,10 @@ import { DocumentScroll } from './document-scroll.type';
 export class DocumentScrollService implements OnDestroy {
     event: Subject<DocumentScroll> = new Subject<DocumentScroll>();
 
-    constructor(@Optional() @SkipSelf() private parentService: DocumentScrollService) {
+    constructor(
+        @Inject(DOCUMENT) private document: Document | undefined,
+        @Optional() @SkipSelf() private parentService: DocumentScrollService
+    ) {
         if (this.parentService) {
             const errorMsg: string = `
                 A11y Document Scroll:
@@ -17,14 +21,15 @@ export class DocumentScrollService implements OnDestroy {
             throw Error(errorMsg.replace(/ {2,}/g, ''));
         }
 
-        document.addEventListener('scroll', this.documentScrollCallback.bind(this));
+        this.document?.addEventListener('scroll', this.documentScrollCallback.bind(this));
     }
 
     ngOnDestroy(): void {
-        window.removeEventListener('resize', this.documentScrollCallback.bind(this));
+        this.document?.removeEventListener('scroll', this.documentScrollCallback.bind(this));
     }
 
     private documentScrollCallback(): void {
+        if (!window) return;
         this.event.next({ x: window.scrollX, y: window.scrollY });
     }
 }
