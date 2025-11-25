@@ -43,7 +43,7 @@ export abstract class OverlayBase {
     virtualTriggerRect!: DOMRect;
     overlayRect!: DOMRect;
     overlayOriginalRect!: DOMRect;
-    boundaryRect: DOMRect = new DOMRect(0, 0, this.viewportSize.width, this.viewportSize.height);
+    boundaryRect!: DOMRect;
 
     isDetached$!: Subject<void>;
     private isAttached: boolean = false;
@@ -1170,6 +1170,12 @@ export abstract class OverlayBase {
      */
     get overlayListeners$(): Observable<void> {
         return from(this.listeners).pipe(mergeAll());
+    }
+
+    constructor() {
+        // To init `boundaryRect` and avoid SSR (Server Side Rendering) to crash
+        if (typeof DOMRect !== 'undefined')
+            this.boundaryRect = new DOMRect(0, 0, this.viewportSize.width, this.viewportSize.height);
     }
 
     /**
