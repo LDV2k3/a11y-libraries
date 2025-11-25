@@ -22,7 +22,7 @@ export class ResponsiveImageAreaDirective implements AfterViewInit {
             .map((coord) => parseInt(coord, 10));
     }
 
-    @HostBinding('attr.coords') private newCoords!: string;
+    @HostBinding('attr.coords') protected newCoords!: string;
 
     private originalCoords!: number[];
 

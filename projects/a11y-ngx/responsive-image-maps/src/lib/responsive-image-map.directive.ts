@@ -5,10 +5,12 @@ import {
     ContentChildren,
     ElementRef,
     EventEmitter,
+    Inject,
     QueryList,
     AfterViewInit,
     OnDestroy,
 } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 
@@ -61,7 +63,11 @@ export class ResponsiveImageMapDirective implements AfterViewInit, OnDestroy {
         return this.loaded.value;
     }
 
-    constructor(private hostElement: ElementRef<HTMLMapElement>, private resizeService: WindowResizeService) {}
+    constructor(
+        private hostElement: ElementRef<HTMLMapElement>,
+        private resizeService: WindowResizeService,
+        @Inject(DOCUMENT) private document: Document | undefined
+    ) {}
 
     ngAfterViewInit(): void {
         this.initMap();
@@ -73,10 +79,10 @@ export class ResponsiveImageMapDirective implements AfterViewInit, OnDestroy {
     }
 
     private initMap(): void {
-        if (!this.areas.length) return;
+        if (!this.areas.length || !this.document) return;
 
-        const useMap = `[usemap="#${this.name}"]`;
-        const imageElements: HTMLImageElement[] = Array.from(document.querySelectorAll(useMap));
+        const useMap: string = `[usemap="#${this.name}"]`;
+        const imageElements: HTMLImageElement[] = Array.from(this.document.querySelectorAll(useMap));
 
         if (imageElements.length !== 1) {
             let errorMsg: string;
@@ -108,13 +114,11 @@ export class ResponsiveImageMapDirective implements AfterViewInit, OnDestroy {
         );
 
         this.resizeService.event.pipe(debounceTime(100), takeUntil(this.destroy$)).subscribe(() => {
-            const oldSize = `${this.imageSize.width}x${this.imageSize.height}`;
+            const oldSize: string = `${this.imageSize.width}x${this.imageSize.height}`;
             this.update();
-            const newSize = `${this.imageSize.width}x${this.imageSize.height}`;
+            const newSize: string = `${this.imageSize.width}x${this.imageSize.height}`;
 
-            if (oldSize !== newSize) {
-                this.sizeChanged.emit(this.imageSize);
-            }
+            if (oldSize !== newSize) this.sizeChanged.emit(this.imageSize);
         });
     }
 
@@ -131,9 +135,9 @@ export class ResponsiveImageMapDirective implements AfterViewInit, OnDestroy {
 
     /** @description To update the image size and its `<area>` coordinates on demand. */
     update(): void {
-        if (this.isLoaded) {
-            this.updateSize();
-            this.areas.forEach((area: ResponsiveImageAreaDirective) => area.updateCoords());
-        }
+        if (!this.isLoaded) return;
+
+        this.updateSize();
+        this.areas.forEach((area: ResponsiveImageAreaDirective) => area.updateCoords());
     }
 }
