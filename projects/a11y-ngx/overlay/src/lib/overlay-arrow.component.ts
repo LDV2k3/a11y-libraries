@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -12,6 +12,7 @@ import { OverlayPosition } from './overlay.type';
     selector: 'a11y-overlay-arrow',
     template: '',
     styleUrls: ['./overlay-arrow.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     host: {
         '[style]': 'attrStyle',
         '[style.--arrow-scale]': 'scaleFactor',
@@ -61,7 +62,7 @@ export class OverlayArrowComponent implements OnInit, OnDestroy {
 
     private readonly destroy$: Subject<void> = new Subject<void>();
 
-    constructor(private hostDirective: OverlayDirective) {}
+    constructor(private hostDirective: OverlayDirective, private cdr: ChangeDetectorRef) {}
 
     ngOnInit(): void {
         this.hostDirective.overlayUpdated$.pipe(takeUntil(this.destroy$)).subscribe(() => this.setArrowPosition());
@@ -131,5 +132,6 @@ export class OverlayArrowComponent implements OnInit, OnDestroy {
         const height: string | null = !isTopBottom ? `${styleSize}px` : null;
 
         this.attrStyle = { top, left, width, height } as CSSStyleDeclaration;
+        this.cdr.markForCheck();
     }
 }
