@@ -12,17 +12,17 @@ export const OVERLAY_STYLES_ID: string = 'a11y-overlay-styles';
 export const OVERLAY_COLOR_SCHEME_PROPERTY: string = 'colorSchemes';
 
 export const OVERLAY_CSS_PROPERTIES: ColorSchemeCSSMap = {
-    backgroundColor: { property: '--overlay-bg-color', ignoreIfUsingBS: true },
-    textColor: { property: '--overlay-text-color', ignoreIfUsingBS: true },
-    borderSize: { property: '--overlay-border-size', suffix: 'px', ignoreIfUsingBS: true },
-    borderColor: { property: '--overlay-border-color', ignoreIfUsingBS: true },
-    borderRadius: { property: '--overlay-border-radius', suffix: 'px', ignoreIfUsingBS: true },
-    shadow: { property: '--overlay-shadow', ignoreIfUsingBS: true },
-    shadowColor: { property: '--overlay-shadow-color', ignoreIfUsingBS: true },
+    backgroundColor: { property: '--overlay-bg-color' },
+    textColor: { property: '--overlay-text-color' },
+    borderSize: { property: '--overlay-border-size', suffix: 'px' },
+    borderColor: { property: '--overlay-border-color' },
+    borderRadius: { property: '--overlay-border-radius', suffix: 'px' },
+    shadow: { property: '--overlay-shadow' },
+    shadowColor: { property: '--overlay-shadow-color' },
     fadeMs: { property: '--overlay-fade-ms', suffix: 'ms' },
-    padding: { property: '--overlay-padding', ignoreIfUsingBS: true },
+    padding: { property: '--overlay-padding' },
     arrowSize: { property: '--overlay-arrow', suffix: 'px' },
-    zIndex: { property: '--overlay-zindex', ignoreIfUsingBS: true },
+    zIndex: { property: '--overlay-zindex' },
 };
 
 export const OVERLAY_BASE_SCHEME: ColorSchemeProperties = {

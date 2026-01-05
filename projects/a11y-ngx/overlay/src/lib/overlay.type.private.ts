@@ -1,5 +1,3 @@
-import { ColorSchemesStyles } from '@a11y-ngx/color-scheme';
-
 import { OverlayConfigStyles, OverlayRootConfig, OverlayCustomConfig } from './overlay.type';
 
 export const OVERLAY_SELECTOR: string = 'a11y-overlay';
@@ -87,8 +85,8 @@ export type OverlayStylesColorScheme = {
     shadowColor: string;
 };
 
-export type OverlayStylesColorSchemeObject = {
-    colorSchemes: Omit<ColorSchemesStyles, 'generics'>;
+export type OverlayColorSchemes = {
+    [scheme: string]: Partial<Record<keyof OverlayStylesColorScheme, string>>;
 };
 
 export type OverlayCustomNoTriggerConfig = Omit<OverlayCustomConfig, 'trigger'>;

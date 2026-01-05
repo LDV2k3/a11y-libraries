@@ -86,7 +86,6 @@ This library was generated with [Angular CLI](https://github.com/angular/angular
     - [The Directive Tab Cycle Listener](#the-directive-tab-cycle-listener)
       - [The Directive Focus on Overlay First](#the-directive-focus-on-overlay-first)
 - [The Overlay Component](#the-overlay-component)
-  - [The Use of Bootstrap Styles](#the-use-of-bootstrap-styles)
 - [The Overlay Arrow Component](#the-overlay-arrow-component)
   - [The Arrow Component inside the Directive](#the-arrow-component-inside-the-directive)
 - [The Overlay Create Service](#the-overlay-create-service)
@@ -229,7 +228,7 @@ Some other config types:
 - **Properties:**
 
   | Property | Type | Description |
-  |:---------|:-----|:------------|
+  | :------- | :--- | :---------- |
   | `position` | `OverlayPositionInput` | See [the Position Input](#the-position-input) |
   | `positionStrategy` | `OverlayPositionStrategy` | See [the Position Strategy](#the-position-strategy) |
   | `positionsAllowed` | `OverlayPositionsAllowedInput` | See [the Positions Allowed Input](#the-positions-allowed-input) |
@@ -245,7 +244,7 @@ Some other config types:
 - **Properties:**
 
   | Property | Type | Description |
-  |:---------|:-----|:------------|  
+  | :------- | :--- | :---------- |
   | `allowClose` | `OverlayAllowClose` or `boolean` | See [the Close Listeners](#the-directive-close-listeners) |
   | `allowTabCycle` | `boolean` | See [the Tab-Cycle Listener](#the-directive-tab-cycle-listener) |
   | `firstFocusOn` | `'first'` or `'last'` or `undefined` | See [the Tab-Cycle Focus First](#the-directive-focus-on-overlay-first) |
@@ -258,7 +257,7 @@ All color related default values (★) are coming from the variables set within 
 - **Properties:**
 
   | Property | Type | Description |
-  |:---------|:-----|:------------|
+  | :------- | :--- | :---------- |
   | `arrowSize` | `number` | See [the Arrow Size](#the-arrow-size) |
   | `offsetSize` | `number` | See [the Offset Size](#the-offset-size) |
   | `fadeMs` | `number` | See [the Fade Timeout](#the-fade-timeout) |
@@ -283,10 +282,9 @@ All color related default values (★) are coming from the variables set within 
 - **Properties:**
 
   | Property | Type | Description |
-  |:---------|:-----|:------------|
-  | `colorSchemes` | `ColorSchemesStyles` | See [how to Configure the Color Schemes](#how-to-configure-the-color-schemes) |
+  | :------- | :--- | :---------- |
+  | `colorSchemes` | `Object` | See [how to Configure the Color Schemes](#how-to-configure-the-color-schemes) |
   | `forceScheme` | `ColorScheme` | See [how to Force a Scheme](#how-to-force-a-scheme) |
-  | `useBootstrapStyles` | `boolean` | See [Use Bootstrap Styles](#the-use-of-bootstrap-styles) |
 
 #### The Overlay Internal Config
 
@@ -889,11 +887,9 @@ Here are the main differences between the component and the directive:
 - [The Component](#the-overlay-component):
   - It will handle the content and calculations better, since it contains a template and a stylesheet that already covers all possible scenarios.
   - All styles are applied through CSS variables.
-  - It allows to use Bootstrap styles.
   - Check [the Component Use](#the-component-use) example.
 - [The Directive](#the-overlay-directive):
   - It will apply all styles to the host element as inline CSS.
-  - It does not allow to use Bootstrap styles.
   - Check [the Directive Use](#the-directive-use) example.
 
 ## The Overlay Directive
@@ -913,7 +909,7 @@ Behind the scenes, this one will take care of:
 ### The Directive Inputs
 
 | Name | Type | Description |
-|:-----|:-----|:------------|
+| :--- | :--- | :---------- |
 | `config` | `OverlayCustomConfig` or `string` | See [the Overlay Custom Config](#the-overlay-custom-config) or [the Config Input through a `string`](#the-config-input-through-a-string) |
 | `trigger` | `HTMLElement` | See [the Trigger element](#the-trigger-element) |
 | `boundary` | `HTMLElement` | See [the Custom Boundary](#the-custom-boundary) |
@@ -944,7 +940,6 @@ Behind the scenes, this one will take care of:
 | `allowTabCycle` | `boolean` | See [the Tab Cycle Listener](#the-directive-tab-cycle-listener) |
 | `firstFocusOn` | `'first'` or `'last'` or `undefined` | See [the Directive Focus on Overlay First](#the-directive-focus-on-overlay-first) |
 | `forceScheme` | `string` | See [how to Force a Scheme](#how-to-force-a-scheme) |
-| `useBootstrapStyles` | `boolean` | See [the Use of Bootstrap Styles](#the-use-of-bootstrap-styles) |
 
 #### The Config Input
 
@@ -1002,7 +997,7 @@ You can follow the examples above, and pass either [an Object](#the-config-input
 ### The Directive Outputs
 
 | Name | Type | Description |
-|:-----|:-----|:------------|
+| :--- | :--- | :---------- |
 | `overlayOpen` | `EventEmitter<void>` | Will emit when `show()` method is invoked |
 | `overlayClose` | `EventEmitter<void>` | Will emit when `hide()` method is invoked, and right after [the fade timeout](#the-fade-timeout) has completed |
 | `overlayToggle` | `EventEmitter<string>` | Will emit values of `'open'` or `'close'`, accordingly |
@@ -1010,7 +1005,7 @@ You can follow the examples above, and pass either [an Object](#the-config-input
 ### The Directive public Methods, Properties, Getters and Setters
 
 | Name | Type | Of Type | Description |
-|:-----|:-----|:--------|:------------|
+| :--- | :--- | :------ | :---------- |
 | `nativeElement` | `get` | `HTMLElement` | The host element: `<a11y-overlay>` for the component or the HTML element for the directive |
 | `isVisible` | `get` | `boolean` | It means that the host element is reachable within the DOM.<br />It doesn't mean is "visually visible" |
 | `isOpaque` | `get` | `boolean` | The Overlay is "visually visible", is fully opaque. |
@@ -1174,10 +1169,7 @@ The `OverlayComponent` extends from [the `OverlayDirective` class](#the-overlay-
 - **Selector:** `'a11y-overlay'`.
 - **Exported As:** `a11yOverlay`.
 
-Behind the scenes, this one will take care of:
-
-- Make use of all the styles through the stylesheet.
-- Provides full use of Bootstrap styles (5.3 or above) when `useBootstrapStyles` is set to `true`.
+Behind the scenes, this one will take care of using all the styles through the stylesheet.
 
 The stylesheet will make use of the values established within [the Config Styles Type](#the-styles-config) for:
 
@@ -1191,50 +1183,6 @@ The stylesheet will make use of the values established within [the Config Styles
 - [`borderColor`](#the-border-color).
 - [`borderRadius`](#the-border-radius).
 - [`zIndex`](#the-zindex).
-
-### The Use of Bootstrap Styles
-
-Whether the overlay will use Bootstrap 5.3 (or above) styles (if set to `true`) or preset/custom (if set to `false`).
-
-> 😅 **NOTE:** You have to have Bootstrap installed on your app for this to work as expected, duh!
-
-- **Input / Config Property:** `useBootstrapStyles`.
-- **Type:** `boolean`.
-- **Default:** `false`.
-
-> **NOTE:** If you choose to use Bootstrap:
->
-> 1. The [Popover styles](https://getbootstrap.com/docs/5.3/components/popovers/) are going to be applied.
-> 2. These styles are only compatible with the use of the component, not the directive.
-> 3. **IMPORTANT:** Everything related to color is managed by Bootstrap, even if you have different schemes configured, you only have `light` and `dark` available.
-
-In the example below:
-
-- The left overlay doesn't have the property, so it will use the preset styles.
-- The right overlay has `useBootstrapStyles` set with `true`, so it's using Bootstrap's (font size, color, border color, shadow, etc.).
-
-```html
-<div class="row">
-    <div class="col text-center">
-        <button type="button" #triggerNoBootstrap (click)="overlayNoBootstrap.toggle()">
-            My button
-        </button>
-        <a11y-overlay #overlayNoBootstrap [trigger]="triggerNoBootstrap">
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Cupiditate repudiandae fuga vero dolore, pariatur, reprehenderit omnis qui deserunt nisi maxime eveniet! Consectetur quo deserunt voluptatum dolore repudiandae sit, est aperiam?
-        </a11y-overlay>
-    </div>
-    <div class="col text-center">
-        <button type="button" #triggerBootstrap (click)="overlayBootstrap.toggle()">
-            My button
-        </button>
-        <a11y-overlay #overlayBootstrap [trigger]="triggerBootstrap" [useBootstrapStyles]="true">
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Cupiditate repudiandae fuga vero dolore, pariatur, reprehenderit omnis qui deserunt nisi maxime eveniet! Consectetur quo deserunt voluptatum dolore repudiandae sit, est aperiam?
-        </a11y-overlay>
-    </div>
-</div>
-```
-
-![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay/src/lib/images/example-use-bootstrap.jpg)
 
 ## The Overlay Arrow Component
 
@@ -1354,13 +1302,10 @@ This library uses [Color Scheme package](https://www.npmjs.com/package/@a11y-ngx
 You can establish all the color related stuff for the preset schemes (`light` and `dark`) or any other you may have added when using the `rootConfig()` method.
 
 - **Config Property:** `colorSchemes`.
-- **Type:** `ColorSchemesStyles`.
 - **Properties:**
-  - `schemes` of type `ColorSchemes`:
-    - In here we have to specify each color scheme by its code-name and, within, the properties we want to override (of type `ColorSchemeProperties`):
-      - `light`.
-      - `dark`.
-      - _'code-name'_ (any other).
+  - `light`.
+  - `dark`.
+  - _'code-name'_ (any other).
 
 Let's say you don't like the default text color for the `light` scheme (`#222`), then you can change it like this:
 
@@ -1371,20 +1316,18 @@ A11yOverlayModule.rootConfig({
     borderSize: 2,
     ...
     colorSchemes: {
-        schemes: {
-            light: {
-                textColor: '#000',
-            },
-            dark: {...},
-            'red-velvet': {...}, // being 'red-velvet' the code-name
+        light: {
+            textColor: '#000',
         },
+        dark: {...},
+        'red-velvet': {...}, // being 'red-velvet' the code-name
     },
 }),
 ```
 
 > **NOTES:**
 >
-> 1. Although `colorSchemes` also includes the `generics` object to define, redundant as it may sound, the generic values (not related to color), that property was removed from here, and you can add those at the _root_ level of the object provided, as shown for the `borderSize` property.
+> 1. You can add any other _generic_ style value from the config (not related to color) at the _root_ level of the object provided, as shown for the `borderSize` property.
 > 2. If you add a color-related property at the _root_ level, it will be treated as _generic_ and will affect all overlays.
 
 ### How to Force a Scheme
@@ -1393,6 +1336,8 @@ Even when the color scheme is set to a specific value (globally), you can force 
 
 - **Input / Config Property:** `forceScheme`.
 - **Type:** `ColorScheme` (aka `string`, aka _'code-name'_).
+
+> **NOTE:** To _reset_ an already set forced scheme, use the value `'auto'`.
 
 I've added a third color scheme for testing purposes called `'red-velvet'`.
 

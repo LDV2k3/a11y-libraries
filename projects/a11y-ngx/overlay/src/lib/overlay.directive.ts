@@ -65,7 +65,6 @@ import {
         '[style.--ao-max-width]': 'inputMaxWidth && isMaxWidthAuto ? null : inputMaxWidth',
         '[style.--ao-max-height]': 'inputMaxHeight ? inputMaxHeight : null',
         //'[style.--ao-max-height]': 'inputMaxHeight ?? null', // Use this once migrated to Angular 17
-        '[style.--bs-popover-max-width]': 'useBootstrapStyles && !isMaxWidthAuto ? inputMaxWidth : null',
         '[attr.visible]': `isVisible ? '' : null`,
         '[attr.fade]': `isVisible && isOpaque ? '' : null`,
     },
@@ -104,7 +103,6 @@ export class OverlayDirective extends OverlayBase implements OnChanges, OnDestro
     @Input('firstFocusOn') inputFirstFocusOn: TabCycleFirstFocus = undefined;
 
     @Input('forceScheme') inputForceScheme: ColorScheme | undefined = undefined;
-    @Input('useBootstrapStyles') inputUseBootstrapStyles: boolean | undefined = undefined;
 
     @Input(OVERLAY_SELECTOR_EXPORT) private set inputIsDirective(isDirective: string) {
         this.isDirective = typeof isDirective === 'string';
@@ -217,14 +215,6 @@ export class OverlayDirective extends OverlayBase implements OnChanges, OnDestro
      * For internal use and to set inline styles.
      */
     private isDirective: boolean = false;
-
-    /**
-     * @description
-     * The Overlay can use Bootstrap and its styles.
-     */
-    get useBootstrapStyles(): boolean {
-        return this.directiveConfig.useBootstrapStyles ?? false;
-    }
 
     /**
      * @description
@@ -398,8 +388,6 @@ export class OverlayDirective extends OverlayBase implements OnChanges, OnDestro
         this.overlayShow = false;
         this.overlayFade = false;
 
-        this.directiveConfig.useBootstrapStyles = this.colorSchemeService.useBootstrapStyles(OVERLAY_SELECTOR);
-
         const overlayGlobalConfig: OverlayRootConfig = this.overlayService.globalConfig;
 
         this.setBaseConfig({ ...overlayGlobalConfig, ...this.overlayConfig });
@@ -433,7 +421,6 @@ export class OverlayDirective extends OverlayBase implements OnChanges, OnDestro
         setChangeValue<boolean>('allowTabCycle', 'inputAllowTabCycle');
         setChangeValue<TabCycleFirstFocus>('firstFocusOn', 'inputFirstFocusOn');
         setChangeValue<boolean>('forceScheme', 'inputForceScheme');
-        setChangeValue<boolean>('useBootstrapStyles', 'inputUseBootstrapStyles');
 
         Object.keys(OVERLAY_CSS_PROPERTIES_DIRECTIVE).forEach((property: string) => {
             const item: OverlayCSSProperty = OVERLAY_CSS_PROPERTIES_DIRECTIVE[property];
@@ -622,17 +609,20 @@ export class OverlayDirective extends OverlayBase implements OnChanges, OnDestro
         if ('maxWidth' in config) this.inputMaxWidth = config.maxWidth as string;
         if ('maxHeight' in config) this.inputMaxHeight = config.maxHeight as string;
 
-        if ('useBootstrapStyles' in config)
-            this.directiveConfig.useBootstrapStyles =
-                this.DOMHelper.getBooleanValue(config.useBootstrapStyles) ?? this.directiveConfig.useBootstrapStyles;
-
-        if ('forceScheme' in config) {
-            this.directiveConfig.forceScheme = config.forceScheme ?? this.directiveConfig.forceScheme;
+        if ('forceScheme' in config && config.forceScheme) {
+            const autoScheme: boolean = config.forceScheme.toLowerCase() === 'auto';
             const { attribute, value } = this.colorSchemeService.getAttributeSelector(config.forceScheme);
-            this.r2.setAttribute(this.nativeElement, attribute, value);
+
+            if (!autoScheme) {
+                this.directiveConfig.forceScheme = config.forceScheme;
+                this.r2.setAttribute(this.nativeElement, attribute, value);
+            } else {
+                this.directiveConfig.forceScheme = undefined;
+                this.r2.removeAttribute(this.nativeElement, attribute);
+            }
         }
 
-        if (!this.directiveConfig.useBootstrapStyles || this.isDirective) {
+        if (this.isDirective) {
             if ('backgroundColor' in config) this.directiveConfig.backgroundColor = config.backgroundColor as string;
             if ('textColor' in config) this.directiveConfig.textColor = config.textColor as string;
             if ('borderColor' in config) this.directiveConfig.borderColor = config.borderColor as string;
@@ -730,7 +720,6 @@ export class OverlayDirective extends OverlayBase implements OnChanges, OnDestro
      */
     setCustomSelector(selector: string): void {
         this.customSelector = selector;
-        this.directiveConfig.useBootstrapStyles = this.colorSchemeService.useBootstrapStyles(selector);
     }
 
     /**

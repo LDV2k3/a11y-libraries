@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { forceStylesCleanup } from '../test';
+import { Component } from '@angular/core';
 
 import { A11yColorSchemeModule } from '@a11y-ngx/color-scheme';
 
 import { A11yOverlayModule } from './overlay.module';
 import { OverlayService } from './overlay.service';
 
-import { OVERLAY_COLOR_SCHEME } from './overlay.color-scheme';
 import { OVERLAY_DEFAULTS, OverlayRootConfig, OverlayCustomConfig } from './overlay.type';
 
 import {
@@ -14,12 +14,38 @@ import {
     ERROR_INIT_CUSTOM_CONFIG_SELECTOR_EMPTY,
     ERROR_INIT_CUSTOM_CONFIG_SELECTOR_NOT_ALLOWED,
     ERROR_UPDATE_CONFIG_SELECTOR_UNEXISTING,
+    ERROR_SERVICE_PROVIDED_MORE_THAN_ONCE,
 } from './overlay.errors';
+
+import { OVERLAY_SELECTOR } from './overlay.type.private';
+
+@Component({
+    template: '',
+    providers: [OverlayService],
+})
+class TestComponent {
+    constructor(public service: OverlayService) {}
+}
+
+describe('Overlay Service provided more than once', () => {
+    beforeEach(() =>
+        TestBed.configureTestingModule({
+            declarations: [TestComponent],
+            providers: [OverlayService],
+        })
+    );
+
+    afterEach(() => TestBed.resetTestingModule());
+
+    it('should throw error when provided more than once', () => {
+        expect(() => TestBed.createComponent(TestComponent)).toThrowError(ERROR_SERVICE_PROVIDED_MORE_THAN_ONCE());
+    });
+});
 
 describe('Overlay Service', () => {
     let service: OverlayService;
 
-    const rootConfig: OverlayRootConfig = { ...OVERLAY_DEFAULTS, colorSchemes: OVERLAY_COLOR_SCHEME };
+    const rootConfig: OverlayRootConfig = { ...OVERLAY_DEFAULTS };
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -39,20 +65,32 @@ describe('Overlay Service', () => {
         expect(service.globalConfig).toEqual(rootConfig);
     });
 
-    it('should check the root config has been set using "initRootConfig()" method', () => {
-        service.initRootConfig({
-            alignmentsAllowed: 'end',
-            arrowSize: 20,
-            position: 'right-start',
+    describe('should check the "initRootConfig()" method', () => {
+        it('should check the root config has been corectly set', () => {
+            service.initRootConfig({
+                alignmentsAllowed: 'end',
+                arrowSize: 20,
+                position: 'right-start',
+            });
+
+            const config = service.globalConfig;
+            expect(config.alignmentsAllowed).toEqual('end');
+            expect(config.arrowSize).toEqual(20);
+            expect(config.position).toEqual('right-start');
         });
 
-        const config = service.globalConfig;
-        expect(config.alignmentsAllowed).toEqual('end');
-        expect(config.arrowSize).toEqual(20);
-        expect(config.position).toEqual('right-start');
+        it('should check the root config has not been set when an undefined object is passed', () => {
+            service.initRootConfig(undefined);
+            expect(service['configs'][OVERLAY_SELECTOR]).toBe(undefined);
+        });
     });
 
     describe('should check the "initCustomConfigs()" method', () => {
+        it('should return when the array of configs is undefined', () => {
+            service.initCustomConfigs(undefined);
+            expect(Object.keys(service['configs']).length).toEqual(1); // Only the root config
+        });
+
         describe('should check the errors and warnings', () => {
             it('should throw an error when not allowed selector is passed', () => {
                 expect(() => service.initCustomConfigs([{ selector: 'root' }])).toThrowError(
@@ -65,6 +103,14 @@ describe('Overlay Service', () => {
                 const spyOnConsoleWarn = spyOn(console, 'warn');
 
                 service.initCustomConfigs([{ selector: ' ' }]);
+
+                expect(spyOnConsoleWarn).toHaveBeenCalledWith(ERROR_INIT_CUSTOM_CONFIG_SELECTOR_EMPTY());
+            });
+
+            it('should throw a warning when an undefined selector is passed', () => {
+                const spyOnConsoleWarn = spyOn(console, 'warn');
+
+                service.initCustomConfigs([{ selector: undefined }]);
 
                 expect(spyOnConsoleWarn).toHaveBeenCalledWith(ERROR_INIT_CUSTOM_CONFIG_SELECTOR_EMPTY());
             });
@@ -134,6 +180,13 @@ describe('Overlay Service', () => {
     });
 
     describe('should check the "getProcessedConfig()" method', () => {
+        it('should return two empty objects when an undefined config is passed', () => {
+            const { custom, module } = service.getProcessedConfig(undefined);
+
+            expect(custom).toEqual({});
+            expect(module).toEqual({});
+        });
+
         it('should return the right objects when custom values are passed using a selector', () => {
             const config: OverlayCustomConfig = {
                 selector: 'test-selector',

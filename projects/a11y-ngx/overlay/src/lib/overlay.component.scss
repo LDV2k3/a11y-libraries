@@ -13,24 +13,6 @@ $overlay-shadow-color: var(--overlay-shadow-color, currentColor);
     --arrow-border-size: #{$overlay-border-size};
     --arrow-bg-color: #{$overlay-bg-color};
 
-    &[use-bs] {
-        --overlay-zindex: var(--bs-popover-zindex);
-        --overlay-text-color: var(--bs-popover-body-color);
-        --overlay-bg-color: var(--bs-popover-bg);
-        --overlay-border-size: var(--bs-popover-border-width);
-        --overlay-border-color: var(--bs-popover-border-color);
-        --overlay-border-radius: var(--bs-popover-border-radius);
-        --overlay-padding: var(--bs-popover-body-padding-y) var(--bs-popover-body-padding-x);
-
-        border: unset;
-        background-color: unset;
-        border-radius: unset;
-
-        & > [overlay-wrapper] {
-            box-shadow: var(--bs-popover-box-shadow);
-        }
-    }
-
     & > [overlay-wrapper] {
         background-color: $overlay-bg-color;
         border: $overlay-border-size solid $overlay-border-color;

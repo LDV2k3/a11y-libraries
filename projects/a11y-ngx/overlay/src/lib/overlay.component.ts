@@ -21,10 +21,6 @@ import { OVERLAY_SELECTOR, OVERLAY_SELECTOR_EXPORT } from './overlay.type.privat
         </div>
     `,
     styleUrls: ['./overlay.component.scss'],
-    host: {
-        '[attr.use-bs]': `useBootstrapStyles ? '' : null`,
-        '[class.popover]': 'useBootstrapStyles',
-    },
     changeDetection: ChangeDetectionStrategy.OnPush,
     exportAs: OVERLAY_SELECTOR_EXPORT,
 })

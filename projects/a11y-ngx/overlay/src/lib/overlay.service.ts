@@ -3,7 +3,7 @@ import { Injectable, Optional, SkipSelf } from '@angular/core';
 import { ColorSchemeService } from '@a11y-ngx/color-scheme';
 import { DOMHelperService } from '@a11y-ngx/dom-helper';
 
-import { OVERLAY_COLOR_SCHEME, OVERLAY_COLOR_SCHEME_PROPERTY } from './overlay.color-scheme';
+import { OVERLAY_COLOR_SCHEME_PROPERTY } from './overlay.color-scheme';
 
 import {
     ERROR_SERVICE_PROVIDED_MORE_THAN_ONCE,
@@ -21,7 +21,7 @@ const OVERLAY_CONFIG_ROOT_SELECTOR: string = ':root';
 @Injectable({ providedIn: 'root' })
 export class OverlayService {
     private readonly configs: { [selector: string]: OverlayRootConfig } = {
-        [OVERLAY_CONFIG_ROOT_SELECTOR]: { ...OVERLAY_DEFAULTS, colorSchemes: OVERLAY_COLOR_SCHEME },
+        [OVERLAY_CONFIG_ROOT_SELECTOR]: { ...OVERLAY_DEFAULTS },
     };
 
     /**
@@ -78,13 +78,17 @@ export class OverlayService {
 
         if (!rootConfig) return;
 
-        const useBootstrapStyles: boolean = !!rootConfig.useBootstrapStyles;
-        delete rootConfig.useBootstrapStyles;
         this.rootConfig = rootConfig;
 
-        const rootConfigOverlay: OverlayRootConfig = { ...rootConfig, useBootstrapStyles };
+        const rootConfigOverlay: OverlayRootConfig = { ...rootConfig };
         this.configs[OVERLAY_SELECTOR] = {};
         this.updateConfig(OVERLAY_SELECTOR, rootConfigOverlay);
+
+        // If we found the "colorSchemes" object, we move its content to the "schemes" object instead,
+        // so the Color Scheme Service can find the schemes/properties appropriately
+        if (rootConfigOverlay.colorSchemes)
+            rootConfigOverlay.colorSchemes = { schemes: rootConfigOverlay.colorSchemes };
+
         this.colorSchemeService.updateConfig(OVERLAY_SELECTOR, rootConfigOverlay, OVERLAY_COLOR_SCHEME_PROPERTY);
     }
 

@@ -11,8 +11,8 @@ import { TabCycleFirstFocus } from '@a11y-ngx/tab-cycle';
 
 import {
     OverlayAllowClose,
+    OverlayColorSchemes,
     OverlayStylesColorScheme,
-    OverlayStylesColorSchemeObject,
     OverlayStylesGenerics,
 } from './overlay.type.private';
 
@@ -50,7 +50,10 @@ export type OverlayConfig = OverlayBaseConfig & OverlayConfigStyles & OverlayCon
 
 export type OverlayConfigStyles = OverlayStylesGenerics &
     OverlayStylesColorScheme &
-    Partial<OverlayStylesColorSchemeObject> & {
+    Partial<{
+        /** @description To define the color schemes. */
+        colorSchemes: OverlayColorSchemes;
+    }> & {
         /** @description The space between the overlay and its trigger (translated to pixels). @default 5 */
         offsetSize: number;
         /** @description The time it will take to start to fade in or out after the overlay is shown or hidden (translated to milliseconds). @default 0 */
