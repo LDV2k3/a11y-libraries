@@ -36,20 +36,7 @@ $tooltip-shadow-color: var(--tooltip-shadow-color, currentColor);
         }
     }
 
-    &:not([use-bs]) {
-        z-index: $tooltip-zindex;
-    }
-
-    &[use-bs] {
-        --tooltip-zindex: var(--bs-tooltip-zindex) !important;
-        --tooltip-bg-color: var(--bs-tooltip-bg) !important;
-        --tooltip-text-color: var(--bs-tooltip-color) !important;
-        --tooltip-border-size: 0px !important;
-        --tooltip-border-color: var(--bs-tooltip-bg) !important;
-        --tooltip-border-radius: var(--bs-tooltip-border-radius) !important;
-        --tooltip-padding: var(--bs-tooltip-padding-y) var(--bs-tooltip-padding-x) !important;
-        --tooltip-shadow: none !important;
-    }
+    z-index: $tooltip-zindex;
 }
 
 [overlay-wrapper] {

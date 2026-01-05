@@ -1,6 +1,6 @@
 {
     "name": "@a11y-ngx/tooltip",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "description": "A fully accessible tooltip directive that provides a standards-compliant experience across mouse, keyboard and touch interactions",
     "keywords": [
         "tooltip",
@@ -16,6 +16,7 @@
         "resize",
         "a11y",
         "accessibility",
+        "accessible",
         "angular"
     ],
     "homepage": "https://github.com/LDV2k3/a11y-libraries/tree/master/projects/a11y-ngx/tooltip#readme",
@@ -44,9 +45,9 @@
     },
     "dependencies": {
         "tslib": "^1.10.0",
-        "@a11y-ngx/overlay": "^1.0.4",
+        "@a11y-ngx/overlay": "^1.0.6",
         "@a11y-ngx/dom-helper": "^1.1.1",
-        "@a11y-ngx/color-scheme": "^1.0.8",
+        "@a11y-ngx/color-scheme": "^1.0.9",
         "@a11y-ngx/sr-only": "^1.0.1"
     }
 }

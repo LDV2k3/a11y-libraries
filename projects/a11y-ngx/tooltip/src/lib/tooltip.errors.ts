@@ -1,6 +1,6 @@
 const formatConsoleMsg = (msg: string): string => msg.replace(/ {2,}/g, '');
 
-const libName: string = 'A11y Tooltip';
+export const libName: string = 'A11y Tooltip';
 
 export const ERROR_ROOT_CONFIG_CALLED_MORE_THAN_ONCE = (): string => {
     const msg: string = `

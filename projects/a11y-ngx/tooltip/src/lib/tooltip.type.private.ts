@@ -52,3 +52,15 @@ export type TooltipDelayEvents = {
     mouse: boolean;
     touch: boolean;
 };
+
+type TooltipStylesColorScheme = {
+    backgroundColor: string;
+    textColor: string;
+    borderColor: string;
+    shadow: string;
+    shadowColor: string;
+};
+
+export type TooltipColorSchemes = {
+    [scheme: string]: Partial<Record<keyof TooltipStylesColorScheme, string>>;
+};

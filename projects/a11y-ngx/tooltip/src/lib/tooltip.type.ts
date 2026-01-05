@@ -2,12 +2,19 @@ import type { OverlayBaseConfig } from '@a11y-ngx/overlay-base';
 import type { OverlayConfigStyles } from '@a11y-ngx/overlay';
 import type { ColorSchemeStylesConfig } from '@a11y-ngx/color-scheme';
 
-import type { TooltipDelayEvents } from './tooltip.type.private';
+import type { TooltipColorSchemes, TooltipDelayEvents } from './tooltip.type.private';
 
 export type Tooltip = string;
 
 export type TooltipConfig = ColorSchemeStylesConfig &
-    Omit<OverlayConfigStyles, 'maxHeight' | 'fadeDelayMs' | 'fadeMs' | 'borderRadius' | 'arrowSize' | 'maxWidth'> &
+    Omit<
+        OverlayConfigStyles,
+        'maxHeight' | 'fadeDelayMs' | 'fadeMs' | 'borderRadius' | 'arrowSize' | 'maxWidth' | 'colorSchemes'
+    > &
+    Partial<{
+        /** @description To define the color schemes for the Tooltip. */
+        colorSchemes: TooltipColorSchemes;
+    }> &
     Omit<OverlayBaseConfig, 'fluidSize' | 'trigger'> & {
         /** @description The desired max width. @default '200px' */
         maxWidth: string;

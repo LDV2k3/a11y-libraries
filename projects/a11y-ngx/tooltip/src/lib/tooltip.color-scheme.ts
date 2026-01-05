@@ -11,17 +11,17 @@ export const TOOLTIP_STYLES_ID: string = 'a11y-tooltip-styles';
 export const TOOLTIP_COLOR_SCHEME_PROPERTY: string = 'colorSchemes';
 
 export const TOOLTIP_CSS_PROPERTIES: ColorSchemeCSSMap = {
-    backgroundColor: { property: '--tooltip-bg-color', ignoreIfUsingBS: true },
-    textColor: { property: '--tooltip-text-color', ignoreIfUsingBS: true },
-    borderSize: { property: '--tooltip-border-size', suffix: 'px', ignoreIfUsingBS: true },
-    borderColor: { property: '--tooltip-border-color', ignoreIfUsingBS: true },
-    borderRadius: { property: '--tooltip-border-radius', suffix: 'px', ignoreIfUsingBS: true },
-    shadow: { property: '--tooltip-shadow', ignoreIfUsingBS: true },
-    shadowColor: { property: '--tooltip-shadow-color', ignoreIfUsingBS: true },
+    backgroundColor: { property: '--tooltip-bg-color' },
+    textColor: { property: '--tooltip-text-color' },
+    borderSize: { property: '--tooltip-border-size', suffix: 'px' },
+    borderColor: { property: '--tooltip-border-color' },
+    borderRadius: { property: '--tooltip-border-radius', suffix: 'px' },
+    shadow: { property: '--tooltip-shadow' },
+    shadowColor: { property: '--tooltip-shadow-color' },
     fadeMs: { property: '--tooltip-fade-ms', suffix: 'ms' },
-    padding: { property: '--tooltip-padding', ignoreIfUsingBS: true },
+    padding: { property: '--tooltip-padding' },
     arrowSize: { property: '--tooltip-arrow', suffix: 'px' },
-    zIndex: { property: '--tooltip-zindex', ignoreIfUsingBS: true },
+    zIndex: { property: '--tooltip-zindex' },
 };
 
 export const TOOLTIP_BASE_SCHEME: ColorSchemeProperties = {

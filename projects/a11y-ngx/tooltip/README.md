@@ -55,7 +55,6 @@ This library was generated with [Angular CLI](https://github.com/angular/angular
   - [How to Configure the Color Schemes](#how-to-configure-the-color-schemes)
   - [How to Force a Scheme](#how-to-force-a-scheme)
   - [How to add a New Color Scheme](#how-to-add-a-new-color-scheme)
-- [The Use of Bootstrap Styles](#the-use-of-bootstrap-styles)
 - [The Use with Image Maps](#the-use-with-image-maps)
 - [The Use with Abbreviation Elements](#the-use-with-abbreviation-elements)
 - [The Use with Non-Interactive Elements](#the-use-with-non-interactive-elements)
@@ -115,7 +114,7 @@ The `TooltipConfig` provides several properties to customize.
 > All color related default values (★) are coming from the variables set within [the Color Scheme global configuration](https://www.npmjs.com/package/@a11y-ngx/color-scheme#user-content-global-config-basic-properties).
 
 | Property | Type | Description |
-|:---------|:-----|:------------|
+| :------- | :--- | :---------- |
 | `position` | `OverlayPositionInput` | See [the Position Input](#the-position-input) |
 | `positionStrategy` | `OverlayPositionStrategy` | See [the Position Strategy](#the-position-strategy) |
 | `positionsAllowed` | `OverlayPositionsAllowedInput` | See [the Positions Allowed Input](#the-positions-allowed-input) |
@@ -142,7 +141,6 @@ The `TooltipConfig` provides several properties to customize.
 | `borderRadius` | `number` | See [the Border Radius](#the-border-radius) |
 | `className` | `string` or `string[]` | See [the Class Names](#the-class-names) |
 | `maxWidth` | `string` | See [the Max Width](#the-max-width) |
-| `useBootstrapStyles` | `boolean` | See [Use Bootstrap Styles](#the-use-of-bootstrap-styles) |
   
 As part as the config object, there is a set of properties for Color Scheme:
   
@@ -151,7 +149,7 @@ As part as the config object, there is a set of properties for Color Scheme:
 - **Properties:**
   
 | Property | Type | Description |
-|:---------|:-----|:------------|
+| :------- | :--- | :---------- |
 | `colorSchemes` | `ColorSchemesStyles` | See [how to Configure the Color Schemes](#how-to-configure-the-color-schemes) |
 | `forceScheme` | `ColorScheme` | See [how to Force a Scheme](#how-to-force-a-scheme) |
 
@@ -578,39 +576,6 @@ A11yColorSchemeModule.rootConfig({
     ],
 }),
 ```
-
-## The Use of Bootstrap Styles
-
-Whether the tooltip will use Bootstrap 5.3 (or above) styles (if set to `true`) or preset/custom (if set to `false`).
-
-> 😅 **NOTE:** You have to have Bootstrap installed on your app for this to work as expected, duh!
-
-- **Config Property:** `useBootstrapStyles`.
-- **Type:** `boolean`.
-- **Default:** `false`.
-
-> **NOTE:** If you choose to use Bootstrap:
->
-> 1. The [Tooltip styles](https://getbootstrap.com/docs/5.3/components/tooltips/) are going to be applied.
-> 2. **IMPORTANT:** Everything related to color is managed by Bootstrap, even if you have different schemes configured, you only have `light` and `dark` available.
-
-In the example below:
-
-- The left one doesn't have the property, so it will use the preset styles.
-- The right one has `useBootstrapStyles` set with `true` (as seen in the code), so it's using Bootstrap's (font size, color, border color, border radius, etc.).
-
-```html
-...
-<button
-    type="button"
-    class="btn"
-    tooltip="Next Month"
-    [tooltipConfig]="{ asLabel: true, useBootstrapStyles: true }">
-    <i class="fa-solid fa-chevron-right"></i>
-</button>
-```
-
-![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/tooltip/src/lib/images/example-use-bootstrap.jpg)
 
 ## The Use with Image Maps
 

@@ -8,7 +8,7 @@ import { TOOLTIP_SELECTOR } from './tooltip.type.private';
     selector: TOOLTIP_SELECTOR,
     template: `
         <div overlay-wrapper>
-            <div overlay-content [class.tooltip-inner]="useBootstrapStyles" [innerHTML]="customContent"></div>
+            <div overlay-content [innerHTML]="customContent"></div>
         </div>
     `,
     styleUrls: ['./tooltip.component.scss'],
@@ -22,8 +22,6 @@ import { TOOLTIP_SELECTOR } from './tooltip.type.private';
         '[attr.left]': 'attrPositionLeft',
         '[attr.right]': 'attrPositionRight',
         '[attr.animate]': 'attrAnimate',
-        '[attr.use-bs]': 'useBootstrapStyles ? "" : null',
-        '[class.tooltip]': 'useBootstrapStyles',
     },
 })
 export class TooltipComponent extends OverlayBaseComponent {

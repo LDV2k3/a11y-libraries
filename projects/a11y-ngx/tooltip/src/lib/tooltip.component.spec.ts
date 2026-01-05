@@ -247,15 +247,6 @@ describe('Tooltip Component', () => {
             expect(getTooltip().classList.contains('tooltip')).toBe(false);
         }));
 
-        it(`should have the "use-bs" and the "tooltip" class attribute`, fakeAsync(() => {
-            component.config = { useBootstrapStyles: true };
-
-            mouseEnterTrigger();
-            tick(showCloseDelayMs());
-            expect(DOMHelper.hasAttribute(getTooltip(), 'use-bs')).toBe(true);
-            expect(getTooltip().classList.contains('tooltip')).toBe(true);
-        }));
-
         it(`should have the "animate" attribute by default`, fakeAsync(() => {
             mouseEnterTrigger();
             tick(showCloseDelayMs());
