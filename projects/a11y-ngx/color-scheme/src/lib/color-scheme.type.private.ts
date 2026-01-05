@@ -71,8 +71,6 @@ export type ColorSchemeCSSProperty = {
      * `suffix: 'ms'` => `150ms`.
      */
     suffix?: string;
-    /** @description To ignore the current property if `useBootstrapStyles` was set to `true` within the config. */
-    ignoreIfUsingBS?: boolean;
 };
 
 export type ColorSchemeSchemeDefaults = Partial<ColorSchemeStylesGenerics> &

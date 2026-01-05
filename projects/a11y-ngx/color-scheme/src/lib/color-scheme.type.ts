@@ -111,8 +111,6 @@ export type ColorSchemeItemNew = ColorSchemeItem &
 export type ColorSchemeStylesConfig = {
     /** @description Force to use the given Color Scheme. */
     forceScheme?: ColorScheme;
-    /** @description Whether it will use Bootstrap 5.3 (or higher) styles or custom. */
-    useBootstrapStyles?: boolean;
 };
 
 /**

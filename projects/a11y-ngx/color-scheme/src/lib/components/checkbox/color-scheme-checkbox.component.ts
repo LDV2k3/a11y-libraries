@@ -1,4 +1,4 @@
-import { Component, HostBinding, Input, OnDestroy } from '@angular/core';
+import { Component, Input, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -28,15 +28,6 @@ export class ColorSchemeCheckboxComponent implements OnDestroy {
     }
     set disabled(disabled: boolean) {
         this.inputDisabled = disabled;
-    }
-
-    @Input() useBootstrapStyles: boolean = false;
-
-    @HostBinding('attr.use-bs') private get attrBS(): string | null {
-        return this.useBootstrapStyles ? '' : null;
-    }
-    @HostBinding('class.form-check') private get classBSFormCheck(): boolean {
-        return this.useBootstrapStyles;
     }
 
     colorSchemeDark!: boolean;

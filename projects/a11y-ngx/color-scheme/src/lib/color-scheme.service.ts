@@ -2,12 +2,13 @@ import { Injectable, Inject, OnDestroy, Optional, SkipSelf } from '@angular/core
 import { DOCUMENT } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
 
-import { WINDOW, LOCAL_STORAGE } from './color-scheme.providers';
+import { WINDOW, LOCAL_STORAGE } from './color-scheme.module.providers.private';
 
 import {
     ERROR_SERVICE_PROVIDED_MORE_THAN_ONCE,
     ERROR_FORCED_SCHEME_SELECTOR_NOT_FOUND,
     ERROR_EDIT_CONFIG_NOT_FOUND,
+    ERROR_NEW_SCHEME_KEY_NOT_ALLOWED,
 } from './color-scheme.errors';
 
 import {
@@ -214,18 +215,6 @@ export class ColorSchemeService implements OnDestroy {
 
     /**
      * @description
-     * To know whether the given selector can use Bootstrap styles or not.
-     *
-     * @param { string } selector - The given selector.
-     * @returns { boolean }
-     */
-    useBootstrapStyles(selector: string): boolean {
-        const { forceScheme, useBootstrapStyles } = this.getConfig(selector);
-        return !this.selectorNotAllowed(selector) && !forceScheme && !!useBootstrapStyles;
-    }
-
-    /**
-     * @description
      * Get the current Color Scheme for a given selector.
      *
      * @param { string } selector - The given selector.
@@ -297,6 +286,13 @@ export class ColorSchemeService implements OnDestroy {
                 .filter((property: string) => property.trim().startsWith('--') && generics[property] !== undefined)
                 .forEach((property: string) => (stylesMap[property.trim()] = property.trim()));
 
+        // TODO: needs refactor!!!
+        // TODO: needs refactor!!!
+        // To avoid create the CSS only for that forced scheme
+        delete newConfig.forceScheme;
+        // TODO: needs refactor!!!
+        // TODO: needs refactor!!!
+
         this.allConfigs[newConfig.selector] = newConfig as ColorSchemeDefaultConfig;
         this.createCSS(newConfig.selector);
     }
@@ -323,13 +319,6 @@ export class ColorSchemeService implements OnDestroy {
         if (!Object.keys(currentConfig).length) {
             console.warn(ERROR_EDIT_CONFIG_NOT_FOUND(selector));
             return;
-        }
-        if (typeof config.useBootstrapStyles === 'boolean') {
-            currentConfig.useBootstrapStyles = Boolean(config.useBootstrapStyles);
-        }
-        if ('forceScheme' in config) {
-            currentConfig.forceScheme = config.forceScheme;
-            updateCSS = true;
         }
 
         const { generics: currentConfigGenerics = {}, schemes: currentConfigSchemes } =
@@ -500,9 +489,6 @@ export class ColorSchemeService implements OnDestroy {
 
         if (Object.keys(customConfig ?? {}).length) {
             const { styles, stylesMap, forceScheme } = this.getConfig(selector);
-            const useBootstrapCustom: boolean = customConfig.useBootstrapStyles as unknown as boolean;
-            const useBootstrapGlobal: boolean = this.useBootstrapStyles(selector);
-            const useBootstrap: boolean = useBootstrapCustom ?? useBootstrapGlobal;
 
             this.findMatchingProperties(selector, stylesMap).forEach((property: string) => {
                 const configProperty: ColorSchemeCSSType = customConfig[property];
@@ -524,16 +510,13 @@ export class ColorSchemeService implements OnDestroy {
                 const currentProperty: ColorSchemeCSSType | undefined = getCurrentProperty();
 
                 if (
-                    (useBootstrapGlobal && !useBootstrapCustom) ||
-                    (((typeof configProperty === 'number' && !isNaN(configProperty)) || configProperty) &&
-                        configProperty !== currentProperty)
+                    ((typeof configProperty === 'number' && !isNaN(configProperty)) || configProperty) &&
+                    configProperty !== currentProperty
                 ) {
                     const item: ColorSchemeCSSProperty = this.getCSSProperty(stylesMap[property]);
 
-                    if (!useBootstrap || (useBootstrap && !item.ignoreIfUsingBS)) {
-                        const propertyValue: ColorSchemeCSSType = configProperty ?? currentProperty;
-                        returnStyles[item.property] = `${propertyValue}${item.suffix ?? ''}`;
-                    }
+                    const propertyValue: ColorSchemeCSSType = configProperty ?? currentProperty;
+                    returnStyles[item.property] = `${propertyValue}${item.suffix ?? ''}`;
                 }
             });
         }
@@ -594,10 +577,15 @@ export class ColorSchemeService implements OnDestroy {
      * @param { ColorSchemeItemNew } newScheme - The new Color Scheme.
      */
     newScheme(newScheme: ColorSchemeItemNew): void {
+        const { value: newSchemeKey, scheme, useMissingPropsFrom } = newScheme;
+
+        if (newSchemeKey.trim().toLowerCase() === 'auto') {
+            console.error(ERROR_NEW_SCHEME_KEY_NOT_ALLOWED());
+            return;
+        }
+
         // Inserts the new scheme into the penultimate position (last position is for 'auto').
         this.allColorSchemes.splice(this.allColorSchemes.length - 1, 0, newScheme);
-
-        const { value: newSchemeKey, scheme, useMissingPropsFrom } = newScheme;
 
         // Default variable suffix set to 'light' scheme.
         let propertyVarSuffix: ColorScheme = SCHEME.LIGHT;
@@ -846,7 +834,6 @@ export class ColorSchemeService implements OnDestroy {
         const { generics } = styles as ColorSchemesObject;
         const { attributeSelectorMatch } = this.globalConfig;
         const stylesID: string = cssTagID ?? this.getStyleIDFromSelector(selector);
-        const useBootstrap: boolean = this.useBootstrapStyles(selector);
 
         const getProperties = (scheme?: ColorScheme): string[] => {
             let properties: ColorSchemeProperties;
@@ -872,10 +859,8 @@ export class ColorSchemeService implements OnDestroy {
                         const item: ColorSchemeCSSProperty = this.getCSSProperty(map[property]);
                         const value: ColorSchemeCSSType = properties[property];
 
-                        if (!useBootstrap || (useBootstrap && !item.ignoreIfUsingBS)) {
-                            const suffix: string = !String(value).startsWith('var(') ? item.suffix ?? '' : '';
-                            return `${item.property}:${value}${suffix};`;
-                        }
+                        const suffix: string = !String(value).startsWith('var(') ? item.suffix ?? '' : '';
+                        return `${item.property}:${value}${suffix};`;
                     })
                     // Filters by non-undefined properties.
                     .filter((property: string | undefined) => property) as string[]

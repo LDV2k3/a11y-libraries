@@ -29,13 +29,11 @@ This library was generated with [Angular CLI](https://github.com/angular/angular
     - [The CSS Tag ID](#the-color-scheme-config-css-tag-id)
   - [The Color Scheme Styles Config](#the-color-scheme-config-styles-config)
     - [Force Scheme](#the-color-scheme-config-force-scheme)
-    - [Use Bootstrap Styles](#the-color-scheme-config-use-bootstrap-styles)
 
 - [The Service](#the-service)
   - [Public Methods, Properties, Getters and Setters](#the-service-public-methods-properties-getters-and-setters)
     - [Color Scheme Change](#the-service-color-scheme-change)
     - [User Chosen](#the-service-user-chosen)
-    - [The `useBootstrapStyles()` Method](#the-service-usebootstrapstyles-method)
     - [The `getCurrentScheme()` Method](#the-service-getcurrentscheme-method)
     - [The `getConfig()` Method](#the-service-getconfig-method)
     - [The `setConfig()` Method](#the-service-setconfig-method)
@@ -90,10 +88,21 @@ Serves the purpose of configuring the basics for the entire Color Scheme system 
 
 Accepts a single parameter `config` of type [`ColorScheme`](#the-color-scheme) or the [`ColorSchemeGlobalConfig`](#the-global-config) object.
 
+**On Angular v12 - v14:**
+
 ```typescript
 A11yColorSchemeModule.rootConfig('dark'),
 // or...
 A11yColorSchemeModule.rootConfig({
+    useScheme: 'dark',
+    ...
+}),
+```
+
+**On Angular v15+:**
+
+```typescript
+provideA11yColorScheme({
     useScheme: 'dark',
     ...
 }),
@@ -106,6 +115,8 @@ Serves to establish one or more sub level configurations based on a given `selec
 This comes handy when you need to add a custom set of properties and styles for the Color Scheme on a particular component or library.
 
 Accepts a single parameter `config` of type [`ColorSchemeConfig`](#the-color-scheme-config) or an array of them, so you can provide multiple selectors.
+
+**On Angular v12 - v14:**
 
 ```typescript
 A11yColorSchemeModule.setColorScheme({
@@ -123,6 +134,15 @@ A11yColorSchemeModule.setColorScheme([
         ...
     },
 ]),
+```
+
+**On Angular v15+:**
+
+```typescript
+provideA11yColorSchemeFeature({
+    selector: 'my-custom-library',
+    ...
+}),
 ```
 
 ## The use within the App or a Custom Library
@@ -190,7 +210,7 @@ Please [check the examples for your library](#examples-for-your-custom-library).
 The global configuration comes with a set of pre-established properties of CSS variables ready to be used:
 
 | Property | CSS Variable | Light | Dark |
-|:---------|:-------------|:------|:-----|
+| :------- | :----------- | :---- | :--- |
 | `a11yBackgroundColor` | `--a11y-bg-color` | `'rgb(255 255 255 / 98%)'` | `'rgb(31 31 31 / 98%)'` |
 | `a11yTextColor` | `--a11y-text-color` | `'#222'` | `'#FFF'` |
 | `a11yBorderColor` | `--a11y-border-color` | `'#656565'` | `'#666'` |
@@ -340,7 +360,6 @@ Used inside [the `setColorScheme()` method](#the-setcolorscheme-method), it serv
   - [`cssTagID`](#the-color-scheme-config-css-tag-id).
   - It also implements the properties from [the Styles Config type](#the-color-scheme-config-styles-config).
     - [`forceScheme`](#the-color-scheme-config-force-scheme).
-    - [`useBootstrapStyles`](#the-color-scheme-config-use-bootstrap-styles).
 
 Check [the Color Scheme Config example](#the-color-scheme-config-example).
 
@@ -413,9 +432,6 @@ The properties to map within each config.
     - `ColorSchemeCSSProperty`: It's an object that could contain:
       - `property` of type `string`: The CSS variable name to use.
       - `suffix` (_optional_) of type `string`: The _suffix_ to apply to the CSS property.
-      - `ignoreIfUsingBS` (_optional_) of type `boolean`: Read the note below.
-
-> **NOTE:** The use of `ignoreIfUsingBS` applies only if you are allowing the use of Bootstrap and/or custom styles, then you allow the property to be ignored in case `useBootstrapStyles` was set to `true` within [the Color Scheme Config](#the-color-scheme-config).
 
 - The map will be conformed by a list of properties (a name of your choosing) and their values (the CSS variable), meaning that you **can not** use `'background-color'` as the value, but `'--bg-color'` instead.
 - Those values will be applied as the final CSS property.
@@ -437,7 +453,6 @@ This type is meant to be implemented within a custom library, so you can give th
 - **Type:** `ColorSchemeStylesConfig`.
 - **Properties:**
   - [`forceScheme`](#the-color-scheme-config-force-scheme).
-  - [`useBootstrapStyles`](#the-color-scheme-config-use-bootstrap-styles).
 
 #### The Color Scheme Config: Force Scheme
 
@@ -447,27 +462,18 @@ To force the use of the given Color Scheme.
 - **Type:** [`ColorScheme`](#the-color-scheme).
 - **Default:** _unset_.
 
-#### The Color Scheme Config: Use Bootstrap Styles
-
-Whether it will use Bootstrap 5.3 (or above) styles or custom (by default).
-
-- **Config Property:** `useBootstrapStyles`.
-- **Type:** `boolean`.
-- **Default:** `false`.
-
 ## The Service
 
 ### The Service: Public Methods, Properties, Getters and Setters
 
 | Name | Type | Of Type | Description |
-|:-----|:-----|:--------|:------------|
-| `colorSchemeChanged` | `property` | `BehaviorSubject<ColorSchemeChange>` | See [the Color Scheme Change](#the-service-color-scheme-change)  |
+| :--- | :--- | :------ | :---------- |
+| `colorSchemeChanged` | `property` | `BehaviorSubject<ColorSchemeChange>` | See [the Color Scheme Change](#the-service-color-scheme-change) |
 | `isSystemThemeDark` | `get` | `boolean` | The know if the current scheme from the system is set to `dark` |
 | `colorSchemes` | `get` | [`ColorSchemeItem[]`](#the-global-config-new-scheme-item) | The saved color schemes |
 | `userChosen` | `get`/`set` | [`ColorScheme`](#the-color-scheme) | See [the Service: User Chosen](#the-service-user-chosen) |
 | `allowUserToChangeScheme` | `get` | `boolean` | See [the Config: Allow User to Change Scheme](#the-global-config-allow-user-to-change-scheme) |
 | `rootConfig` | `get` | [`ColorSchemeConfig`](#the-color-scheme-config) | The root (global) configuration |
-| `useBootstrapStyles()` | `method` | `boolean` | See [the Use Bootstrap Styles method](#the-service-usebootstrapstyles-method) |
 | `getCurrentScheme()` | `method` | [`ColorSchemeProperties`](#color-scheme-properties-type) | See [the Get Current Scheme method](#the-service-getcurrentscheme-method) |
 | `getConfig()` | `method` | [`ColorSchemeConfig`](#the-color-scheme-config) | See [the Get Config method](#the-service-getconfig-method) |
 | `setConfig()` | `method` | `void` | See [the Set Config method](#the-service-setconfig-method) |
@@ -498,12 +504,6 @@ The color scheme the user has chosen.
       - An event listener will start listening for changes from the system to apply it as soon as it gets triggered.
     - If a _code-name_ is set:
       - The event listener will be stopped.
-
-#### The Service: `useBootstrapStyles()` Method
-
-To know whether the given selector was configured to use Bootstrap styles or not. See [the Config: Use Bootstrap Styles](#the-color-scheme-config-use-bootstrap-styles).
-
-Accepts a single parameter `selector` of type `string` and returns a `boolean`.
 
 #### The Service: `getCurrentScheme()` Method
 
@@ -587,7 +587,6 @@ Two basic components to allow the user to change the Color Scheme on the page.
 > **NOTE:** For both components:
 >
 > - The `disabled` state will depend not only on the `@Input()` but also on the [`allowUserToChangeScheme`](#the-global-config-allow-user-to-change-scheme) property set on the global config.
-> - The `useBootstrapStyles` will make use of the class names within Bootstrap 5.3 (or above) so, in case you are using it within your site, either of the components will look with those styles.
 
 ### The Component: Dropdown Selector
 
@@ -597,10 +596,9 @@ A simple dropdown selector to allow the user to choose between any of the basic,
 - **Inputs:**
 
   | Name | Type | Default |
-  |:-----|:-----|:--------|
+  | :--- | :--- | :------ |
   | `label` | `string` | `'Color Scheme'` |
   | `disabled` | `boolean` | `false` |
-  | `useBootstrapStyles` | `boolean` | `false` |
 
 #### Dropdown Selector - Default Use
 
@@ -622,17 +620,6 @@ For this example, two new Color Schemes were added using [the Global Config New 
 
 ![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/color-scheme/src/lib/images/example-select-custom-light.jpg)
 
-#### Dropdown Selector - Using Bootstrap
-
-```html
-<a11y-color-scheme-select
-    label="Pick a Scheme"
-    [useBootstrapStyles]="true">
-</a11y-color-scheme-select>
-```
-
-![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/color-scheme/src/lib/images/example-select-custom-bs-light.jpg)
-
 ### The Component: Checkbox
 
 A simple checkbox to allow the user to choose between `light` or `dark` schemes.
@@ -641,10 +628,9 @@ A simple checkbox to allow the user to choose between `light` or `dark` schemes.
 - **Inputs:**
 
   | Name | Type | Default |
-  |:-----|:-----|:--------|
+  | :--- | :--- | :------ |
   | `label` | `string` | `'Dark Mode'` |
   | `disabled` | `boolean` | `false` |
-  | `useBootstrapStyles` | `boolean` | `false` |
 
 #### Checkbox - Default Use
 
@@ -661,15 +647,6 @@ A simple checkbox to allow the user to choose between `light` or `dark` schemes.
 ```
 
 ![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/color-scheme/src/lib/images/example-checkbox-default-disabled-light.jpg)
-
-#### Checkbox - Using Bootstrap
-
-```html
-<a11y-color-scheme-checkbox [useBootstrapStyles]="true">
-</a11y-color-scheme-checkbox>
-```
-
-![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/color-scheme/src/lib/images/example-checkbox-default-bs-light.jpg)
 
 ## Examples for your App
 

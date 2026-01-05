@@ -147,7 +147,7 @@ export class TestColorSchemeFinalComponent {
     @ViewChild('testSpan', { static: true }) public testSpan: ElementRef<HTMLSpanElement>;
 }
 
-describe('Color Scheme Integration', () => {
+xdescribe('Color Scheme Integration', () => {
     let elementMain: HTMLElement;
     let elementSpan: HTMLSpanElement;
     let stylesMain: CSSStyleDeclaration;

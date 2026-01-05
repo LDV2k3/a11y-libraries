@@ -85,51 +85,6 @@ describe('Color Scheme Select Component', () => {
         });
     });
 
-    describe('Not Using Bootstrap', () => {
-        beforeEach(() => getElements());
-
-        it('should not have the "use-bs" attribute set in the host', () => {
-            expect(componentElement.getAttribute('use-bs')).toBeNull();
-        });
-
-        it('should not have the "form-floating" class-name set in the host', () => {
-            expect(componentElement.classList.contains('form-floating')).toBeFalse();
-        });
-
-        it('should have the right class-names set in each of the elements', () => {
-            expect(selectElement.classList.contains('form-select')).toBeFalse();
-            expect(selectElement.classList.contains('color-scheme-select')).toBeTrue();
-
-            expect(labelElement.classList.contains('form-label')).toBeFalse();
-            expect(labelElement.classList.contains('color-scheme-label')).toBeTrue();
-        });
-    });
-
-    describe('Using Bootstrap', () => {
-        beforeEach(() => {
-            component.useBootstrapStyles = true;
-            fixture.detectChanges();
-
-            getElements();
-        });
-
-        it('should have the "use-bs" attribute set in the host', () => {
-            expect(componentElement.getAttribute('use-bs')).not.toBeNull();
-        });
-
-        it('should have the "form-floating" class-name set in the host', () => {
-            expect(componentElement.classList.contains('form-floating')).toBeTrue();
-        });
-
-        it('should have the right class-names set in each of the elements', () => {
-            expect(selectElement.classList.contains('form-select')).toBeTrue();
-            expect(selectElement.classList.contains('color-scheme-select')).toBeFalse();
-
-            expect(labelElement.classList.contains('form-label')).toBeTrue();
-            expect(labelElement.classList.contains('color-scheme-label')).toBeFalse();
-        });
-    });
-
     describe('On Change', () => {
         beforeEach(() => getElements());
 
