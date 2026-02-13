@@ -2,7 +2,9 @@
 
 A simple window resize listener singleton service.
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0.
+![Angular support from version 12 up to version 20](https://img.shields.io/badge/Angular-v12_to_v20-darkgreen?logo=angular)
+
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0 to ensure compatibility with a wide range of Angular versions. It has been tested up to v20.
 
 ## Installation
 

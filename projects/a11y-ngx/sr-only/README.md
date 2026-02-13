@@ -2,7 +2,9 @@
 
 A simple component & CSS rules that provides a way to insert visually hidden text that is still reached and announced by screen readers. It helps improve accessibility by conveying additional context, labels, or instructions to users relying on assistive technologies.
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0.
+![Angular support from version 12 up to version 20](https://img.shields.io/badge/Angular-v12_to_v20-darkgreen?logo=angular)
+
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0 to ensure compatibility with a wide range of Angular versions. It has been tested up to v20.
 
 ## Index
 

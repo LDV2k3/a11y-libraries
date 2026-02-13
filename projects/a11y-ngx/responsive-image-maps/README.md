@@ -4,7 +4,9 @@ A responsive image map Angular directive that updates the areas' coordinates acc
 
 It will manage all shapes (`rect`, `circle` and `poly`).
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0.
+![Angular support from version 12 up to version 20](https://img.shields.io/badge/Angular-v12_to_v20-darkgreen?logo=angular)
+
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0 to ensure compatibility with a wide range of Angular versions. It has been tested up to v20.
 
 ## Index
 
@@ -61,7 +63,7 @@ Add an image with a map in your template.
 #### Map Directive public Properties, Getters and Methods
 
 | Property | Type | Returns | Description |
-|:---------|:-----|:--------|:------------|
+| :------- | :--- | :------ | :---------- |
 | `loaded` | `BehaviorSubject` | `boolean` | Will return `true` when the image has been loaded |
 | `sizeChanged` | `EventEmitter` | [`MapSize`](#the-mapsize-type) | Will emit the new image's size & position when page resize and it changes the width and height values |
 | `areas` | `QueryList` | `ResponsiveImageAreaDirective` | To access all `<area>` children directives |
@@ -74,7 +76,7 @@ Add an image with a map in your template.
 #### The MapSize Type
 
 | Property | Type | Description |
-|:---------|:----:|:------------|
+| :------- | :--: | :---------- |
 | `top` | `number` | The image `DOMRect`'s top value |
 | `left` | `number` | The image `DOMRect`'s left value |
 | `width` | `number` | The image `DOMRect`'s width value |
@@ -94,7 +96,7 @@ Add an image with a map in your template.
 #### Area Directive public Properties, Getters and Methods
 
 | Property | Type | Returns | Description |
-|:---------|:-----|:--------|:------------|
+| :------- | :--- | :------ | :---------- |
 | `areaSize` | [`AreaSize`](#the-areasize-type) | `object` | To access all the values (size & position) from the area (relative to the image) |
 | `nativeElement` | `get` | `HTMLAreaElement` | To access the HTML `<area>` element |
 | `getBoundingClientRect()` | `method` | `DOMRect` | To get the calculated position of the `<area>` element (relative to the viewport) |
@@ -103,7 +105,7 @@ Add an image with a map in your template.
 #### The AreaSize Type
 
 | Property | Type | Description |
-|:---------|:----:|:------------|
+| :------- | :--: | :---------- |
 | `top` | `number` | The area's (relative to image) top value |
 | `left` | `number` | The area's (relative to image) left value |
 | `width` | `number` | The area's width value |
