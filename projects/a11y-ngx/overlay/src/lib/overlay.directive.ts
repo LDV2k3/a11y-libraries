@@ -72,7 +72,7 @@ import {
 export class OverlayDirective extends OverlayBase implements OnChanges, OnDestroy {
     @Input('config') inputConfig: OverlayCustomConfig | string | undefined = undefined;
     @Input('trigger') inputTrigger: HTMLElement | undefined = undefined;
-    @Input('boundary') inputBoundary: HTMLElement | undefined = undefined;
+    @Input('boundary') inputBoundary: string | HTMLElement | undefined = undefined;
     @Input('position') inputPosition: OverlayBasePositionInput | undefined = undefined;
     @Input('positionStrategy') inputPositionStrategy: OverlayBasePositionStrategy | undefined = undefined;
     @Input('positionsAllowed') inputPositionsAllowed: OverlayBasePositionsAllowed | undefined = undefined;
@@ -407,7 +407,7 @@ export class OverlayDirective extends OverlayBase implements OnChanges, OnDestro
         };
 
         setChangeValue<HTMLElement>('trigger', 'inputTrigger');
-        setChangeValue<HTMLElement>('boundary', 'inputBoundary');
+        setChangeValue<string | HTMLElement>('boundary', 'inputBoundary');
         setChangeValue<OverlayBasePositionInput>('position', 'inputPosition');
         setChangeValue<OverlayBasePositionStrategy>('positionStrategy', 'inputPositionStrategy');
         setChangeValue<OverlayBasePositionsAllowed>('positionsAllowed', 'inputPositionsAllowed');
@@ -741,8 +741,8 @@ export class OverlayDirective extends OverlayBase implements OnChanges, OnDestro
 
         setTimeout(() => {
             if (this.fluidSize && !this.isMaxWidthAuto) {
-                this.maxSize.width = parseFloat(window.getComputedStyle(this.nativeElement, '::before').width) || null;
-                this.maxSize.height = parseFloat(window.getComputedStyle(this.nativeElement, '::after').height) || null;
+                this.maxSize.width = parseFloat(window.getComputedStyle(this.nativeElement, '::before').width) || 0;
+                this.maxSize.height = parseFloat(window.getComputedStyle(this.nativeElement, '::after').height) || 0;
             }
 
             lastOverlayData.maxSize = { ...this.maxSize };
@@ -762,21 +762,21 @@ export class OverlayDirective extends OverlayBase implements OnChanges, OnDestro
          *
          * @param { OverlayBaseMaxSize } maxSize - The given max sizes.
          */
-        const updateMaxSizes = (maxSize: OverlayBaseMaxSize = {}) => {
+        const updateMaxSizes = (maxSize?: OverlayBaseMaxSize) => {
             const viewportSize = this.viewportSizeSafe ?? this.viewportSize;
 
             const calcMaxWidth: number =
-                maxSize.width ?? (this.isTopBottom && this.fluidAlignment ? viewportSize.width : NaN);
+                maxSize?.width ?? (this.isTopBottom && this.fluidAlignment ? viewportSize.width : NaN);
             const setMaxWidth: string = this.DOMHelper.isNumeric(calcMaxWidth) ? `${calcMaxWidth}px, ` : '';
 
             const directiveOnlyHeight: number = this.isDirective ? this.borderSize * 2 : 0;
             const calcMaxHeight: number =
-                maxSize.height ?? (!this.isTopBottom && this.fluidAlignment ? viewportSize.height : NaN);
+                maxSize?.height ?? (!this.isTopBottom && this.fluidAlignment ? viewportSize.height : NaN);
             const setMaxHeight: string = this.DOMHelper.isNumeric(calcMaxHeight)
                 ? `${calcMaxHeight + directiveOnlyHeight}px, `
                 : '';
 
-            this.styleWidth = maxSize.width ? `${maxSize.width}px` : 'max-content';
+            this.styleWidth = maxSize?.width ? `${maxSize.width}px` : 'max-content';
             this.styleMaxWidth = `min(${setMaxWidth}var(--ao-max-width, 100vw))`;
             this.styleMaxHeight = `min(${setMaxHeight}var(--ao-max-height, 100vh))`;
         };
@@ -790,24 +790,33 @@ export class OverlayDirective extends OverlayBase implements OnChanges, OnDestro
          */
         const needsToRecalc = (overlayData: OverlayBaseCalculatedPosition): boolean => {
             if (!(this.fluidSize && this.fluidAlignment)) return false;
-            if (this.firstCalc && !lastOverlayData.position) lastOverlayData.position = overlayData.position;
 
-            const yTriggerMoved: boolean = lastOverlayData.triggerRect.y !== this.triggerRect.y;
-            const xTriggerMoved: boolean = lastOverlayData.triggerRect.x !== this.triggerRect.x;
-            const positionOverlayChanged: boolean = lastOverlayData.position !== overlayData.position;
-            const maxWidthOverlayChanged: boolean =
-                overlayData.maxSize.width !== null && lastOverlayData.maxSize.width !== overlayData.maxSize.width;
-            const maxHeightOverlayChanged: boolean =
-                overlayData.maxSize.height !== null && lastOverlayData.maxSize.height !== overlayData.maxSize.height;
+            const {
+                position: currentPosition,
+                maxSize: { width: currentMaxWidth, height: currentMaxHeight } = { width: 0, height: 0 },
+            } = overlayData;
+            const {
+                position: lastPosition,
+                maxSize: { width: lastMaxWidth, height: lastMaxHeight } = { width: 0, height: 0 },
+                triggerRect: { x: lastTriggerX, y: lastTriggerY },
+            } = lastOverlayData;
+
+            if (this.firstCalc && !lastPosition) lastOverlayData.position = currentPosition;
+
+            const yTriggerMoved: boolean = lastTriggerY !== this.triggerRect.y;
+            const xTriggerMoved: boolean = lastTriggerX !== this.triggerRect.x;
+            const positionOverlayChanged: boolean = lastPosition !== currentPosition;
+            const maxWidthOverlayChanged: boolean = currentMaxWidth > 0 && lastMaxWidth !== currentMaxWidth;
+            const maxHeightOverlayChanged: boolean = currentMaxHeight !== null && lastMaxHeight !== currentMaxHeight;
 
             if (
                 positionOverlayChanged ||
                 (this.isTopBottom && (this.firstCalc || yTriggerMoved) && maxHeightOverlayChanged) ||
                 (!this.isTopBottom && (this.firstCalc || xTriggerMoved) && maxWidthOverlayChanged)
             ) {
-                if (positionOverlayChanged) lastOverlayData.position = overlayData.position;
-                if (maxWidthOverlayChanged) lastOverlayData.maxSize.width = overlayData.maxSize.width;
-                if (maxHeightOverlayChanged) lastOverlayData.maxSize.height = overlayData.maxSize.height;
+                if (positionOverlayChanged) lastOverlayData.position = currentPosition;
+                if (maxWidthOverlayChanged) lastOverlayData.maxSize.width = currentMaxWidth;
+                if (maxHeightOverlayChanged) lastOverlayData.maxSize.height = currentMaxHeight;
                 if (yTriggerMoved || xTriggerMoved) lastOverlayData.triggerRect = this.triggerRect;
 
                 return true;
@@ -822,7 +831,7 @@ export class OverlayDirective extends OverlayBase implements OnChanges, OnDestro
             triggerRect: DOMRect;
         } = {
             triggerRect: this.virtualTriggerRect || this.triggerElement?.getBoundingClientRect(),
-            maxSize: {},
+            maxSize: { width: 0, height: 0 },
         };
 
         updateMaxSizes();

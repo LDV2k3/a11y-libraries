@@ -5,7 +5,9 @@
 
 The main goal of this library is to prevent any common accessibility pitfalls, like _losing_ the opened element within containers with overflow, not being automatically repositioned on scroll or window resize (specially for keyboard users), etc.
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0.
+![Angular support from version 12 up to version 20](https://img.shields.io/badge/Angular-v12_to_v20-darkgreen?logo=angular)
+
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0 to ensure compatibility with a wide range of Angular versions. It has been tested up to v20.
 
 ## Index
 
@@ -389,8 +391,10 @@ A11yOverlayModule.rootConfig({
 
 A custom boundary can be interpreted as a wrapper/container, and the overlay will consider that boundary as the new limits for its positioning.
 
+> **NOTE:** You can establish a `string` with the element's selector or an HTML element.
+
 - **Input / Config Property:** `boundary`.
-- **Type:** `HTMLElement`.
+- **Type:** `string` or `HTMLElement`.
 - **Default:** `<body>`.
 
 ```html

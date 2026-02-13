@@ -9,12 +9,8 @@ import {
 import { ColorSchemeStylesConfig } from '@a11y-ngx/color-scheme';
 import { TabCycleFirstFocus } from '@a11y-ngx/tab-cycle';
 
-import {
-    OverlayAllowClose,
-    OverlayColorSchemes,
-    OverlayStylesColorScheme,
-    OverlayStylesGenerics,
-} from './overlay.type.private';
+import { OverlayStylesColorScheme, OverlayStylesGenerics } from './overlay.color-scheme';
+import { OverlayAllowClose, OverlayColorSchemes } from './overlay.type.private';
 
 export const OVERLAY_DEFAULTS: OverlayConfig = {
     ...OVERLAY_BASE_DEFAULTS,
@@ -86,6 +82,6 @@ export type OverlayCustomConfig = Partial<OverlaySelectorConfig> &
     Partial<{
         /** @description The trigger element. */
         trigger: HTMLElement | DOMRect;
-        /** @description The boundary element. */
-        boundary: HTMLElement;
+        /** @description The boundary HTML Element or its string selector. */
+        boundary: string | HTMLElement;
     }>;
