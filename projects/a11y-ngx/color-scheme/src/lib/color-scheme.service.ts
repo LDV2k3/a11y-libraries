@@ -272,7 +272,7 @@ export class ColorSchemeService implements OnDestroy {
         const newConfig: ColorSchemeConfig = this.deepCopyObj(config);
 
         const { stylesMap } = newConfig;
-        const { generics } = newConfig.styles as { generics: ColorSchemeProperties };
+        const { generics } = newConfig.styles as ColorSchemesObject;
 
         // Delete any property where its value is not a CSS variable.
         Object.keys(stylesMap).forEach((mapProperty: string) => {
@@ -743,6 +743,18 @@ export class ColorSchemeService implements OnDestroy {
         const attribute: string = this.globalConfig.attributeSelectorMatch;
         const value: string = forceScheme ?? this.colorScheme;
         return { attribute, value };
+    }
+
+    /**
+     * @description
+     * To clean undefined values within the given object.
+     */
+    private cleanUndefined(obj: Record<string, unknown>): void {
+        Object.keys(obj).forEach((key) => {
+            if (obj[key] === undefined) delete obj[key];
+            else if (typeof obj[key] === 'object' && !Array.isArray(obj[key]))
+                this.cleanUndefined(obj[key] as Record<string, unknown>);
+        });
     }
 
     /**

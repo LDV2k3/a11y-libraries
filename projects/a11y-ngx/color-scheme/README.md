@@ -7,7 +7,9 @@ The purpose of this library is to allow your own components/libraries to impleme
 - All given Color Schemes will be added as new `<style>` tags within the `<head>` element.
 - The default (system's) or given Color Scheme will be established in the `<html>` tag.
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0.
+![Angular support from version 12 up to version 20](https://img.shields.io/badge/Angular-v12_to_v20-darkgreen?logo=angular)
+
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0 to ensure compatibility with a wide range of Angular versions. It has been tested up to v20.
 
 ## Index
 

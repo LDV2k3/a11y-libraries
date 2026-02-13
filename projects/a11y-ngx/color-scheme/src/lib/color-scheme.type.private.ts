@@ -41,7 +41,7 @@ export type ColorSchemeStylesGenerics = {
     a11yFocusVisible: string;
 };
 
-export const COLOR_SCHEME_BASE_MAP: ColorSchemeCSSMap = {
+export const COLOR_SCHEME_BASE_MAP: ColorSchemeCSSMap<ColorSchemeStylesGenerics> = {
     a11yBackgroundColor: '--a11y-bg-color',
     a11yTextColor: '--a11y-text-color',
     a11yBorderColor: '--a11y-border-color',

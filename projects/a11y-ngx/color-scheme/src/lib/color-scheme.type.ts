@@ -39,16 +39,18 @@ export type ColorSchemeChange = {
     changedBy: 'user' | 'system';
 };
 
-export type ColorSchemes = {
+export type ColorSchemes<T extends Record<string, unknown> = Record<string, unknown>> = {
     /** @description The `light` Color Scheme. */
-    light: ColorSchemeProperties;
+    light: ColorSchemeProperties<T>;
     /** @description The `dark` Color Scheme. */
-    dark?: ColorSchemeProperties;
+    dark?: ColorSchemeProperties<T>;
     /** @description The custom Color Schemes. */
-    [customScheme: string]: ColorSchemeProperties | undefined;
+    [customScheme: string]: ColorSchemeProperties<T> | undefined;
 };
 
-export type ColorSchemeProperties = Record<string, ColorSchemeCSSType>;
+export type ColorSchemeProperties<T extends Record<string, unknown> = Record<string, unknown>> = {
+    [K in keyof T]: ColorSchemeCSSType;
+};
 
 export type ColorSchemesStyles = ColorSchemeProperties | RecursivePartial<ColorSchemesObject>;
 
@@ -116,6 +118,6 @@ export type ColorSchemeStylesConfig = {
 /**
  * @description A map of all the **required** styles to apply to the Color Scheme.
  */
-export type ColorSchemeCSSMap = {
-    [property: string]: string | ColorSchemeCSSProperty;
+export type ColorSchemeCSSMap<T extends Record<string, unknown> = Record<string, unknown>> = {
+    [K in keyof T]: string | ColorSchemeCSSProperty;
 };
