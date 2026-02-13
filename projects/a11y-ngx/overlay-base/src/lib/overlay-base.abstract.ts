@@ -7,6 +7,7 @@ import {
     OverlayBaseRenderPosition,
     OverlayBaseAllowed,
     OverlayBaseSquareAreas,
+    OverlayBaseAlignmentOrder,
     BoundaryData,
     ViewportSize,
     ScrollSize,
@@ -65,8 +66,21 @@ export abstract class OverlayBase {
     private allowed: OverlayBaseAllowed = {
         positions: DEFAULTS.positionsAllowed as OverlayBasePosition[],
         alignments: DEFAULTS.alignmentsAllowed as OverlayBaseAlignment[],
+        alignmentOrder: DEFAULTS.alignmentOrder as OverlayBaseAlignment[],
     };
     private allowedOpposite!: boolean;
+
+    /**
+     * @description
+     * To apply the initial scale factor only the first time it calculates the overlay original size.
+     */
+    private initialScaleApplied: boolean = false;
+
+    /**
+     * @description
+     * To recalculate the overlay's original client rect next time it asks for reposition.
+     */
+    private recalculateOverlayOriginalClientRect: boolean = false;
 
     /**
      * @description
@@ -86,8 +100,8 @@ export abstract class OverlayBase {
      * proper calculations in case `fluidSize` is active.
      */
     readonly maxSize: OverlayBaseMaxSize = {
-        width: null,
-        height: null,
+        width: 0,
+        height: 0,
     };
 
     /**
@@ -95,6 +109,12 @@ export abstract class OverlayBase {
      * Scrollbar size (`vertical` & `horizontal`) for a given custom Boundary.
      */
     private boundaryScrollSize!: ScrollSize;
+
+    /**
+     * @description
+     * The selector for the Boundary.
+     */
+    private boundarySelector: string | undefined = undefined;
 
     /**
      * @description
@@ -319,14 +339,16 @@ export abstract class OverlayBase {
     private set alignmentsAllowed(allowed: OverlayBaseAlignmentsAllowed) {
         if (allowed === 'edges') {
             this.allowed.alignments = [ALIGNMENT.START, ALIGNMENT.END];
-        } else if (allowed === 'center' && this.fluidAlignment) {
-            this.allowed.alignments = [ALIGNMENT.CENTER];
         } else {
             if (typeof allowed === 'string') allowed = allowed.split(',') as OverlayBaseAlignment[];
 
             allowed = allowed
                 .map((alignment) => alignment.toLowerCase().trim() as OverlayBaseAlignment)
                 .filter(this.isValidAlignment) as OverlayBaseAlignment[];
+
+            // If the only allowed alignment is set to "center" but "fluid alignment" is off,
+            // delete everything so the default values are set
+            if (allowed.length === 1 && allowed[0] === 'center' && !this.fluidAlignment) allowed.length = 0;
 
             this.allowed.alignments = allowed.length
                 ? (allowed as OverlayBaseAlignment[])
@@ -368,12 +390,24 @@ export abstract class OverlayBase {
 
     /**
      * @description
-     * Sets a custom Boundary element.
+     * Sets the alignment order priority.
+     */
+    set alignmentOrder(order: OverlayBaseAlignment[]) {
+        order = (order ?? []).filter(
+            (alignment) => this.isValidAlignment(alignment) && this.isAlignmentAllowed(alignment)
+        );
+        order = [...new Set(order)]; // Unique values
+        this.allowed.alignmentOrder = order.length ? order : DEFAULTS.alignmentOrder;
+    }
+
+    /**
+     * @description
+     * The Boundary element.
      *
      * @default <body>
      */
     get boundaryElement(): HTMLElement {
-        return this.overlayConfig.boundary ?? document.body;
+        return (this.overlayConfig.boundary as HTMLElement) ?? document.body;
     }
     set boundaryElement(boundaryElement: HTMLElement) {
         this.overlayConfig.boundary = boundaryElement instanceof HTMLElement ? boundaryElement : document.body;
@@ -395,7 +429,16 @@ export abstract class OverlayBase {
         return this.overlayConfig.safeSpace ?? DEFAULTS.safeSpace;
     }
     set safeSpace(safeSpace: OverlayBaseSafeSpace) {
-        this.overlayConfig.safeSpace = { ...DEFAULTS.safeSpace, ...(safeSpace || {}) } as OverlayBaseSafeSpace;
+        safeSpace ??= {};
+
+        // Removes possible undefined and/or negative numbers
+        Object.keys(safeSpace).forEach((key) => {
+            const safeSpaceKey: POSITION = key as POSITION;
+            const posVal: number | null = this.getNumericValue(safeSpace[safeSpaceKey]);
+            if (posVal === null || posVal < 0) delete safeSpace[safeSpaceKey];
+        });
+
+        this.overlayConfig.safeSpace = { ...DEFAULTS.safeSpace, ...safeSpace } as OverlayBaseSafeSpace;
     }
 
     /**
@@ -407,6 +450,23 @@ export abstract class OverlayBase {
     }
     set offsetSize(offsetSize: number) {
         this.overlayConfig.offsetSize = this.getNumericValue(offsetSize) ?? undefined;
+    }
+
+    /**
+     * @description
+     * Initial scale factor size for the overlay.
+     *
+     * When "initialScaleApplied" is set to true, it will return always "1",
+     * meaning that it was already calculated with the original scaling factor applied
+     * and, from now on, has to return calculations based on the "normal size".
+     */
+    get scaleFactor(): number {
+        return this.initialScaleApplied ? 1 : this.overlayConfig.initialScale ?? DEFAULTS.initialScale;
+    }
+    set scaleFactor(scaleFactor: number) {
+        const scale: number | null = this.getNumericValue(scaleFactor);
+        scaleFactor = scale ? Math.max(0.1, scale) : 1;
+        this.overlayConfig.initialScale = scaleFactor;
     }
 
     /**
@@ -477,7 +537,7 @@ export abstract class OverlayBase {
      * Positive value means the Overlay is wider than the Trigger.
      */
     private get triggerOverlayDifferenceWidth(): number {
-        return this.overlayRect.width - this.triggerRect.width;
+        return this.overlayRect.width / this.scaleFactor - this.triggerRect.width;
     }
 
     /**
@@ -487,7 +547,7 @@ export abstract class OverlayBase {
      * Positive value means the Overlay is higher than the Trigger.
      */
     private get triggerOverlayDifferenceHeight(): number {
-        return this.overlayRect.height - this.triggerRect.height;
+        return this.overlayRect.height / this.scaleFactor - this.triggerRect.height;
     }
 
     /**
@@ -497,7 +557,7 @@ export abstract class OverlayBase {
      * Positive value means the Overlay is wider than the Trigger.
      */
     private get triggerOverlayOriginalDifferenceWidth(): number {
-        return this.overlayOriginalRect.width - this.triggerRect.width;
+        return this.overlayOriginalRect.width / this.scaleFactor - this.triggerRect.width;
     }
 
     /**
@@ -507,7 +567,7 @@ export abstract class OverlayBase {
      * Positive value means the Overlay is higher than the Trigger.
      */
     private get triggerOverlayOriginalDifferenceHeight(): number {
-        return this.overlayOriginalRect.height - this.triggerRect.height;
+        return this.overlayOriginalRect.height / this.scaleFactor - this.triggerRect.height;
     }
 
     /**
@@ -625,9 +685,9 @@ export abstract class OverlayBase {
         let enoughSpace: number = this.triggerBoundaryDistance(position);
 
         if (position === POSITION.TOP || position === POSITION.BOTTOM) {
-            enoughSpace -= this.overlayOriginalRect.height + this.triggerOverlayDistance;
+            enoughSpace -= this.overlayOriginalRect.height / this.scaleFactor + this.triggerOverlayDistance;
         } else {
-            enoughSpace -= this.overlayOriginalRect.width + this.triggerOverlayDistance;
+            enoughSpace -= this.overlayOriginalRect.width / this.scaleFactor + this.triggerOverlayDistance;
         }
 
         return enoughSpace - 2 >= 0;
@@ -653,10 +713,8 @@ export abstract class OverlayBase {
         let overlayTriggerDiff: number = this.triggerOverlayOriginalDifferenceHeight;
         let overlayTriggerDiffHalf: number = overlayTriggerDiff / 2;
 
-        if (this.fluidAlignment && overlayTriggerDiff > 0) return this.desiredAlignment;
-
-        const distanceTop = this.triggerBoundaryDistance(POSITION.TOP);
-        const distanceBottom = this.triggerBoundaryDistance(POSITION.BOTTOM);
+        const distanceTop: number = this.triggerBoundaryDistance(POSITION.TOP);
+        const distanceBottom: number = this.triggerBoundaryDistance(POSITION.BOTTOM);
 
         let canBeStart!: boolean;
         let canBeCentered!: boolean;
@@ -664,8 +722,8 @@ export abstract class OverlayBase {
 
         if (overlayTriggerDiff > 0) {
             // Overlay is higher than Trigger
-            const topSpaceCentered = distanceTop - overlayTriggerDiffHalf > 0 ? distanceTop : 0;
-            const bottomSpaceCentered = distanceBottom - overlayTriggerDiffHalf > 0 ? distanceBottom : 0;
+            const topSpaceCentered: number = distanceTop - overlayTriggerDiffHalf > 0 ? distanceTop : 0;
+            const bottomSpaceCentered: number = distanceBottom - overlayTriggerDiffHalf > 0 ? distanceBottom : 0;
 
             canBeStart = overlayTriggerDiff <= bottomSpaceCentered;
             canBeCentered = overlayTriggerDiffHalf <= topSpaceCentered && overlayTriggerDiffHalf <= bottomSpaceCentered;
@@ -690,10 +748,8 @@ export abstract class OverlayBase {
         let overlayTriggerDiff: number = this.triggerOverlayOriginalDifferenceWidth;
         let overlayTriggerDiffHalf: number = overlayTriggerDiff / 2;
 
-        if (this.fluidAlignment && overlayTriggerDiff > 0) return this.desiredAlignment;
-
-        const distanceLeft = this.triggerBoundaryDistance(POSITION.LEFT);
-        const distanceRight = this.triggerBoundaryDistance(POSITION.RIGHT);
+        const distanceLeft: number = this.triggerBoundaryDistance(POSITION.LEFT);
+        const distanceRight: number = this.triggerBoundaryDistance(POSITION.RIGHT);
 
         let canBeStart!: boolean;
         let canBeCentered!: boolean;
@@ -701,8 +757,8 @@ export abstract class OverlayBase {
 
         if (overlayTriggerDiff > 0) {
             // Overlay is wider than Trigger
-            const leftSpaceCentered = distanceLeft - overlayTriggerDiffHalf > 0 ? distanceLeft : 0;
-            const rightSpaceCentered = distanceRight - overlayTriggerDiffHalf > 0 ? distanceRight : 0;
+            const leftSpaceCentered: number = distanceLeft - overlayTriggerDiffHalf > 0 ? distanceLeft : 0;
+            const rightSpaceCentered: number = distanceRight - overlayTriggerDiffHalf > 0 ? distanceRight : 0;
 
             canBeStart = overlayTriggerDiff <= rightSpaceCentered;
             canBeCentered = overlayTriggerDiffHalf <= leftSpaceCentered && overlayTriggerDiffHalf <= rightSpaceCentered;
@@ -739,19 +795,38 @@ export abstract class OverlayBase {
         const isAlignmentStartAllowed: boolean = this.isAlignmentStartAllowed;
         const isAlignmentCenterAllowed: boolean = this.isAlignmentCenterAllowed;
         const isAlignmentEndAllowed: boolean = this.isAlignmentEndAllowed;
-        const isDesiredAllowedAlignmentStart: boolean = isAlignmentStartAllowed && this.isDesiredAlignmentStart;
-        const isDesiredAllowedAlignmentCenter: boolean = isAlignmentCenterAllowed && this.isDesiredAlignmentCenter;
-        const isDesiredAllowedAlignmentEnd: boolean = isAlignmentEndAllowed && this.isDesiredAlignmentEnd;
+
+        const alignmentMap: Record<OverlayBaseAlignment, OverlayBaseAlignmentOrder> = {
+            [ALIGNMENT.START]: {
+                isAllowed: isAlignmentStartAllowed,
+                isDesired: this.isDesiredAlignmentStart,
+                canApply: canBeStart,
+            },
+            [ALIGNMENT.CENTER]: {
+                isAllowed: isAlignmentCenterAllowed,
+                isDesired: this.isDesiredAlignmentCenter,
+                canApply: canBeCentered || (this.fluidAlignment && isAlignmentCenterAllowed),
+            },
+            [ALIGNMENT.END]: {
+                isAllowed: isAlignmentEndAllowed,
+                isDesired: this.isDesiredAlignmentEnd,
+                canApply: canBeEnd,
+            },
+        };
+
+        const alignmentOrder: OverlayBaseAlignment[] = this.allowed.alignmentOrder;
 
         // Check for desired alignment
-        if (isDesiredAllowedAlignmentCenter && canBeCentered) return ALIGNMENT.CENTER;
-        if (isDesiredAllowedAlignmentStart && canBeStart) return ALIGNMENT.START;
-        if (isDesiredAllowedAlignmentEnd && canBeEnd) return ALIGNMENT.END;
+        for (const alignment of alignmentOrder) {
+            const { isDesired, isAllowed, canApply } = alignmentMap[alignment];
+            if (isDesired && isAllowed && canApply) return alignment;
+        }
 
         // Check for allowed alignment
-        if (isAlignmentCenterAllowed && canBeCentered) return ALIGNMENT.CENTER;
-        if (isAlignmentStartAllowed && canBeStart) return ALIGNMENT.START;
-        if (isAlignmentEndAllowed && canBeEnd) return ALIGNMENT.END;
+        for (const alignment of alignmentOrder) {
+            const { isAllowed, canApply } = alignmentMap[alignment];
+            if (isAllowed && canApply) return alignment;
+        }
 
         // Check for which edge has more free space
         if (!isAlignmentCenterAllowed && isAlignmentStartAllowed && isAlignmentEndAllowed) {
@@ -769,20 +844,39 @@ export abstract class OverlayBase {
      * @description
      * Calculates maximum size (`width` or `height`) in case the overlay does not fit in the screen.
      */
-    private get getMaxSize(): OverlayBaseMaxSize {
-        const maxSize: OverlayBaseMaxSize = { width: null, height: null };
+    private get getMaxSize(): OverlayBaseMaxSize | undefined {
+        if (!this.fluidSize) return undefined;
 
-        if (this.fluidSize) {
-            const size: number = this.triggerBoundaryDistance(this.currentPosition) - this.triggerOverlayDistance;
+        const { width: viewportWidth, height: viewportHeight } = this.viewportSizeSafe;
+        let sizeWidth: number = viewportWidth;
+        let sizeHeight: number = viewportHeight;
 
-            if (this.isTopBottom) {
-                maxSize.height = Math.min(this.maxSize.height || Infinity, size);
-            } else {
-                maxSize.width = Math.min(this.maxSize.width || Infinity, size);
+        const alignment: OverlayBaseAlignment = this.currentAlignment;
+        const triggerOverlayDistance: number = this.triggerOverlayDistance;
+
+        const triggerBoundaryDistance = (position: OverlayBasePosition, triggerOverlayDistance: number): number =>
+            this.triggerBoundaryDistance(position) - triggerOverlayDistance;
+
+        if (this.isTopBottom) {
+            sizeHeight = triggerBoundaryDistance(this.currentPosition, triggerOverlayDistance);
+
+            if (alignment !== 'center') {
+                const positionToCalc: OverlayBasePosition = alignment === 'start' ? 'right' : 'left';
+                sizeWidth = triggerBoundaryDistance(positionToCalc, 0) + this.triggerRect.width;
+            }
+        } else {
+            sizeWidth = triggerBoundaryDistance(this.currentPosition, triggerOverlayDistance);
+
+            if (alignment !== 'center') {
+                const positionToCalc: OverlayBasePosition = alignment === 'start' ? 'bottom' : 'top';
+                sizeHeight = triggerBoundaryDistance(positionToCalc, 0) + this.triggerRect.height;
             }
         }
 
-        return maxSize;
+        const height: number = Math.min(this.maxSize.height || Infinity, sizeHeight);
+        const width: number = Math.min(this.maxSize.width || Infinity, sizeWidth);
+
+        return { width, height };
     }
 
     /**
@@ -805,7 +899,18 @@ export abstract class OverlayBase {
             ...(isPositionFixed ? this.getFixedX : this.getAbsoluteX),
         };
 
-        const maxSize: OverlayBaseMaxSize = this.getMaxSize;
+        const maxSize: OverlayBaseMaxSize | undefined = this.getMaxSize;
+
+        // If the scale factor is different from "1" => means that the overlay IS scaled
+        // (It will return "1" automatically next time, when "initialScaleApplied" is set to true)
+        if (this.scaleFactor !== 1) {
+            // Set the flag to true, to avoid enter a second time
+            this.initialScaleApplied = true;
+
+            // Set the "recalculate original client rect" flag to true,
+            // to recalculate its original size next time it needs repositioning
+            this.recalculateOverlayOriginalClientRect = true;
+        }
 
         return { position, alignment, render, maxSize };
     }
@@ -822,8 +927,8 @@ export abstract class OverlayBase {
         } else if (this.isBottom) {
             posY.top = this.triggerRect.bottom + this.triggerOverlayDistance;
         } else {
-            const triggerOverlayDifferenceHeight = this.triggerOverlayDifferenceHeight;
-            const triggerOverlayDifferenceHalf = triggerOverlayDifferenceHeight / 2;
+            const triggerOverlayDifferenceHeight: number = this.triggerOverlayDifferenceHeight;
+            const triggerOverlayDifferenceHalf: number = triggerOverlayDifferenceHeight / 2;
 
             // Fluid Alignment only works for Overlays that are higher than the Trigger
             if (this.fluidAlignment && triggerOverlayDifferenceHeight > 0) {
@@ -888,8 +993,8 @@ export abstract class OverlayBase {
         } else if (this.isRight) {
             posX.left = this.triggerRect.right + this.triggerOverlayDistance;
         } else {
-            const triggerOverlayDifferenceWidth = this.triggerOverlayDifferenceWidth;
-            const triggerOverlayDifferenceHalf = triggerOverlayDifferenceWidth / 2;
+            const triggerOverlayDifferenceWidth: number = this.triggerOverlayDifferenceWidth;
+            const triggerOverlayDifferenceHalf: number = triggerOverlayDifferenceWidth / 2;
 
             // Fluid Alignment only works for Overlays that are wider than the Trigger
             if (this.fluidAlignment && triggerOverlayDifferenceWidth > 0) {
@@ -979,15 +1084,15 @@ export abstract class OverlayBase {
      */
     private get getAbsoluteY(): OverlayBasePositionY {
         const posY: OverlayBasePositionY = { top: null, bottom: null };
-        const offsetPosition = this.getAbsoluteOffset('top');
+        const offsetPosition: number = this.getAbsoluteOffset('top');
 
         if (this.isTop) {
             posY.bottom = this.boundaryData.height - offsetPosition + this.triggerOverlayDistance;
         } else if (this.isBottom) {
             posY.top = offsetPosition + this.triggerRect.height + this.triggerOverlayDistance;
         } else {
-            const triggerOverlayDifferenceHeight = this.triggerOverlayDifferenceHeight;
-            const triggerOverlayDifferenceHalf = triggerOverlayDifferenceHeight / 2;
+            const triggerOverlayDifferenceHeight: number = this.triggerOverlayDifferenceHeight;
+            const triggerOverlayDifferenceHalf: number = triggerOverlayDifferenceHeight / 2;
 
             // Fluid Alignment only works for Overlays that are higher than the Trigger
             if (this.fluidAlignment && triggerOverlayDifferenceHeight > 0) {
@@ -1040,15 +1145,15 @@ export abstract class OverlayBase {
      */
     private get getAbsoluteX(): OverlayBasePositionX {
         const posX: OverlayBasePositionX = { left: null, right: null };
-        const offsetPosition = this.getAbsoluteOffset('left');
+        const offsetPosition: number = this.getAbsoluteOffset('left');
 
         if (this.isLeft) {
             posX.right = this.boundaryData.width - offsetPosition + this.triggerOverlayDistance;
         } else if (this.isRight) {
             posX.left = offsetPosition + this.triggerRect.width + this.triggerOverlayDistance;
         } else {
-            const triggerOverlayDifferenceWidth = this.triggerOverlayDifferenceWidth;
-            const triggerOverlayDifferenceHalf = triggerOverlayDifferenceWidth / 2;
+            const triggerOverlayDifferenceWidth: number = this.triggerOverlayDifferenceWidth;
+            const triggerOverlayDifferenceHalf: number = triggerOverlayDifferenceWidth / 2;
 
             // Fluid Alignment only works for Overlays that are wider than the Trigger
             if (this.fluidAlignment && triggerOverlayDifferenceWidth > 0) {
@@ -1141,7 +1246,8 @@ export abstract class OverlayBase {
             order = [POSITION.BOTTOM, POSITION.TOP, POSITION.LEFT, POSITION.RIGHT];
         } else if (this.desiredPosition === POSITION.LEFT) {
             order = [POSITION.LEFT, POSITION.RIGHT, POSITION.TOP, POSITION.BOTTOM];
-        } else if (this.desiredPosition === POSITION.RIGHT) {
+        } else {
+            // right
             order = [POSITION.RIGHT, POSITION.LEFT, POSITION.TOP, POSITION.BOTTOM];
         }
 
@@ -1219,6 +1325,8 @@ export abstract class OverlayBase {
 
         if ('alignmentsAllowed' in customConfig)
             this.alignmentsAllowed = customConfig.alignmentsAllowed as OverlayBaseAlignmentsAllowed;
+        if ('alignmentOrder' in customConfig)
+            this.alignmentOrder = customConfig.alignmentOrder as OverlayBaseAlignment[];
         if ('positionsAllowed' in customConfig) {
             const positionsAllowed = customConfig.positionsAllowed as OverlayBasePositionsAllowed;
             this.allowedOpposite =
@@ -1241,12 +1349,19 @@ export abstract class OverlayBase {
 
         if ('positionStrategy' in customConfig)
             this.positionStrategy = customConfig.positionStrategy as OverlayBasePositionStrategy;
-        if ('boundary' in customConfig) this.boundaryElement = customConfig.boundary as HTMLElement;
+        if ('boundary' in customConfig) {
+            if (typeof customConfig.boundary === 'string') this.boundarySelector = customConfig.boundary;
+            else {
+                this.boundarySelector = undefined;
+                this.boundaryElement = customConfig.boundary as HTMLElement;
+            }
+        }
         if ('safeSpace' in customConfig) this.safeSpace = customConfig.safeSpace as OverlayBaseSafeSpace;
         if ('offsetSize' in customConfig) this.offsetSize = customConfig.offsetSize as number;
         if ('allowScrollListener' in customConfig)
             this.allowScrollListener =
                 this.getBooleanValue(customConfig.allowScrollListener) ?? DEFAULTS.allowScrollListener;
+        if ('initialScale' in customConfig) this.scaleFactor = customConfig.initialScale as number;
     }
 
     /**
@@ -1264,6 +1379,11 @@ export abstract class OverlayBase {
     attachOverlay(overlayElement: HTMLElement, debounceTimeMs: number = 10): Observable<OverlayBaseCalculatedPosition> {
         if (!this.isAttached) {
             this.overlayElement = overlayElement;
+
+            if (this.boundarySelector) {
+                const boundaryElement: HTMLElement | null = document.querySelector(this.boundarySelector);
+                if (boundaryElement) this.boundaryElement = boundaryElement;
+            }
 
             if (this.isBoundaryCustom) {
                 this.boundaryElement.addEventListener('scroll', this.boundaryScrollFn);
@@ -1296,6 +1416,8 @@ export abstract class OverlayBase {
         if (!this.isAttached) return;
 
         this.isAttached = false;
+        this.initialScaleApplied = false;
+        this.recalculateOverlayOriginalClientRect = false;
 
         this.isDetached$.next();
         this.isDetached$.complete();
@@ -1316,6 +1438,11 @@ export abstract class OverlayBase {
      * Gets all the necessary ClientRect, Boundary and Viewport data.
      */
     private getElementsSizeInfo(): void {
+        if (this.recalculateOverlayOriginalClientRect) {
+            this.recalculateOverlayOriginalClientRect = false;
+            this.getOverlayOriginalClientRect(true);
+        }
+
         this.getTriggerClientRect();
         this.getOverlayClientRect();
         this.getBoundaryClientRect();
@@ -1345,7 +1472,7 @@ export abstract class OverlayBase {
     }
 
     private getBoundaryCalculatedRect(): void {
-        const viewportSize = this.viewportSize;
+        const viewportSize: ViewportSize = this.viewportSize;
         let top: number = 0;
         let bottom: number = viewportSize.height;
         let left: number = 0;
@@ -1381,7 +1508,7 @@ export abstract class OverlayBase {
     }
 
     private getViewportSizeSafe(): void {
-        const viewportSize = this.viewportSize;
+        const viewportSize: ViewportSize = this.viewportSize;
         this.viewportSafe = {
             width:
                 viewportSize.width -

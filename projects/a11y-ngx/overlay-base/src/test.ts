@@ -16,6 +16,15 @@ declare const require: {
     };
 };
 
+// -------------- FOR DEBUGGING PURPOSES --------------
+// -------------- FOR DEBUGGING PURPOSES --------------
+
+// To delete the trigger/overlay after each test. // Default true
+export const forceElementsCleanup: boolean = true;
+
+// -------------- FOR DEBUGGING PURPOSES --------------
+// -------------- FOR DEBUGGING PURPOSES --------------
+
 // First, initialize the Angular testing environment.
 getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting());
 

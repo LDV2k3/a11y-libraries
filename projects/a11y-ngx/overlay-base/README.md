@@ -2,7 +2,17 @@
 
 An overlay positioning system that allows them to remain within the visible area of the viewport or a given custom boundary (such as containers with overflow) and thus, prevent being out of the screen.
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0.
+You can use this library to create your own custom overlay-type stuff, such as:
+
+- Tooltips
+- Dropdowns
+- Menus / Context Menus
+- Popovers
+- And much more!
+
+![Angular support from version 12 up to version 20](https://img.shields.io/badge/Angular-v12_to_v20-darkgreen?logo=angular)
+
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0 to ensure compatibility with a wide range of Angular versions. It has been tested up to v20.
 
 ## Index
 
@@ -66,10 +76,12 @@ This library was generated with [Angular CLI](https://github.com/angular/angular
   - [`boundary`](#the-custom-boundary)
   - [`safeSpace`](#the-safe-space)
   - [`offsetSize`](#the-offset-size)
+  - [`initialScale`](#the-initial-scale)
   - [`fluidAlignment`](#the-fluid-alignment)
   - [`fluidSize`](#the-fluid-size)
   - [`positionsAllowed`](#the-positions-allowed-input)
   - [`alignmentsAllowed`](#the-alignments-allowed-input)
+  - [`alignmentOrder`](#the-alignment-order)
   - [`allowScrollListener`](#the-page-scroll-listener)
 
 ### The Trigger Element
@@ -131,6 +143,14 @@ To establish which alignments are allowed.
     - ⚠️ **IMPORTANT:** avoid using this option unless you'll be 100% sure the overlay will be within the visible area at that alignment!
   - `OverlayBaseAlignment[]`: an array of values, e.g.: `[ALIGNMENT.CENTER, ALIGNMENT.END]` or `['center', 'end']`.
 
+### The Alignment Order
+
+To establish the alignment order priority.
+
+- **Property:** `alignmentOrder`.
+- **Type:** `OverlayBaseAlignment[]`.
+- **Default:** `['center', 'start', 'end']`.
+
 ### The Position Strategy
 
 To establish whether a `fixed` or `absolute` strategy positioning is used in CSS.
@@ -151,8 +171,10 @@ The `absolute` strategy was designed mainly to be utilized inside containers (ak
 
 A custom boundary can be interpreted as a wrapper/container, and the overlay will consider that boundary as the new limits for its positioning.
 
+> **NOTE:** You can establish a `string` with the element's selector or an HTML element.
+
 - **Property:** `boundary`.
-- **Type:** `HTMLElement`.
+- **Type:** `string` or `HTMLElement`.
 - **Default:** `<body>`.
 
 See [the example](#example).
@@ -215,9 +237,33 @@ It defines the space between the overlay and its trigger.
 
 ![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay-base/src/lib/images/example-offset-size.jpg)
 
+### The Initial Scale
+
+It defines the initial scale factor for the overlay to properly calculate its final position.
+
+After the first calculation, if repositioning is needed, it will use the scale factor as 1 by default.
+
+> **NOTE:** This comes in handy when you want to provide a scaling animation to the overlay.
+>
+> Let's say you want to use a "scale down" effect: having the overlay with an initial CSS `scale(1.2)` and ending at `scale(1)`, then:
+>
+> - You set `initialScale` to `1.2`.
+> - This will tell the calculations that the actual overlay is oversized by `0.2`.
+> - When your animation ends, it will be positioned in the right place.
+> - If repositioning is needed, the next calculations will use a scale factor of `1`.
+
+- **Property:** `initialScale`.
+- **Type:** `number`.
+- **Default:** `1`.
+- **Accepts:** `0.1` and above.
+
 ### The Fluid Alignment
 
 To establish whether the overlay's alignment will stick to the edges of the viewport/boundary (if set to `true`) or make jumps between `start`, `center` or `end` (if set to `false`).
+
+> **IMPORTANT:** This option will gain priority when the desired alignment is `center` (default) and, most importantly, [that alignment is also allowed](#the-alignments-allowed-input).
+>
+> So, even if the overlay lacks enough space to be properly centered, if `fluidAlignment` is `true`, it will stick to the nearest edge of the viewport/boundary.
 
 - **Property:** `fluidAlignment`.
 - **Type:** `boolean`.
@@ -248,11 +294,11 @@ The size adjustment will depend of the overlay's position:
 
 #### The Fluid Size On or Off
 
-If `fluidSize` is on, and the overlay is bigger than the chosen side free space, it will return the max `width` or `height` within `maxSize` (as part of [the Calculated Position](#the-calculated-position)).
+If `fluidSize` is on, and the overlay is bigger than the chosen side free space, it will return the max `width` and `height` within `maxSize` (as part of [the Calculated Position](#the-calculated-position)).
 
 At this point, is up to you to force either the `width` or `height` of your overlay to those "max" values, and handle any possible overflow inside of it.
 
-If is off, `maxSize` will return `null` for both, `width` and `height`.
+If it's off, `maxSize` will return `undefined`.
 
 Check also [the square areas](#the-overlay-reposition-by-square-areas) to better understand how the free space is calculated in case the overlay size exceeds it.
 
@@ -420,11 +466,11 @@ Returns an `Observable` of type [`OverlayBaseCalculatedPosition`](#the-calculate
 - **Properties:**
 
   | Property | Type | Description |
-  |:---------|:-----|:------------|
+  | :------- | :--- | :---------- |
   | `position` | [`OverlayBasePosition`](#the-overlay-position) | The final position for the overlay |
   | `alignment` | [`OverlayBaseAlignment`](#the-overlay-alignment) | The final alignment for the overlay |
   | `render` | `OverlayBaseRenderPosition` | The (top, bottom, left or right) coordinates depending on the chosen [Position Strategy](#the-position-strategy) |
-  | `maxSize` | `OverlayBaseMaxSize` | The possible max size (`width` or `height`) if [`fluidSize`](#the-fluid-size) is set to `true` |
+  | `maxSize` | `OverlayBaseMaxSize` | The possible max size (`width` and `height`) if [`fluidSize`](#the-fluid-size) is set to `true` |
 
 ### The `detachOverlay()` Method
 
@@ -453,7 +499,7 @@ This will take into consideration a given [Custom Boundary](#the-custom-boundary
 ### The public Properties, Getters and Setters
 
 | Name | Type | Of Type | Description |
-|:-----|:-----|:--------|:------------|
+| :--- | :--- | :------ | :---------- |
 | `uid` | `property` | `number` | A unique auto-incremented value for each overlay created |
 | `getCurrentPosition` | `get` | `OverlayBasePosition` | The position after all calculations. See [the Overlay Position](#the-overlay-position) |
 | `getCurrentAlignment` | `get` | `OverlayBaseAlignment` | The alignment after all calculations. See [the Overlay Alignment](#the-overlay-alignment) |
@@ -484,11 +530,11 @@ This will take into consideration a given [Custom Boundary](#the-custom-boundary
 These are the listeners that will be approperly triggered so the overlay can reposition and/or realign.
 
 | Listener | Default | Description |
-|:---------|:--------|:------------|
+| :------- | :------ | :---------- |
 | Window resize | _Always listening_ | The window changes its size |
 | Page scroll | `true` | See [allow scroll listener](#the-page-scroll-listener) |
-| Custom Boundary scroll |  _Always listening_ (if any) | See [the Custom Boundary Scroll listener](#the-custom-boundary-scroll-listener) |
-| _Force update_ |  _Always listening_ | If the [`recalculate()` method](#the-recalculate-method) is invoked |
+| Custom Boundary scroll | _Always listening_ (if any) | See [the Custom Boundary Scroll listener](#the-custom-boundary-scroll-listener) |
+| _Force update_ | _Always listening_ | If the [`recalculate()` method](#the-recalculate-method) is invoked |
 
 #### The Page Scroll Listener
 
@@ -512,6 +558,8 @@ If a [custom boundary](#the-custom-boundary) was set and, at some point, has ove
 
 This is a quick example on how to crate a basic tooltip directive extending the `OverlayBase` class.
 
+> **IMPORTANT:** Although a tooltip needs a lot more logic to be accessible, you can get an idea on how to start to implement it.
+
 **Tooltip Directive:**
 
 ```typescript
@@ -527,19 +575,21 @@ import { OverlayBase } from '@a11y-ngx/overlay-base';
     host: {
         '(mouseenter)': 'createTooltip()',
         '(mouseleave)': 'destroyTooltip()',
+        '(focus)': '...',
+        '(blur)': '...',
         '[attr.aria-labelledby]': 'tooltipElement ? id : null',
     },
 })
 export class MyCustomTooltip extends OverlayBase implements OnDestroy {
     @Input() tooltip: string;
 
-    private get id(): string {
+    protected get id(): string {
         return `my-custom-tooltip-${this.uid}`;
     }
 
     private readonly destroy$: Subject<void> = new Subject<void>();
 
-    private tooltipElement: HTMLDivElement | undefined = undefined;
+    protected tooltipElement: HTMLDivElement | undefined = undefined;
 
     constructor(private hostElement: ElementRef) {
         super();
@@ -553,7 +603,7 @@ export class MyCustomTooltip extends OverlayBase implements OnDestroy {
             // Offset: We want a 10px distance between trigger & overlay
             offsetSize: 10,
             // Boundary: We want the <main> element as the boundary
-            boundary: document.querySelector('main'),
+            boundary: 'main',
         });
     }
 
@@ -564,7 +614,7 @@ export class MyCustomTooltip extends OverlayBase implements OnDestroy {
     }
 
     // 2. We create the tooltip on (mouseenter) event
-    private createTooltip(): void {
+    protected createTooltip(): void {
         // We create a new <div> element and set the id and inner text
         this.tooltipElement = document.createElement('div');
         this.tooltipElement.id = this.id;
@@ -603,7 +653,7 @@ export class MyCustomTooltip extends OverlayBase implements OnDestroy {
     }
 
     // 3. We destroy the tooltip on (mouseleave) event
-    private destroyTooltip(): void {
+    protected destroyTooltip(): void {
         this.detachOverlay();
         this.tooltipElement.remove();
         this.tooltipElement = undefined;

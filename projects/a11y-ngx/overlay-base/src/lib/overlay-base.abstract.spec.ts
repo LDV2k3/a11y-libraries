@@ -9,7 +9,7 @@ import {
     ViewChild,
     ViewChildren,
 } from '@angular/core';
-import { merge, Subject } from 'rxjs';
+import { merge, Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { OverlayBase } from './overlay-base.abstract';
@@ -27,6 +27,8 @@ import {
 
 import { ERROR_NO_TRIGGER_PROVIDED } from './overlay-base.errors';
 
+import { forceElementsCleanup } from '../test';
+
 @Component({
     selector: 'a11y-test-overlay-abstract-class',
     template: `
@@ -41,7 +43,8 @@ import { ERROR_NO_TRIGGER_PROVIDED } from './overlay-base.errors';
                 class="overlay overlay1"
                 #overlay
                 [style.display]="isOverlay(1) && isVisible ? 'inline-flex' : 'none'"
-                [style.opacity]="isOverlay(1) && isOpaque ? '1' : '0'">
+                [style.opacity]="isOverlay(1) && isOpaque ? '1' : '0'"
+                [style.transform]="'scale(' + customScaleFactor + ')'">
                 <div *ngFor="let item of [1, 2, 3, 4, 5]">some content to test the overlay</div>
             </div>
 
@@ -62,6 +65,14 @@ import { ERROR_NO_TRIGGER_PROVIDED } from './overlay-base.errors';
                 #overlay
                 [style.display]="isOverlay(3) && isVisible ? 'inline-flex' : 'none'"
                 [style.opacity]="isOverlay(3) && isOpaque ? '1' : '0'">
+                :)
+            </div>
+
+            <div
+                class="overlay overlay4"
+                #overlay
+                [style.display]="isOverlay(4) && isVisible ? 'inline-flex' : 'none'"
+                [style.opacity]="isOverlay(4) && isOpaque ? '1' : '0'">
                 :)
             </div>
 
@@ -159,6 +170,13 @@ import { ERROR_NO_TRIGGER_PROVIDED } from './overlay-base.errors';
                 align-items: center;
                 justify-content: center;
             }
+            .overlay4 {
+                position: absolute;
+                width: 100px;
+                height: 100px;
+                align-items: center;
+                justify-content: center;
+            }
             .boundary.active {
                 overflow: auto;
                 box-sizing: border-box;
@@ -196,6 +214,8 @@ class OverlayComponent extends OverlayBase implements AfterViewInit, OnDestroy {
 
     overlay: HTMLDivElement;
     boundary: HTMLDivElement;
+
+    customScaleFactor: number = 1;
 
     readonly destroy$: Subject<void> = new Subject<void>();
 
@@ -314,7 +334,7 @@ describe('Abstract Overlay Base', () => {
         tick(debounceTime);
     };
 
-    const toggleOverlay = (config?: Partial<OverlayBaseConfig>): void => {
+    const toggleOverlay = (config?: OverlayBaseConfig): void => {
         if (!component.isVisible) {
             component.setBaseConfig({ trigger: component.trigger.nativeElement, ...config });
             component.show(debounceTimeMs);
@@ -375,6 +395,8 @@ describe('Abstract Overlay Base', () => {
     });
 
     afterEach(() => {
+        if (!forceElementsCleanup) return;
+
         fixture.nativeElement.remove();
         fixture.destroy();
         TestBed.resetTestingModule();
@@ -505,8 +527,63 @@ describe('Abstract Overlay Base', () => {
 
             scrollBoundaryTo(0, 1);
             expect(spyOnBoundaryScroll).toHaveBeenCalledWith();
+
+            // For coverage: To cover the removal of the boundary "scroll" listener when detached
+            toggleOverlay();
         }));
     });
+
+    it('should verify "detachOverlay()" is not invoked twice if the overlay is not currently attached', fakeAsync(() => {
+        toggleOverlay();
+
+        const spyOnIsDetached = spyOn(component.isDetached$, 'next');
+        const spyOnIsDetachedComplete = spyOn(component.isDetached$, 'complete');
+
+        expect(spyOnIsDetached).toHaveBeenCalledTimes(0);
+        expect(spyOnIsDetachedComplete).toHaveBeenCalledTimes(0);
+
+        component.detachOverlay();
+
+        expect(spyOnIsDetached).toHaveBeenCalledTimes(1);
+        expect(spyOnIsDetachedComplete).toHaveBeenCalledTimes(1);
+
+        component.detachOverlay();
+
+        expect(spyOnIsDetached).toHaveBeenCalledTimes(1);
+        expect(spyOnIsDetachedComplete).toHaveBeenCalledTimes(1);
+    }));
+
+    it('should verify "attachOverlay()" is not invoked twice if the overlay is currently attached', fakeAsync(() => {
+        toggleOverlay();
+
+        expect(component.overlayElement).toEqual(component.overlay);
+
+        const newOverlayElement: HTMLDivElement = document.createElement('div');
+        const overlaySubscription: Subscription = component.attachOverlay(newOverlayElement).subscribe((data) => data);
+
+        expect(component.overlayElement).toEqual(component.overlay);
+
+        overlaySubscription.unsubscribe();
+    }));
+
+    it('should update the overlay DOMRect when "updateOverlaySize()" method is invoked', fakeAsync(() => {
+        toggleOverlay();
+        getOverlayRect();
+
+        expect(overlayRect.width).toEqual(overlayWidth);
+        expect(overlayRect.height).toEqual(overlayHeight);
+
+        // Subtract 2 for the border
+        component.overlayElement.style.width = `${overlayWidth - 2 + 20}px`;
+        component.overlayElement.style.height = `${overlayHeight - 2 + 10}px`;
+
+        component.updateOverlaySize();
+        debounceTime();
+        getOverlayRect();
+
+        expect(overlayRect.width).toEqual(overlayWidth + 20);
+        expect(overlayRect.height).toEqual(overlayHeight + 10);
+    }));
 
     it('should have the entire configuration with their defaults', () => {
         expect(component.triggerElement).toEqual(undefined);
@@ -523,9 +600,10 @@ describe('Abstract Overlay Base', () => {
         expect(component.boundaryElement).toEqual(document.body);
         expect(component.safeSpace).toEqual(OVERLAY_BASE_DEFAULTS.safeSpace);
         expect(component.offsetSize).toEqual(OVERLAY_BASE_DEFAULTS.offsetSize);
+        expect(component.scaleFactor).toEqual(OVERLAY_BASE_DEFAULTS.initialScale);
         expect(component['allowScrollListener']).toEqual(OVERLAY_BASE_DEFAULTS.allowScrollListener);
 
-        expect(component.maxSize).toEqual({ width: null, height: null });
+        expect(component.maxSize).toEqual({ width: 0, height: 0 });
         expect(component.overlayOutside).toEqual(undefined);
         expect(component.overlayElement).toEqual(undefined);
     });
@@ -539,6 +617,12 @@ describe('Abstract Overlay Base', () => {
     }));
 
     describe('Should check the "setBaseConfig()" method', () => {
+        it('should have the position & alignment not defined when undefined config is sent (early return)', fakeAsync(() => {
+            component.setBaseConfig(undefined);
+            expect(component.getCurrentPosition).toBe(undefined);
+            expect(component.getCurrentAlignment).toBe(undefined);
+        }));
+
         describe('Should check the "position" property', () => {
             const getTopBottomEndLeft = (): number =>
                 component.triggerRect.left - (overlayRect.width - component.triggerRect.width);
@@ -549,6 +633,52 @@ describe('Abstract Overlay Base', () => {
 
             const getLeftRightCenterTop = (): number =>
                 component.triggerRect.top - (overlayRect.height - component.triggerRect.height) / 2;
+
+            describe('Should check the opposite positions', () => {
+                beforeEach(() => component.setBaseConfig({ positionsAllowed: 'opposite' }));
+
+                it('should set the opposite position for "top" as "bottom"', fakeAsync(() => {
+                    component.setBaseConfig({ position: 'top' });
+                    expect(component['allowed'].positions).toEqual(['top', 'bottom']);
+                }));
+
+                it('should set the opposite position for "left" as "right"', fakeAsync(() => {
+                    component.setBaseConfig({ position: 'left' });
+                    expect(component['allowed'].positions).toEqual(['left', 'right']);
+                }));
+
+                it('should set the opposite position for "bottom" as "top"', fakeAsync(() => {
+                    component.setBaseConfig({ position: 'bottom' });
+                    expect(component['allowed'].positions).toEqual(['bottom', 'top']);
+                }));
+
+                it('should set the opposite position for "right" as "left"', fakeAsync(() => {
+                    component.setBaseConfig({ position: 'right' });
+                    expect(component['allowed'].positions).toEqual(['right', 'left']);
+                }));
+
+                it('should set the opposite position for a wrong value position as the defaults "top" & "bottom"', fakeAsync(() => {
+                    component.setBaseConfig({ position: 'x' as OverlayBasePositionInput });
+                    component['desiredPosition'] = undefined;
+                    component.setBaseConfig({ position: 'x' as OverlayBasePositionInput });
+                    expect(component['allowed'].positions).toEqual(['top', 'bottom']);
+                }));
+            });
+
+            it('should set the default position/alignment ("top-start") when undefined values are found somehow', fakeAsync(() => {
+                toggleOverlay();
+
+                component['allowed'].positions = [];
+                component['allowed'].alignments = [];
+                component['desiredPosition'] = undefined;
+                component['desiredAlignment'] = undefined;
+                component.setBaseConfig({ position: undefined });
+
+                expect(component['desiredPosition']).toEqual('top');
+                // When no "allowed alignments" are found,
+                // "start" will be set as default since "center" does not exist
+                expect(component['desiredAlignment']).toEqual('start');
+            }));
 
             describe('Should check the position TOP', () => {
                 const getTop = (): number => component.triggerRect.top - overlayRect.height - component.offsetSize;
@@ -735,6 +865,28 @@ describe('Abstract Overlay Base', () => {
             }));
         });
 
+        describe('Should check the "safeSpace" property', () => {
+            it('should establish the defaults when undefined is sent', fakeAsync(() => {
+                component.setBaseConfig({ safeSpace: undefined });
+                expect(component.safeSpace).toEqual(OVERLAY_BASE_DEFAULTS.safeSpace);
+            }));
+
+            it('should establish the defaults when wrong values are sent', fakeAsync(() => {
+                component.setBaseConfig({ safeSpace: { top: undefined, bottom: -20, left: -1, right: null } });
+                expect(component.safeSpace).toEqual(OVERLAY_BASE_DEFAULTS.safeSpace);
+            }));
+
+            it('should establish the right values when some are right and some wrong', fakeAsync(() => {
+                component.setBaseConfig({ safeSpace: { top: 15, bottom: 20, left: undefined, right: -5 } });
+                expect(component.safeSpace).toEqual({ right: 0, bottom: 20, left: 0, top: 15 });
+            }));
+
+            it('should establish the values sent', fakeAsync(() => {
+                component.setBaseConfig({ safeSpace: { right: 5, left: 2 } });
+                expect(component.safeSpace).toEqual({ right: 5, bottom: 0, left: 2, top: 0 });
+            }));
+        });
+
         describe('Should check the "offsetSize" property', () => {
             it('should establish the right value', fakeAsync(() => {
                 component.setBaseConfig({ offsetSize: 10 });
@@ -767,6 +919,84 @@ describe('Abstract Overlay Base', () => {
                 expect(Math.round(overlayRect.left)).toEqual(
                     Math.round(component.triggerRect.left + component.triggerRect.width)
                 );
+            }));
+        });
+
+        describe('Should check the "scaleFactor" property', () => {
+            const expectedCommon = (): void => {
+                const triggerRect: DOMRect = component.trigger.nativeElement.getBoundingClientRect();
+
+                toggleOverlay();
+
+                expect(component.scaleFactor).toEqual(1);
+
+                component.customScaleFactor = 1;
+                fixture.detectChanges();
+                getOverlayRect();
+
+                expect(overlayRect.top).toEqual(triggerRect.top - overlayHeight - component.offsetSize);
+                expect(overlayRect.left).toEqual(triggerRect.left - overlayWidth / 2 + triggerWidth / 2);
+            };
+
+            it('should set the overlay in the right "top-center" position when the initial scale factor is above normal', fakeAsync(() => {
+                component.customScaleFactor = 1.5;
+                fixture.detectChanges();
+
+                component.setBaseConfig({ initialScale: 1.5 });
+                expect(component.scaleFactor).toEqual(1.5);
+
+                expectedCommon();
+            }));
+
+            it('should set the overlay in the right "top-center" position when the initial scale factor is below normal', fakeAsync(() => {
+                component.customScaleFactor = 0.7;
+                fixture.detectChanges();
+
+                component.setBaseConfig({ initialScale: 0.7 });
+                expect(component.scaleFactor).toEqual(0.7);
+
+                expectedCommon();
+            }));
+
+            it('should set the scale factor to 1 when it is not a valid value', () => {
+                component.setBaseConfig({ initialScale: 'invalid-value' as unknown as number });
+                expect(component.overlayConfig.initialScale).toEqual(1);
+
+                component.setBaseConfig({ initialScale: undefined });
+                expect(component.overlayConfig.initialScale).toEqual(1);
+
+                component.setBaseConfig({ initialScale: 0 });
+                expect(component.overlayConfig.initialScale).toEqual(1);
+            });
+
+            it('should set the scale factor to the minimum (0.1) when it is a valid value but below the minimum', () => {
+                component.setBaseConfig({ initialScale: 0.009 });
+                expect(component.overlayConfig.initialScale).toEqual(0.1);
+
+                component.setBaseConfig({ initialScale: 0.09 });
+                expect(component.overlayConfig.initialScale).toEqual(0.1);
+
+                component.setBaseConfig({ initialScale: 0.099 });
+                expect(component.overlayConfig.initialScale).toEqual(0.1);
+            });
+
+            it('should update the overlay original rect when reposition', fakeAsync(() => {
+                const customScaleFactor: number = 1.44;
+                component.customScaleFactor = customScaleFactor;
+
+                toggleOverlay({ initialScale: customScaleFactor });
+
+                let originalRect: DOMRect = component['overlayOriginalRect'];
+                expect(+originalRect.width.toFixed(2)).toEqual(overlayWidth * customScaleFactor);
+                expect(+originalRect.height.toFixed(2)).toEqual(overlayHeight * customScaleFactor);
+
+                component.customScaleFactor = 1;
+                fixture.detectChanges();
+                recalculateOverlay();
+
+                originalRect = component['overlayOriginalRect'];
+                expect(+originalRect.width.toFixed(2)).toEqual(overlayWidth);
+                expect(+originalRect.height.toFixed(2)).toEqual(overlayHeight);
             }));
         });
 
@@ -891,6 +1121,38 @@ describe('Abstract Overlay Base', () => {
             });
         });
 
+        describe('Should check the "alignmentOrder" property', () => {
+            it('should set the default alignment order when the wrong value is sent', fakeAsync(() => {
+                component.setBaseConfig({ alignmentOrder: ['x'] as unknown as OverlayBaseAlignment[] });
+                expect(component['allowed'].alignmentOrder).toEqual(OVERLAY_BASE_DEFAULTS.alignmentOrder);
+            }));
+
+            it('should set the default alignment order when an undefined value is sent', fakeAsync(() => {
+                component.setBaseConfig({ alignmentOrder: undefined });
+                expect(component['allowed'].alignmentOrder).toEqual(OVERLAY_BASE_DEFAULTS.alignmentOrder);
+            }));
+
+            it('should set the alignment order to "center"', fakeAsync(() => {
+                component.setBaseConfig({ alignmentOrder: ['center'] });
+                expect(component['allowed'].alignmentOrder).toEqual(['center']);
+            }));
+
+            it('should set the alignment order to "start" even when several values are sent', fakeAsync(() => {
+                component.setBaseConfig({ alignmentOrder: ['start', 'start', 'start'] });
+                expect(component['allowed'].alignmentOrder).toEqual(['start']);
+            }));
+
+            it('should set the alignment order to "start"/"center"/"end"', fakeAsync(() => {
+                component.setBaseConfig({ alignmentOrder: ['start', 'center', 'end'] });
+                expect(component['allowed'].alignmentOrder).toEqual(['start', 'center', 'end']);
+            }));
+
+            it('should set the alignment order to "end"/"start"/"center"', fakeAsync(() => {
+                component.setBaseConfig({ alignmentOrder: ['end', 'start', 'center'] });
+                expect(component['allowed'].alignmentOrder).toEqual(['end', 'start', 'center']);
+            }));
+        });
+
         describe('Should check the "alignmentsAllowed" property', () => {
             it('should open the overlay in the allowed alignment despite of the one desired', fakeAsync(() => {
                 toggleOverlay({ alignmentsAllowed: ['start'], position: 'left-end' });
@@ -965,10 +1227,15 @@ describe('Abstract Overlay Base', () => {
                 expect(component['allowed'].alignments).toEqual(['end', 'start']);
 
                 component.setBaseConfig({ position: 'left' });
-                expect(component['desiredAlignment']).toEqual('start');
+                expect(component['desiredAlignment']).toEqual('start'); // last known accepted alignment
                 expect(component['allowed'].alignments).toEqual(['end', 'start']);
 
+                // This will be ignored since "center" only works when "fluidAlignment=true"
                 component.setBaseConfig({ alignmentsAllowed: 'center' });
+                expect(component['desiredAlignment']).toEqual('start'); // last known accepted alignment
+                expect(component['allowed'].alignments).toEqual(['center', 'start', 'end']);
+
+                component.setBaseConfig({ alignmentsAllowed: 'center', fluidAlignment: true });
                 expect(component['desiredAlignment']).toEqual('center');
                 expect(component['allowed'].alignments).toEqual(['center']);
 
@@ -990,7 +1257,55 @@ describe('Abstract Overlay Base', () => {
             }));
         });
 
-        it('should check the "positionStrategy"', fakeAsync(() => {
+        it('should check the "fluidAlignment" property', () => {
+            expect(component.fluidAlignment).toBe(false);
+
+            component.setBaseConfig({ fluidAlignment: true });
+            expect(component.fluidAlignment).toEqual(true);
+
+            component.setBaseConfig({ fluidAlignment: 'x' as unknown as boolean });
+            expect(component.fluidAlignment).toEqual(false);
+
+            component.setBaseConfig({ fluidAlignment: '  true' as unknown as boolean });
+            expect(component.fluidAlignment).toEqual(true);
+
+            component.setBaseConfig({ fluidAlignment: undefined });
+            expect(component.fluidAlignment).toEqual(false);
+        });
+
+        it('should check the "fluidSize" property', () => {
+            expect(component.fluidSize).toBe(true);
+
+            component.setBaseConfig({ fluidSize: false });
+            expect(component.fluidSize).toEqual(false);
+
+            component.setBaseConfig({ fluidSize: 'x' as unknown as boolean });
+            expect(component.fluidSize).toEqual(true);
+
+            component.setBaseConfig({ fluidSize: ' false ' as unknown as boolean });
+            expect(component.fluidSize).toEqual(false);
+
+            component.setBaseConfig({ fluidSize: undefined });
+            expect(component.fluidSize).toEqual(true);
+        });
+
+        it('should check the "allowScrollListener" property', () => {
+            expect(component['allowScrollListener']).toBe(true);
+
+            component.setBaseConfig({ allowScrollListener: false });
+            expect(component['allowScrollListener']).toEqual(false);
+
+            component.setBaseConfig({ allowScrollListener: 'x' as unknown as boolean });
+            expect(component['allowScrollListener']).toEqual(true);
+
+            component.setBaseConfig({ allowScrollListener: 'false  ' as unknown as boolean });
+            expect(component['allowScrollListener']).toEqual(false);
+
+            component.setBaseConfig({ allowScrollListener: undefined });
+            expect(component['allowScrollListener']).toEqual(true);
+        });
+
+        it('should check the "positionStrategy" property', fakeAsync(() => {
             expect(component.positionStrategy).toEqual('fixed');
 
             component.setBaseConfig({ positionStrategy: 'absolute' });
@@ -999,11 +1314,110 @@ describe('Abstract Overlay Base', () => {
             component.setBaseConfig({ positionStrategy: 'x' as OverlayBasePositionStrategy });
             expect(component.positionStrategy).toEqual('fixed');
 
+            component.setBaseConfig({ positionStrategy: undefined });
+            expect(component.positionStrategy).toEqual('fixed');
+
             component.setBaseConfig({ positionStrategy: 'ABSOLUTE' as OverlayBasePositionStrategy });
             expect(component.positionStrategy).toEqual('absolute');
 
             component.setBaseConfig({ positionStrategy: 'FIXED' as OverlayBasePositionStrategy });
             expect(component.positionStrategy).toEqual('fixed');
+        }));
+
+        describe('Check the "boundary" property', () => {
+            it('should assign the right boundary element when using a string selector', fakeAsync(() => {
+                toggleOverlay({ boundary: 'div.safe-space' });
+                expect(component.overlayConfig.boundary).toHaveClass('safe-space');
+            }));
+
+            it('should keep the default boundary element when using an unexisting string selector', fakeAsync(() => {
+                toggleOverlay({ boundary: '.non-existing-selector' });
+                expect(component.boundaryElement).toEqual(document.body);
+            }));
+        });
+    });
+
+    describe('Should check the "absolute" position strategy', () => {
+        let trigger: HTMLButtonElement;
+        let triggerRect: DOMRect;
+
+        const setTriggerPosition = (left?: number, top?: number): void => {
+            trigger = component.trigger.nativeElement;
+
+            trigger.style.position = 'absolute';
+            trigger.style.transform = 'initial';
+
+            trigger.style.top = `${top ?? 200}px`;
+            trigger.style.left = `${left ?? 200}px`;
+        };
+
+        const getTriggerRect = (): void => {
+            triggerRect = trigger.getBoundingClientRect();
+        };
+
+        beforeEach(() => {
+            component.generateScroll = true;
+            component.selectOverlay = 4;
+
+            component.setBaseConfig({ positionStrategy: 'absolute' });
+        });
+
+        it('should open the overlay at the right distance for "top" position and reposition to "bottom" when scroll', fakeAsync(() => {
+            setTriggerPosition();
+            toggleOverlay();
+            getOverlayRect();
+            getTriggerRect();
+
+            expect(component.getCurrentPosition).toEqual('top');
+            expect(component.getCurrentAlignment).toEqual('center');
+            expect(Math.round(overlayRect.top)).toEqual(
+                Math.round(triggerRect.top - overlayRect.height - component.offsetSize)
+            );
+
+            const scrollTop: number = 100;
+
+            scrollTo(0, scrollTop);
+            getOverlayRect();
+
+            expect(component.getCurrentPosition).toEqual('bottom');
+            expect(component.getCurrentAlignment).toEqual('center');
+            expect(Math.round(overlayRect.top)).toEqual(
+                Math.round(triggerRect.top + triggerRect.height + component.offsetSize - scrollTop)
+            );
+        }));
+
+        it('should open the overlay at the right distance for "left" position and reposition to "right" when scroll', fakeAsync(() => {
+            setTriggerPosition();
+            toggleOverlay({ position: 'left' });
+            getOverlayRect();
+            getTriggerRect();
+
+            expect(component.getCurrentPosition).toEqual('left');
+            expect(component.getCurrentAlignment).toEqual('center');
+            expect(Math.round(overlayRect.left)).toEqual(
+                Math.round(triggerRect.left - overlayRect.width - component.offsetSize)
+            );
+
+            const scrollLeft: number = 100;
+
+            scrollTo(scrollLeft, 0);
+            getOverlayRect();
+
+            expect(component.getCurrentPosition).toEqual('right');
+            expect(component.getCurrentAlignment).toEqual('center');
+            expect(Math.round(overlayRect.left)).toEqual(
+                Math.round(triggerRect.left + triggerRect.width + component.offsetSize - scrollLeft)
+            );
+        }));
+
+        it('should stick the overlay to the top of the screen when "fluidAlignment" is set to true and scrolling a bit down', fakeAsync(() => {
+            setTriggerPosition(undefined, 200);
+            toggleOverlay({ position: 'right', fluidAlignment: true });
+
+            scrollTo(0, 200);
+            getOverlayRect();
+
+            expect(overlayRect.top).toEqual(0);
         }));
     });
 
@@ -1203,7 +1617,7 @@ describe('Abstract Overlay Base', () => {
                     }));
 
                     it('should be aligned only to CENTER on scroll left', fakeAsync(() => {
-                        toggleOverlay({ alignmentsAllowed: 'center' });
+                        toggleOverlay({ alignmentsAllowed: 'center', fluidAlignment: true });
                         expect(component.getCurrentAlignment).toBe('center');
 
                         scrollTo(documentWidth() * 0.1, 0);
@@ -1289,7 +1703,7 @@ describe('Abstract Overlay Base', () => {
                     }));
 
                     it('should be aligned only to CENTER on scroll down', fakeAsync(() => {
-                        toggleOverlay({ alignmentsAllowed: 'center', position: 'right' });
+                        toggleOverlay({ alignmentsAllowed: 'center', position: 'right', fluidAlignment: true });
                         expect(component.getCurrentAlignment).toBe('center');
 
                         scrollTo(0, documentHeight() / 2);
@@ -1390,7 +1804,7 @@ describe('Abstract Overlay Base', () => {
                     }));
 
                     it('should be aligned only to CENTER on scroll left', fakeAsync(() => {
-                        toggleOverlay({ alignmentsAllowed: 'center' });
+                        toggleOverlay({ alignmentsAllowed: 'center', fluidAlignment: true });
                         expect(component.getCurrentPosition).toEqual('left');
                         expect(component.getCurrentAlignment).toBe('center');
 
@@ -1471,7 +1885,7 @@ describe('Abstract Overlay Base', () => {
                         }));
 
                         it('should be aligned only to CENTER on scroll down', fakeAsync(() => {
-                            toggleOverlay({ alignmentsAllowed: 'center', position: 'right' });
+                            toggleOverlay({ alignmentsAllowed: 'center', position: 'right', fluidAlignment: true });
                             expect(component.getCurrentAlignment).toBe('center');
 
                             scrollTo(0, documentHeight() / 2);
@@ -1487,6 +1901,11 @@ describe('Abstract Overlay Base', () => {
     });
 
     describe('Should check the overlay inside a custom boundary', () => {
+        it('should verify the boundary element is set to <body> when an undefined value is sent', fakeAsync(() => {
+            toggleOverlay({ boundary: undefined });
+            expect(component.boundaryElement).toEqual(document.body);
+        }));
+
         describe('Should check without safe space', () => {
             beforeEach(() => {
                 component.selectBoundary = 1;
@@ -1688,22 +2107,36 @@ describe('Abstract Overlay Base', () => {
 
         it('should have "width" and "height" set to null by default if "fluidSize" is set to false', fakeAsync(() => {
             toggleOverlay({ fluidSize: false });
-            expect(component['getMaxSize']).toEqual({ width: null, height: null });
+            expect(component['getMaxSize']).toBe(undefined);
         }));
 
-        it('should have "width" and "height" properly set if no "maxSize" was established', fakeAsync(() => {
+        it('should have "width" and "height" properly set if "maxSize" was not established', fakeAsync(() => {
             toggleOverlay();
 
-            expect(component['getMaxSize']).toEqual({ width: null, height: getTriggerBoundaryDistance('top') });
+            const { width: viewPortWidth, height: viewportHeight } = component.viewportSizeSafe;
+
+            expect(component['getMaxSize']).toEqual({
+                width: viewPortWidth,
+                height: getTriggerBoundaryDistance('top'),
+            });
 
             recalculateOverlay({ position: 'right' });
-            expect(component['getMaxSize']).toEqual({ width: getTriggerBoundaryDistance('right'), height: null });
+            expect(component['getMaxSize']).toEqual({
+                width: getTriggerBoundaryDistance('right'),
+                height: viewportHeight,
+            });
 
             recalculateOverlay({ position: 'bottom' });
-            expect(component['getMaxSize']).toEqual({ width: null, height: getTriggerBoundaryDistance('bottom') });
+            expect(component['getMaxSize']).toEqual({
+                width: viewPortWidth,
+                height: getTriggerBoundaryDistance('bottom'),
+            });
 
             recalculateOverlay({ position: 'left' });
-            expect(component['getMaxSize']).toEqual({ width: getTriggerBoundaryDistance('left'), height: null });
+            expect(component['getMaxSize']).toEqual({
+                width: getTriggerBoundaryDistance('left'),
+                height: viewportHeight,
+            });
         }));
 
         it('should have "width" and "height" properly set if "maxSize" values were established', fakeAsync(() => {
@@ -1711,16 +2144,16 @@ describe('Abstract Overlay Base', () => {
             component.maxSize.height = 50;
 
             toggleOverlay();
-            expect(component['getMaxSize']).toEqual({ width: null, height: 50 });
+            expect(component['getMaxSize']).toEqual({ width: 75, height: 50 });
 
             recalculateOverlay({ position: 'right' });
-            expect(component['getMaxSize']).toEqual({ width: 75, height: null });
+            expect(component['getMaxSize']).toEqual({ width: 75, height: 50 });
 
             recalculateOverlay({ position: 'bottom' });
-            expect(component['getMaxSize']).toEqual({ width: null, height: 50 });
+            expect(component['getMaxSize']).toEqual({ width: 75, height: 50 });
 
             recalculateOverlay({ position: 'left' });
-            expect(component['getMaxSize']).toEqual({ width: 75, height: null });
+            expect(component['getMaxSize']).toEqual({ width: 75, height: 50 });
         }));
     });
 });

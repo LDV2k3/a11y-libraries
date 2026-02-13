@@ -26,8 +26,10 @@ export const OVERLAY_BASE_DEFAULTS: Required<Omit<OverlayBaseConfig, 'trigger' |
     positionStrategy: POSITION_STRATEGY.FIXED,
     positionsAllowed: [POSITION.TOP, POSITION.BOTTOM, POSITION.LEFT, POSITION.RIGHT],
     alignmentsAllowed: [ALIGNMENT.CENTER, ALIGNMENT.START, ALIGNMENT.END],
+    alignmentOrder: [ALIGNMENT.CENTER, ALIGNMENT.START, ALIGNMENT.END],
     safeSpace: { top: 0, bottom: 0, left: 0, right: 0 },
     allowScrollListener: true,
+    initialScale: 1,
 };
 
 export type OverlayBasePosition = `${POSITION}`;
@@ -38,7 +40,7 @@ export type OverlayBasePositionStrategy = `${POSITION_STRATEGY}`;
 
 export type OverlayBaseSafeSpace = Partial<{ [key in POSITION]: number }>;
 
-export type OverlayBaseMaxSize = Partial<{ width: number | null; height: number | null }>;
+export type OverlayBaseMaxSize = { width: number; height: number };
 
 export type OverlayBasePositionInput =
     | OverlayBasePosition
@@ -63,14 +65,14 @@ export type OverlayBaseCalculatedPosition = {
     /** @description Returns the numeric value to position the overlay (top, bottom, left, right). */
     render: OverlayBaseRenderPosition;
     /** @description Returns the maximum size (width, height). */
-    maxSize: OverlayBaseMaxSize;
+    maxSize: OverlayBaseMaxSize | undefined;
 };
 
 export type OverlayBaseConfig = Partial<{
     /** @description The trigger to which the overlay will be attached. */
     trigger: HTMLElement | DOMRect;
-    /** @description To define a custom boundary, such as wrappers with established overflow. @default <body> */
-    boundary: HTMLElement;
+    /** @description To define a custom boundary, such as wrappers with established overflow. @note Accepts a `string` for the element's selector or an HTML element. @default <body> */
+    boundary: string | HTMLElement;
     /** @description The desired position and alignment. @default 'top-center' */
     position: OverlayBasePositionInput;
     /** @description Whether a `fixed` or `absolute` position will be used. @default 'fixed' */
@@ -79,6 +81,8 @@ export type OverlayBaseConfig = Partial<{
     positionsAllowed: OverlayBasePositionsAllowed;
     /** @description To establish which alignments are allowed when repositioning is needed. @default 'auto' */
     alignmentsAllowed: OverlayBaseAlignmentsAllowed;
+    /** @description To establish the alignment order priority for when repositioning is needed. @default ['center', 'start', 'end'] */
+    alignmentOrder: OverlayBaseAlignment[];
     /** @description The space between the overlay and its trigger (translated to pixels). @default 5 */
     offsetSize: number;
     /** @description To establish extra safe space to the viewport's edges in case some fixed areas are present. @default { top: 0, bottom: 0, left: 0, right: 0 } */
@@ -89,4 +93,6 @@ export type OverlayBaseConfig = Partial<{
     fluidSize: boolean;
     /** @description To allow listening for page scrolling. @default true */
     allowScrollListener: boolean;
+    /** @description To indicate the scale factor of the overlay for the very first time it calculates its size. @default 1 */
+    initialScale: number;
 }>;

@@ -11,6 +11,13 @@ export type ViewportSize = { width: number; height: number };
 export type OverlayBaseAllowed = {
     positions: OverlayBasePosition[];
     alignments: OverlayBaseAlignment[];
+    alignmentOrder: OverlayBaseAlignment[];
+};
+
+export type OverlayBaseAlignmentOrder = {
+    isAllowed: boolean;
+    isDesired: boolean;
+    canApply: boolean;
 };
 
 export type OverlayBaseSquareAreas = { [key in POSITION]: number };

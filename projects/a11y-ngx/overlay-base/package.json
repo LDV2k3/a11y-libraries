@@ -1,6 +1,6 @@
 {
     "name": "@a11y-ngx/overlay-base",
-    "version": "1.0.2",
+    "version": "1.1.1",
     "description": "An overlay positioning system that allows them to remain within the visible area of the viewport or a given custom boundary (such as containers with overflow) and thus prevent being out of the screen",
     "keywords": [
         "overlay",
@@ -11,6 +11,7 @@
         "overflow",
         "a11y",
         "accessibility",
+        "accessible",
         "angular"
     ],
     "homepage": "https://github.com/LDV2k3/a11y-libraries/tree/master/projects/a11y-ngx/overlay-base#readme",
