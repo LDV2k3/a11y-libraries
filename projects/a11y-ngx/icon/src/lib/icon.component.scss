@@ -1,0 +1,21 @@
+:host {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    width: var(--icon-size, 1rem);
+    height: var(--icon-size, 1rem);
+    font-size: var(--icon-size, inherit);
+
+    ::ng-deep {
+        * {
+            width: 100% !important;
+            height: 100% !important;
+            font-size: inherit !important;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+}
