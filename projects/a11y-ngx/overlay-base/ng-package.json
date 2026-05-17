@@ -8,5 +8,6 @@
             "@a11y-ngx/overlay-base": "a11yNGx.overlayBase"
         }
     },
-    "allowedNonPeerDependencies": []
+    "allowedNonPeerDependencies": [],
+    "assets": ["CHANGELOG.md"]
 }
