@@ -10,9 +10,13 @@ You can use this library to create your own custom overlay-type stuff, such as:
 - Popovers
 - And much more!
 
-![Angular support from version 12 up to version 20](https://img.shields.io/badge/Angular-v12_to_v20-darkgreen?logo=angular)
+![Angular support from version 12 up to version 21](https://img.shields.io/badge/Angular-v12_to_v21-darkgreen?logo=angular)
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0 to ensure compatibility with a wide range of Angular versions. It has been tested up to v20.
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0 to ensure compatibility with a wide range of Angular versions. It has been tested up to v21.
+
+## Changelog
+
+See the complete [changelog](./CHANGELOG.md) for details on updates and breaking changes.
 
 ## Index
 
@@ -28,14 +32,12 @@ This library was generated with [Angular CLI](https://github.com/angular/angular
     - [The Safe Space Off](#the-safe-space-off)
     - [The Safe Space On](#the-safe-space-on)
   - [The Offset Size](#the-offset-size)
+  - [The Initial Scale](#the-initial-scale)
   - [The Fluid Alignment](#the-fluid-alignment)
     - [The Fluid Alignment On or Off](#the-fluid-alignment-on-or-off)
   - [The Fluid Size](#the-fluid-size)
     - [The Fluid Size On or Off](#the-fluid-size-on-or-off)
-  - [The Viewport Size](#the-viewport-size)
-  - [The Viewport Safe Size](#the-viewport-safe-size)
-    - [The Viewport Safe Size Without a Boundary](#the-viewport-safe-size-without-a-boundary)
-    - [The Viewport Safe Size With a Boundary](#the-viewport-safe-size-with-a-boundary)
+  - [The Keep In Viewport](#the-keep-in-viewport)
 - [The Types](#the-types)
   - [The Overlay Position](#the-overlay-position)
     - [The Overlay Reposition](#the-overlay-reposition)
@@ -53,6 +55,10 @@ This library was generated with [Angular CLI](https://github.com/angular/angular
   - [The `recalculate()` Method](#the-recalculate-method)
   - [The `triggerBoundaryDistance()` Method](#the-triggerboundarydistance-method)
   - [The public Properties, Getters and Setters](#the-public-properties-getters-and-setters)
+    - [The Viewport Size](#the-viewport-size)
+    - [The Viewport Safe Size](#the-viewport-safe-size)
+      - [The Viewport Safe Size Without a Boundary](#the-viewport-safe-size-without-a-boundary)
+      - [The Viewport Safe Size With a Boundary](#the-viewport-safe-size-with-a-boundary)
   - [The Listeners](#the-listeners)
     - [The Page Scroll Listener](#the-page-scroll-listener)
     - [The Custom Boundary Scroll Listener](#the-custom-boundary-scroll-listener)
@@ -79,6 +85,7 @@ This library was generated with [Angular CLI](https://github.com/angular/angular
   - [`initialScale`](#the-initial-scale)
   - [`fluidAlignment`](#the-fluid-alignment)
   - [`fluidSize`](#the-fluid-size)
+  - [`keepInViewport`](#the-keep-in-viewport)
   - [`positionsAllowed`](#the-positions-allowed-input)
   - [`alignmentsAllowed`](#the-alignments-allowed-input)
   - [`alignmentOrder`](#the-alignment-order)
@@ -302,42 +309,20 @@ If it's off, `maxSize` will return `undefined`.
 
 Check also [the square areas](#the-overlay-reposition-by-square-areas) to better understand how the free space is calculated in case the overlay size exceeds it.
 
-### The Viewport Size
+### The Keep In Viewport
 
-The viewport size (without the scrollbars into consideration).
+Determines whether the overlay should remain visible within the viewport when scrolling.
 
-- **Type:** `ViewportSize`:
-  - `object` with `width` and `height` as a property of type `number`.
-- **Default:** viewport's width and height.
+> 💡 **Scrolling Behavior:**
+>
+> - When `true` (default): Forces the overlay to remain inside the visible viewport.
+>   - If the trigger element scrolls off-screen, the overlay will stay on-screen (**accessibility-first approach:** so the user doesn't lose context of what is currently open).
+> - When `false`: Anchors the overlay strictly to its trigger.
+>   - If the trigger scrolls out of view, the overlay will follow it off-screen. Recommended for dropdowns, menus, etc.
 
-### The Viewport Safe Size
-
-The viewport safe size is the result of how many free space (`width` and `height`) the overlay can consider to be positioned.
-
-It will be the calculation between the [viewport size](#the-viewport-size), a given [custom boundary](#the-custom-boundary) (also without the scrollbars into consideration, if any) and/or the [safe space](#the-safe-space).
-
-- **Type:** `ViewportSize`.
-
-In the following two examples, the green area is the so called _viewport **safe** size_, meaning that the overlay will consider only that area to establish its position and alignment.
-
-#### The Viewport Safe Size Without a Boundary
-
-Imagine having a viewport of `755px` of width and `415px` of height and two safe spaces, one at the `top` of `65px` and another at the `left` of `50px`.
-
-In this case, the _safe size_ will be the result of:
-
-- the viewport's `width` minus the `left` safe space: `755 - 50 = 705px`.
-- the viewport's `height` minus the `top` safe space `415 - 65 = 350px`.
-
-![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay-base/src/lib/images/example-viewport-safe-size-without-boundary.jpg)
-
-#### The Viewport Safe Size With a Boundary
-
-Now imagine having the same viewport (`755px` by `415px`), the same safe spaces (`65px` and `50px`) and a [custom boundary](#the-custom-boundary) of `730px` of `width` and `240px` of `height`. This boundary is, in this examnple, by design, partially behind the left safe space.
-
-Now, the _safe size_ will be the result of the custom boundary size minus the safe space area that is overlapping at its left side.
-
-![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay-base/src/lib/images/example-viewport-safe-size-with-boundary.jpg)
+- **Property:** `keepInViewport`.
+- **Type:** `boolean`.
+- **Default:** `true`.
 
 ## The Types
 
@@ -525,6 +510,45 @@ This will take into consideration a given [Custom Boundary](#the-custom-boundary
 | `maxSize` | `property` | `OverlayBaseMaxSize` | To save the overlay max size and provide a better calculation for the `maxSize` values returned in the [attachOverlay() Method](#the-attachoverlay-method) |
 | `isDetached$` | `property` | `Subject<void>` | So you can use it to kill the `attachOverlay()` subscription. See [the example](#example) |
 
+#### The Viewport Size
+
+The viewport size (without the scrollbars into consideration).
+
+- **Property:** `viewportSize`.
+- **Type:** `ViewportSize`:
+  - `object` with `width` and `height` as a property of type `number`.
+- **Default:** viewport's width and height.
+
+#### The Viewport Safe Size
+
+The viewport safe size is the result of how many free space (`width` and `height`) the overlay can consider to be positioned.
+
+It will be the calculation between the [viewport size](#the-viewport-size), a given [custom boundary](#the-custom-boundary) (also without the scrollbars into consideration, if any) and/or the [safe space](#the-safe-space).
+
+- **Property:** `viewportSizeSafe`.
+- **Type:** `ViewportSize`.
+
+In the following two examples, the green area is the so called _viewport **safe** size_, meaning that the overlay will consider only _that_ area to establish its position and alignment.
+
+##### The Viewport Safe Size Without a Boundary
+
+Imagine having a viewport of `755px` of width and `415px` of height and two safe spaces, one at the `top` of `65px` and another at the `left` of `50px`.
+
+In this case, the _safe size_ will be the result of:
+
+- the viewport's `width` minus the `left` safe space: `755 - 50 = 705px`.
+- the viewport's `height` minus the `top` safe space `415 - 65 = 350px`.
+
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay-base/src/lib/images/example-viewport-safe-size-without-boundary.jpg)
+
+##### The Viewport Safe Size With a Boundary
+
+Now imagine having the same viewport (`755px` by `415px`), the same safe spaces (`65px` and `50px`) and a [custom boundary](#the-custom-boundary) of `730px` of `width` and `240px` of `height`. This boundary is, in this examnple, by design, partially behind the left safe space.
+
+Now, the _safe size_ will be the result of the custom boundary size minus the safe space area that is overlapping at its left side.
+
+![""](https://raw.githubusercontent.com/LDV2k3/a11y-libraries/refs/heads/master/projects/a11y-ngx/overlay-base/src/lib/images/example-viewport-safe-size-with-boundary.jpg)
+
 ### The Listeners
 
 These are the listeners that will be approperly triggered so the overlay can reposition and/or realign.
@@ -642,10 +666,10 @@ export class MyCustomTooltip extends OverlayBase implements OnDestroy {
             // or this directive gets destroyed
             .pipe(takeUntil(merge(this.destroy$, this.isDetached$)))
             .subscribe(({ render: { top, bottom, left, right } }) => {
-                this.tooltipElement.style.top = top !== null ? `${top}px` : null;
-                this.tooltipElement.style.bottom = bottom !== null ? `${bottom}px` : null;
-                this.tooltipElement.style.left = left !== null ? `${left}px` : null;
-                this.tooltipElement.style.right = right !== null ? `${right}px` : null;
+                this.tooltipElement.style.top = top !== null ? `${top}px` : '';
+                this.tooltipElement.style.bottom = bottom !== null ? `${bottom}px` : '';
+                this.tooltipElement.style.left = left !== null ? `${left}px` : '';
+                this.tooltipElement.style.right = right !== null ? `${right}px` : '';
 
                 // We make the overlay fully visible now
                 this.tooltipElement.style.opacity = '1';

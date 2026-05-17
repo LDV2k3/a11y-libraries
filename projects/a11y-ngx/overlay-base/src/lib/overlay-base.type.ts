@@ -30,6 +30,7 @@ export const OVERLAY_BASE_DEFAULTS: Required<Omit<OverlayBaseConfig, 'trigger' |
     safeSpace: { top: 0, bottom: 0, left: 0, right: 0 },
     allowScrollListener: true,
     initialScale: 1,
+    keepInViewport: true,
 };
 
 export type OverlayBasePosition = `${POSITION}`;
@@ -95,4 +96,6 @@ export type OverlayBaseConfig = Partial<{
     allowScrollListener: boolean;
     /** @description To indicate the scale factor of the overlay for the very first time it calculates its size. @default 1 */
     initialScale: number;
+    /** @description Determines whether the overlay should remain visible within the viewport when scrolling. @note When `false`, the overlay will scroll out of view along with its trigger element. @default true */
+    keepInViewport: boolean;
 }>;

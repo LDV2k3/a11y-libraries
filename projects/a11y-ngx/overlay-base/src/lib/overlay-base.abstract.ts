@@ -273,6 +273,8 @@ export abstract class OverlayBase {
     /**
      * @description
      * The position strategy to use (Fixed or Absolute).
+     *
+     * @default 'fixed'
      */
     get positionStrategy(): OverlayBasePositionStrategy {
         return (this.overlayConfig.positionStrategy ?? DEFAULTS.positionStrategy) as OverlayBasePositionStrategy;
@@ -391,6 +393,8 @@ export abstract class OverlayBase {
     /**
      * @description
      * Sets the alignment order priority.
+     *
+     * @default ['center', 'start', 'end']
      */
     set alignmentOrder(order: OverlayBaseAlignment[]) {
         order = (order ?? []).filter(
@@ -424,6 +428,8 @@ export abstract class OverlayBase {
     /**
      * @description
      * Considers an extra (safe) space for the Viewport.
+     *
+     * @default { top: 0, bottom: 0, left: 0, right: 0 }
      */
     get safeSpace(): OverlayBaseSafeSpace {
         return this.overlayConfig.safeSpace ?? DEFAULTS.safeSpace;
@@ -444,6 +450,8 @@ export abstract class OverlayBase {
     /**
      * @description
      * Distance between Trigger & Overlay.
+     *
+     * @default 5
      */
     get offsetSize(): number {
         return this.overlayConfig.offsetSize ?? DEFAULTS.offsetSize;
@@ -459,6 +467,8 @@ export abstract class OverlayBase {
      * When "initialScaleApplied" is set to true, it will return always "1",
      * meaning that it was already calculated with the original scaling factor applied
      * and, from now on, has to return calculations based on the "normal size".
+     *
+     * @default 1
      */
     get scaleFactor(): number {
         return this.initialScaleApplied ? 1 : this.overlayConfig.initialScale ?? DEFAULTS.initialScale;
@@ -471,8 +481,25 @@ export abstract class OverlayBase {
 
     /**
      * @description
+     * Determines whether the overlay should remain visible within the viewport when scrolling.
+     *
+     * @note When `false`, the overlay will scroll out of view along with its trigger element.
+     *
+     * @default true
+     */
+    get keepInViewport(): boolean {
+        return this.overlayConfig.keepInViewport ?? DEFAULTS.keepInViewport;
+    }
+    set keepInViewport(keepInViewport: boolean) {
+        this.overlayConfig.keepInViewport = keepInViewport;
+    }
+
+    /**
+     * @description
      * Overlay alignment is fluid, it doesn't make jumps between Start, Center or End.
      * The Overlay will stick to the edges of the Viewport/Boundary when reaches any of them.
+     *
+     * @default false
      */
     get fluidAlignment(): boolean {
         return !!this.overlayConfig.fluidAlignment;
@@ -487,6 +514,8 @@ export abstract class OverlayBase {
      * height (for `top`/`bottom` positions) to the available free space.
      *
      * Hand in hand with this, would be good to establish `maxSize` values.
+     *
+     * @default true
      */
     get fluidSize(): boolean {
         return this.overlayConfig.fluidSize ?? DEFAULTS.fluidSize;
@@ -946,7 +975,8 @@ export abstract class OverlayBase {
                     overlayTop = distanceTop;
                     posTop = this.triggerRect.top;
                     posBottom = distanceBottom - triggerOverlayDifferenceHeight;
-                } else if (this.isEnd) {
+                } else {
+                    // isEnd
                     overlayTop = distanceTop - triggerOverlayDifferenceHeight;
                     posTop = this.triggerRect.top - triggerOverlayDifferenceHeight;
                     posBottom = distanceBottom;
@@ -955,17 +985,21 @@ export abstract class OverlayBase {
                 this.overlayOutsideCheckY(overlayTop, posBottom);
 
                 if (posBottom > 0) {
-                    posY.top = Math.max(
+                    const maxTop: number = Math.max(
                         posTop,
                         this.boundaryViewportDistance(POSITION.TOP),
                         Number(this.safeSpace.top)
                     );
+                    const keepInViewport: number = this.keepInViewport ? 0 : Math.min(0, distanceTop);
+                    posY.top = maxTop + keepInViewport;
                 } else {
-                    posY.bottom = Math.max(
+                    const maxBottom: number = Math.max(
                         posBottom,
                         this.boundaryViewportDistance(POSITION.BOTTOM),
                         Number(this.safeSpace.bottom)
                     );
+                    const keepInViewport: number = this.keepInViewport ? 0 : Math.min(0, distanceBottom);
+                    posY.bottom = maxBottom + keepInViewport;
                 }
             } else {
                 if (this.isStart) {
@@ -1012,7 +1046,8 @@ export abstract class OverlayBase {
                     overlayLeft = distanceLeft;
                     posLeft = this.triggerRect.left;
                     posRight = distanceRight - triggerOverlayDifferenceWidth;
-                } else if (this.isEnd) {
+                } else {
+                    // isEnd
                     overlayLeft = distanceLeft - triggerOverlayDifferenceWidth;
                     posLeft = this.triggerRect.left - triggerOverlayDifferenceWidth;
                     posRight = distanceRight;
@@ -1021,17 +1056,21 @@ export abstract class OverlayBase {
                 this.overlayOutsideCheckX(overlayLeft, posRight);
 
                 if (posRight > 0) {
-                    posX.left = Math.max(
+                    const maxLeft: number = Math.max(
                         posLeft,
                         this.boundaryViewportDistance(POSITION.LEFT),
                         Number(this.safeSpace.left)
                     );
+                    const keepInViewport: number = this.keepInViewport ? 0 : Math.min(0, distanceLeft);
+                    posX.left = maxLeft + keepInViewport;
                 } else {
-                    posX.right = Math.max(
+                    const maxRight: number = Math.max(
                         posRight,
                         this.boundaryViewportDistance(POSITION.RIGHT),
                         Number(this.safeSpace.right)
                     );
+                    const keepInViewport: number = this.keepInViewport ? 0 : Math.min(0, distanceRight);
+                    posX.right = maxRight + keepInViewport;
                 }
             } else {
                 if (this.isStart) {
@@ -1112,7 +1151,8 @@ export abstract class OverlayBase {
                 } else if (this.isStart) {
                     posTop = distanceTop;
                     posBottom = distanceBottom - triggerOverlayDifferenceHeight;
-                } else if (this.isEnd) {
+                } else {
+                    // isEnd
                     posTop = distanceTop - triggerOverlayDifferenceHeight;
                     posBottom = distanceBottom;
                 }
@@ -1120,10 +1160,13 @@ export abstract class OverlayBase {
                 this.overlayOutsideCheckY(posTop, posBottom);
 
                 if (posBottom > 0) {
-                    posY.top =
+                    const maxTop: number =
                         Math.max(posTop + scrollTop, scrollTop) - Math.min(boundaryTop - Number(this.safeSpace.top), 0);
+                    posY.top = this.keepInViewport ? maxTop : Math.min(maxTop, offsetPosition);
                 } else {
-                    posY.bottom = scrollTop * -1 - Math.min(boundaryBottom - Number(this.safeSpace.bottom), 0);
+                    const maxBottom: number =
+                        scrollTop * -1 - Math.min(boundaryBottom - Number(this.safeSpace.bottom), 0);
+                    posY.bottom = this.keepInViewport ? maxBottom : maxBottom + Math.min(0, distanceBottom);
                 }
             } else {
                 if (this.isStart) {
@@ -1173,7 +1216,8 @@ export abstract class OverlayBase {
                 } else if (this.isStart) {
                     posLeft = distanceLeft;
                     posRight = distanceRight - triggerOverlayDifferenceWidth;
-                } else if (this.isEnd) {
+                } else {
+                    // isEnd
                     posLeft = distanceLeft - triggerOverlayDifferenceWidth;
                     posRight = distanceRight;
                 }
@@ -1181,11 +1225,14 @@ export abstract class OverlayBase {
                 this.overlayOutsideCheckX(posLeft, posRight);
 
                 if (posRight > 0) {
-                    posX.left =
+                    const maxLeft: number =
                         Math.max(posLeft + scrollLeft, scrollLeft) -
                         Math.min(boundaryLeft - Number(this.safeSpace.left), 0);
+                    posX.left = this.keepInViewport ? maxLeft : Math.min(maxLeft, offsetPosition);
                 } else {
-                    posX.right = scrollLeft * -1 - Math.min(boundaryRight - Number(this.safeSpace.right), 0);
+                    const maxRight: number =
+                        scrollLeft * -1 - Math.min(boundaryRight - Number(this.safeSpace.right), 0);
+                    posX.right = this.keepInViewport ? maxRight : maxRight + Math.min(0, distanceRight);
                 }
             } else {
                 if (this.isStart) {
@@ -1362,6 +1409,8 @@ export abstract class OverlayBase {
             this.allowScrollListener =
                 this.getBooleanValue(customConfig.allowScrollListener) ?? DEFAULTS.allowScrollListener;
         if ('initialScale' in customConfig) this.scaleFactor = customConfig.initialScale as number;
+        if ('keepInViewport' in customConfig)
+            this.keepInViewport = this.getBooleanValue(customConfig.keepInViewport) ?? DEFAULTS.keepInViewport;
     }
 
     /**
