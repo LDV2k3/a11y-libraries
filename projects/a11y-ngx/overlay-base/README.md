@@ -16,7 +16,7 @@ This library was generated with [Angular CLI](https://github.com/angular/angular
 
 ## Changelog
 
-See the complete [changelog](./CHANGELOG.md) for details on updates and breaking changes.
+See the complete [changelog](https://github.com/LDV2k3/a11y-libraries/blob/master/projects/a11y-ngx/overlay-base/CHANGELOG.md) for details on updates and breaking changes.
 
 ## Index
 
