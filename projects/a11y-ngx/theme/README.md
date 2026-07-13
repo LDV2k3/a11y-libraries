@@ -41,6 +41,16 @@ If you are integrating the `@a11y-ngx` ecosystem into your app, use the module's
 This will inject the base CSS tokens into the DOM and set the active theme state (when provided) for the rest of the libraries that will consume it.
 
 > 💡 **NOTE:** Not providing a value will fall back to the user system's color scheme configuration.
+>
+> ⚠️ **IMPORTANT:** To prevent unexpectedly changing your application's global background color, this library **does not** force `color-scheme` on your `:root` or `<body>`.
+>
+> If you want the fallback to work automatically across your entire app, we highly recommend adding this to your global `styles.css`:
+>
+> ```css
+> :root {
+>     color-scheme: light dark;
+> }
+> ```
 
 Both the method and the provider accept a single parameter `theme` of type `'light'` or `'dark'`.
 

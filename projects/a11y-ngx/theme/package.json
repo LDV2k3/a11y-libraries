@@ -1,6 +1,6 @@
 {
     "name": "@a11y-ngx/theme",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "A lightweight, centralized theming engine for the @a11y-ngx ecosystem.",
     "keywords": [
         "theme",
