@@ -52,6 +52,10 @@ export const THEME_STYLES: string = `
 --a11y-disabled-hover-bg-color-dark: var(--a11y-hover-bg-color-dark);
 --a11y-disabled-hover-bg-color: light-dark(var(--a11y-disabled-hover-bg-color-light), var(--a11y-disabled-hover-bg-color-dark));
 
+.a11y-theme { color-scheme: light dark; }
+.a11y-theme[theme='light'] { color-scheme: light; }
+.a11y-theme[theme='dark'] { color-scheme: dark; }
+
 @supports not selector(::-webkit-scrollbar) {
     .a11y-scrollbar,
     .a11y-scrollbar * {
