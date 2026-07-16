@@ -1,6 +1,6 @@
 {
     "name": "@a11y-ngx/icon",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "A polymorphic icon wrapper that enables your Angular libraries to accept and render any icon format (HTML, images, Components, or TemplateRefs).",
     "keywords": [
         "icon",

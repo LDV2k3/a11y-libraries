@@ -3,6 +3,6 @@
         "line_length": 500
     },
     "MD033": {
-        "allowed_elements": ["br", "img"]
+        "allowed_elements": ["br"]
     }
 }

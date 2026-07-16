@@ -128,12 +128,19 @@ describe('A11y Icon', () => {
 
     beforeEach(async () => await setupTestBed());
 
+    it('should set the type as an empty string when setting an undefined value', () => {
+        setIcon('<i></i>');
+        expect(component.iconComp.iconType).toEqual('string');
+        setIcon(undefined as unknown as Icon);
+        expect(component.iconComp.iconType).toEqual('');
+    });
+
     describe('Should check the type "string"', () => {
         it('should set the type as "string" when a simple string is passed', () => {
             const sanitizer: DomSanitizer = TestBed.inject(DomSanitizer);
 
             setIcon('<i></i>');
-            expect(component.iconComp.iconType).toBe('string');
+            expect(component.iconComp.iconType).toEqual('string');
 
             const resolvedHtml: string | null = sanitizer.sanitize(SecurityContext.HTML, component.iconComp.stringIcon);
             expect(resolvedHtml).toBe('<i></i>');
@@ -148,7 +155,7 @@ describe('A11y Icon', () => {
             const sanitizer: DomSanitizer = TestBed.inject(DomSanitizer);
 
             setIcon({ html: 'hello' });
-            expect(component.iconComp.iconType).toBe('string');
+            expect(component.iconComp.iconType).toEqual('string');
 
             const resolvedHtml: string | null = sanitizer.sanitize(SecurityContext.HTML, component.iconComp.stringIcon);
             expect(resolvedHtml).toBe('hello');
@@ -163,7 +170,7 @@ describe('A11y Icon', () => {
     it('should set the type as "component"', () => {
         setIcon({ component: TestIconComponent });
         expect(component.iconComp['iconStrategyComponent']).toBeUndefined();
-        expect(component.iconComp.iconType).toBe('component');
+        expect(component.iconComp.iconType).toEqual('component');
 
         getTestIcon();
         expect(testIcon).toBeTruthy();
@@ -173,7 +180,7 @@ describe('A11y Icon', () => {
     it('should set the type as "image"', () => {
         const imageSrc: string = '../image.png';
         setIcon({ src: imageSrc });
-        expect(component.iconComp.iconType).toBe('image');
+        expect(component.iconComp.iconType).toEqual('image');
 
         getImage();
         expect(image).toBeTruthy();
@@ -182,7 +189,7 @@ describe('A11y Icon', () => {
 
     it('should set the type as "template-ref"', () => {
         setIcon(component.templateRef);
-        expect(component.iconComp.iconType).toBe('template-ref');
+        expect(component.iconComp.iconType).toEqual('template-ref');
 
         getDebugEl();
         expect(a11yEl.nativeElement.textContent).toEqual('template text');
@@ -201,7 +208,7 @@ describe('A11y Icon', () => {
             const value: string = 'text for the template ref string';
             setIcon(value);
             expect(component.iconComp['iconStrategyTemplate']).toBe(templateRef);
-            expect(component.iconComp.iconType).toBe('template');
+            expect(component.iconComp.iconType).toEqual('template');
 
             getDebugEl();
             expect(a11yEl.nativeElement.textContent).toEqual(value);
@@ -232,7 +239,7 @@ describe('A11y Icon', () => {
                 expect(defaultComponent?.component).toBeDefined();
                 expect(defaultComponent?.content).toEqual(value);
                 expect(defaultComponent?.inputs).toEqual({});
-                expect(component.iconComp.iconType).toBe('component');
+                expect(component.iconComp.iconType).toEqual('component');
 
                 getTestIcon();
                 expect(testIcon).toBeTruthy();
@@ -265,7 +272,7 @@ describe('A11y Icon', () => {
                     expect(defaultComponent?.component).toBe(TestIconComponent);
                     expect(defaultComponent?.inputs).toEqual({ icon: value });
                     expect(defaultComponent?.content).toBeUndefined();
-                    expect(component.iconComp.iconType).toBe('component');
+                    expect(component.iconComp.iconType).toEqual('component');
 
                     getTestIcon();
                     expect(testIcon).toBeTruthy();
@@ -299,7 +306,7 @@ describe('A11y Icon', () => {
                     expect(defaultComponent?.component).toBeDefined();
                     expect(defaultComponent?.inputs).toEqual({ icon: value, something: 'yes' });
                     expect(defaultComponent?.content).toBeUndefined();
-                    expect(component.iconComp.iconType).toBe('component');
+                    expect(component.iconComp.iconType).toEqual('component');
 
                     getTestIcon();
                     expect(testIcon).toBeTruthy();
@@ -367,7 +374,7 @@ describe('A11y Icon', () => {
             const imageSrc: string = '../token-image.png';
             setIcon(imageSrc);
             expect(component.iconComp['iconStrategyImage']).toBe(true);
-            expect(component.iconComp.iconType).toBe('image');
+            expect(component.iconComp.iconType).toEqual('image');
 
             getImage();
             expect(image).toBeTruthy();
@@ -455,7 +462,7 @@ describe('A11y Icon', () => {
                 expect(defaultComponent?.component).toBe(TestIconComponent);
                 expect(defaultComponent?.inputs).toEqual({ icon: value });
                 expect(defaultComponent?.content).toBeUndefined();
-                expect(component.iconComp.iconType).toBe('component');
+                expect(component.iconComp.iconType).toEqual('component');
 
                 getTestIcon();
                 expect(testIcon).toBeTruthy();
@@ -474,7 +481,7 @@ describe('A11y Icon', () => {
                 const imageSrc: string = '../token-image.png';
                 setIcon(imageSrc);
                 expect(component.iconComp['iconStrategyImage']).toBe(true);
-                expect(component.iconComp.iconType).toBe('image');
+                expect(component.iconComp.iconType).toEqual('image');
 
                 getImage();
                 expect(image).toBeTruthy();
@@ -482,7 +489,7 @@ describe('A11y Icon', () => {
 
                 setIcon({ component: TestIconComponent });
                 expect(component.iconComp['iconStrategyImage']).toBe(false);
-                expect(component.iconComp.iconType).toBe('component');
+                expect(component.iconComp.iconType).toEqual('component');
             });
         });
 
@@ -568,7 +575,7 @@ describe('A11y Icon', () => {
                 expect(defaultComponent?.component).toBe(TestIconComponent);
                 expect(defaultComponent?.inputs).toEqual({ icon: value });
                 expect(defaultComponent?.content).toBeUndefined();
-                expect(component.iconComp.iconType).toBe('component');
+                expect(component.iconComp.iconType).toEqual('component');
 
                 getTestIcon();
                 expect(testIcon).toBeTruthy();
@@ -590,7 +597,7 @@ describe('A11y Icon', () => {
                 const imageSrc: string = '../custom-token-image.png';
                 setIcon(imageSrc);
                 expect(component.iconComp['iconStrategyImage']).toBe(true);
-                expect(component.iconComp.iconType).toBe('image');
+                expect(component.iconComp.iconType).toEqual('image');
 
                 getImage();
                 expect(image).toBeTruthy();

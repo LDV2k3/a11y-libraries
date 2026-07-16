@@ -6,9 +6,13 @@ An Angular core utility library designed to normalize icon rendering across UI c
 >
 > ✨ Its primary purpose is to be consumed by **other UI component libraries** that need icons (like accessible Menus, Tree views, or Dropdowns). It provides library authors with a standardized, decoupled way to accept any icon format from the end-user, delegating the rendering strategy to the host application without forcing a specific icon pack.
 
-<img src="https://img.shields.io/badge/Angular-v12_to_v21-darkgreen?logo=angular" alt="Angular support from version 12 up to version 21" />
+![Angular support from version 12 up to version 21](https://img.shields.io/badge/Angular-v12_to_v21-darkgreen?logo=angular)
 
 This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0 to ensure compatibility with a wide range of Angular versions. It has been tested up to v21.
+
+## Changelog
+
+See the complete [changelog](https://github.com/LDV2k3/a11y-libraries/blob/master/projects/a11y-ngx/icon/CHANGELOG.md) for details on updates and breaking changes.
 
 ## Index
 

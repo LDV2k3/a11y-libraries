@@ -131,7 +131,10 @@ export class IconComponent implements OnChanges {
 
     ngOnChanges({ icon: iconChange }: SimpleChanges): void {
         const icon: Icon | undefined = iconChange?.currentValue;
-        if (!icon) return;
+        if (!icon) {
+            this.iconType = '';
+            return;
+        }
 
         const strategy: IconCustomStrategy | null = this.iconStrategy;
 
