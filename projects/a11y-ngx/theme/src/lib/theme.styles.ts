@@ -51,10 +51,38 @@ export const THEME_STYLES: string = `
 --a11y-disabled-hover-bg-color-light: var(--a11y-hover-bg-color-light);
 --a11y-disabled-hover-bg-color-dark: var(--a11y-hover-bg-color-dark);
 --a11y-disabled-hover-bg-color: light-dark(var(--a11y-disabled-hover-bg-color-light), var(--a11y-disabled-hover-bg-color-dark));
+}
 
 .a11y-theme { color-scheme: light dark; }
 .a11y-theme[theme='light'] { color-scheme: light; }
 .a11y-theme[theme='dark'] { color-scheme: dark; }
+
+.a11y-visually-hidden:not(:focus):not(:focus-within) {
+    border: 0 !important;
+    clip: rect(0 0 0 0) !important;
+    clip-path: inset(50%) !important;
+    height: 1px !important;
+    width: 1px !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    position: absolute !important;
+    white-space: nowrap !important;
+}
+
+.a11y-busy[aria-busy='true'] {
+    animation: a11y-busy 500ms ease-in-out infinite alternate;
+    cursor: wait;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .a11y-busy[aria-busy='true'] { animation: none; opacity: 0.5; }
+}
+
+@keyframes a11y-busy {
+    0% { opacity: 0.7; }
+    100% { opacity: 0.4; }
+}
 
 @supports not selector(::-webkit-scrollbar) {
     .a11y-scrollbar,
@@ -87,6 +115,5 @@ body[class^='a11y-body-blocked'], body[class*=' a11y-body-blocked'] {
     left: var(--a11y-body-blocked-x) !important;
     position: fixed !important;
     width: 100% !important;
-}
 }
 `;
