@@ -50,7 +50,6 @@ export const NAVIGATION_STRATEGIES: KeyboardNavigationStrategyConfig = {
         keysVertical: {
             ArrowUp: 'previous',
             ArrowDown: 'next',
-            ArrowLeft: 'open',
             ArrowRight: 'open',
         },
     },

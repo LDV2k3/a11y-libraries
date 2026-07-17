@@ -588,7 +588,6 @@ Here is the default key mapping for each preset. If these do not fit your needs,
     keysVertical: {
         ArrowUp: 'previous',
         ArrowDown: 'next',
-        ArrowLeft: 'open',
         ArrowRight: 'open',
     },
 }
