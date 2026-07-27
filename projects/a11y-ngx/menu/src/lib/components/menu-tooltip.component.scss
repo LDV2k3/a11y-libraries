@@ -1,0 +1,28 @@
+:host {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    opacity: 0;
+    white-space: pre;
+    text-align: center;
+    color: var(--menu-tooltip-text-color, var(--a11y-hover-text-color));
+    background-color: var(--menu-tooltip-bg-color, var(--a11y-hover-bg-color));
+    outline: var(--menu-tooltip-border-size, 1px) solid
+        var(--menu-tooltip-border-color, var(--a11y-focus-visible-outline));
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    pointer-events: none;
+
+    &[show] {
+        display: inline-flex;
+        flex-direction: column;
+    }
+    &[fade] {
+        opacity: 1;
+    }
+}
+
+[menu-item-shortcut] {
+    font-size: 0.95rem;
+    color: var(--a11y-menu-shortcut-color);
+}

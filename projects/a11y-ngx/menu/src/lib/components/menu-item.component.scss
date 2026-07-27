@@ -1,0 +1,228 @@
+:host {
+    display: flex;
+    gap: var(--a11y-menu-item-gap-size);
+    cursor: context-menu;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+
+    --a11y-menu-item-text-color: var(--menu-item-text-color, var(--a11y-text-color));
+    --a11y-menu-item-hover-bg-color: var(--menu-item-hover-bg-color, var(--a11y-hover-bg-color));
+
+    color: var(--a11y-menu-item-text-color);
+    background-color: var(--menu-item-bg-color, transparent);
+    line-height: var(--a11y-menu-line-height);
+    font-size: var(--menu-item-font-size, 16px);
+    border-radius: var(--menu-item-border-radius, 4px);
+    padding-block: var(--a11y-menu-itm-top) var(--a11y-menu-itm-bottom);
+    padding-inline: var(--a11y-menu-itm-left) var(--a11y-menu-itm-right);
+
+    &[menu-item-info],
+    &[aria-hidden] {
+        pointer-events: none;
+    }
+
+    &:focus,
+    &:focus-visible {
+        outline: none;
+    }
+
+    // The active item for keyboard
+    &[active-item='kb'] {
+        --a11y-item-focus-size: var(--menu-item-focus-size, var(--a11y-focus-visible-outline-size));
+
+        outline: var(--a11y-item-focus-size) solid var(--menu-item-focus-color, var(--a11y-focus-visible-outline));
+        outline-offset: calc(var(--a11y-item-focus-size) * -1);
+    }
+
+    // The disabled item
+    &[aria-disabled] {
+        &,
+        [menu-item-shortcut] {
+            color: var(--menu-item-disabled-text-color, var(--a11y-disabled-text-color));
+        }
+        background-color: var(--menu-item-disabled-bg-color, var(--a11y-disabled-bg-color));
+
+        // For when user taps on mobile
+        &:active,
+        // For desktop (either keyboard or pointer)
+        &:not([mobile])[active-item],
+        // For when navigating with keyboard on mobile
+        &[mobile][active-item='kb'] {
+            background-color: var(--menu-item-disabled-hover-bg-color, var(--a11y-menu-item-hover-bg-color));
+        }
+    }
+
+    // The active item (NOT disabled)
+    &:not([aria-disabled]) {
+        &[active-item] {
+            color: var(--menu-item-hover-text-color, var(--a11y-menu-item-text-color));
+        }
+
+        // For when user taps on mobile
+        &:active,
+        // For desktop (either keyboard or pointer)
+        &:not([mobile])[active-item],
+        // For when navigating with keyboard on mobile
+        &[mobile][active-item='kb'] {
+            background-color: var(--a11y-menu-item-hover-bg-color);
+        }
+    }
+
+    // Mobile
+    &[mobile] {
+        -webkit-tap-highlight-color: transparent;
+    }
+}
+
+[menu-item-select],
+[menu-item-caret],
+[menu-item-shortcut] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+// Adds same width as icons for the "check" item within "stack" selectable items only
+:host-context([menu-group='checkbox'], [menu-group='radio']) :host [menu-item-select] {
+    width: var(--icon-size);
+}
+
+[menu-item-label] {
+    flex: 1;
+}
+
+[menu-item-shortcut] {
+    font-size: 0.95rem;
+    color: var(--a11y-menu-shortcut-color);
+}
+
+// Adds extra padding for the shortcut within "stack" items only
+:host-context([role='menu']) {
+    > :host,
+    [menu-group='common'] :host {
+        [menu-item-shortcut] {
+            padding-left: var(--a11y-menu-item-gap-size);
+        }
+    }
+}
+
+// Aligns the caret to the right, to be in the same alignment of the shortcut
+:host-context([role='menu'][has-shortcuts]) {
+    [menu-item-caret] {
+        mask-position: center right;
+    }
+}
+
+// For "inline" and "grid" groups
+:host-context([menu-group='inline']) {
+    // Adds extra padding top to items with icons and label below
+    &[item-labels='below']:has([menu-group-items][has-icons]) :host {
+        padding-block-start: calc(var(--a11y-menu-itm-bottom) * (var(--a11y-menu-line-height) * 1.6));
+    }
+
+    // Adds extra padding top and bottom to items with icons only (no visible label)
+    &:has([menu-group-items][has-icons-only]) :host {
+        padding-block-start: calc(var(--a11y-menu-itm-bottom) * (var(--a11y-menu-line-height) * 1.6));
+        padding-block-end: calc(var(--a11y-menu-itm-top) * (var(--a11y-menu-line-height) * 1.6));
+    }
+
+    // Stretch the items when they have label on "start" or "end"
+    &[item-labels='start'],
+    &[item-labels='end'] {
+        :host {
+            justify-self: stretch;
+        }
+    }
+    &[item-labels='start'] [menu-group-items] {
+        justify-items: end;
+
+        :host {
+            flex-direction: row-reverse;
+
+            [menu-item-label] {
+                text-align: end;
+            }
+        }
+    }
+    &[item-labels='end'] [menu-group-items] {
+        justify-items: start;
+    }
+
+    &[item-labels='below'] :host {
+        flex-direction: column;
+        place-self: stretch;
+
+        [menu-item-label] {
+            text-align: center;
+        }
+    }
+
+    &[label-no-wrap] :host {
+        white-space: nowrap;
+    }
+
+    :host {
+        gap: 8px;
+
+        [menu-item-shortcut] {
+            font-size: 0.85em;
+            padding-left: 0;
+            margin: unset;
+        }
+    }
+}
+
+[menu-item-caret] {
+    width: 1rem;
+    font-size: 0.5rem;
+    background-color: currentColor;
+    mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 298 511.93"><path fill-rule="nonzero" d="M70.77 499.85c-16.24 16.17-42.53 16.09-58.69-.15-16.17-16.25-16.09-42.54.15-58.7l185.5-185.03L12.23 70.93c-16.24-16.16-16.32-42.45-.15-58.7 16.16-16.24 42.45-16.32 58.69-.15l215.15 214.61c16.17 16.25 16.09 42.54-.15 58.7l-215 214.46z"/></svg>');
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+}
+
+// Icons
+::ng-deep {
+    a11y-menu {
+        [menu-item-icon] {
+            display: none;
+        }
+
+        &[has-icons] > {
+            &,
+            [menu-body] {
+                // Loose item 👉 icon
+                [menu-item],
+                // Info item 👉 icon
+                [menu-item-info],
+                // Inline Groups ("inline" or "grid") with group icon & label 👉 group's icon
+                [menu-group='inline']:not([items-only]):not([layout='stack']) >,
+                // Common Groups 👉 item's icon
+                [menu-group='common'] {
+                    [menu-item-icon] {
+                        display: inline-flex;
+                    }
+                }
+            }
+        }
+
+        // Checkbox/Radio Groups (specific) that says "has-icons" 👉 item's icon
+        [role='group'][has-icons],
+        // Inline Groups, the "group of items" that says "has-icons" 👉 item's icon
+        [menu-group-items][has-icons] {
+            [menu-item-icon] {
+                display: inline-flex;
+            }
+        }
+
+        // Inline Groups ("inline" or "grid"), the "group of items" with "only icons", hide info item's icon if has "no icon"
+        [menu-group='inline'] [menu-group-items][has-icons-only] [menu-item-info]:not([has-icon]) {
+            [menu-item-icon] {
+                display: none;
+            }
+        }
+    }
+}

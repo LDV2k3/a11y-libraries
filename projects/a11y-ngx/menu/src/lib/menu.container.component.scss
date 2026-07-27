@@ -1,0 +1,10 @@
+:host {
+    // Mobile
+    &[aria-modal] {
+        position: fixed;
+        inset: 0;
+        max-width: 100dvw;
+        max-height: 100dvh;
+        background: rgb(0 0 0 / 75%);
+    }
+}

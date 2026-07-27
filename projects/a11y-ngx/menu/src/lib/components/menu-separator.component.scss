@@ -1,0 +1,21 @@
+:host {
+    display: block;
+
+    margin-block: var(--menu-separator-block, 0.25rem);
+    margin-inline: var(--menu-separator-inline, 0);
+
+    border-width: 0;
+    border-style: solid;
+    border-color: var(--menu-separator-border-color, var(--a11y-menu-border-color));
+
+    --separator-size: var(--menu-separator-border-size, 1px);
+
+    &[aria-orientation='horizontal'] {
+        border-bottom-width: var(--separator-size);
+    }
+    &[aria-orientation='vertical'] {
+        writing-mode: vertical-rl;
+        border-right-width: var(--separator-size);
+        align-self: normal;
+    }
+}

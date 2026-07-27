@@ -1,0 +1,84 @@
+:host {
+    display: flex;
+    align-items: center;
+    gap: var(--a11y-menu-item-gap-size);
+    color: var(--menu-item-text-color, var(--a11y-text-color));
+
+    &:not([items-only]) {
+        padding-block: var(--a11y-menu-itm-top) var(--a11y-menu-itm-bottom);
+        padding-inline: var(--a11y-menu-itm-left) var(--a11y-menu-itm-right);
+    }
+
+    &[has-columns] [menu-group-items] {
+        display: grid;
+        grid-template-columns: repeat(var(--cols), 1fr);
+        justify-items: center;
+        overflow-x: visible;
+    }
+
+    &[item-labels='panel-above'] [menu-group-wrapper] {
+        flex-direction: column-reverse;
+    }
+
+    &[layout='stack'] {
+        flex-direction: column;
+        align-items: start;
+        gap: 0;
+
+        [menu-group-label] {
+            opacity: 0.7;
+            font-size: 0.9rem;
+            letter-spacing: 0.1rem;
+            text-transform: uppercase;
+        }
+
+        & > {
+            [menu-group-wrapper],
+            [menu-group-items] {
+                width: 100%;
+            }
+        }
+    }
+
+    &[items-busy] {
+        cursor: wait;
+    }
+}
+
+[menu-group-wrapper] {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: var(--a11y-menu-itm-top);
+
+    [menu-group-panel-label] {
+        text-align: center;
+        border-radius: 5px;
+        color: var(--menu-panel-text-color, currentColor);
+        background-color: var(--menu-panel-bg-color, color-mix(in srgb, var(--a11y-hover-bg-color), transparent 25%));
+        outline: var(--menu-panel-border-size, 1px) solid
+            var(--menu-panel-border-color, color-mix(in srgb, var(--a11y-focus-visible-outline), transparent 25%));
+    }
+
+    [menu-item-shortcut] {
+        color: var(--a11y-menu-shortcut-color);
+        margin-inline-start: 1ch;
+    }
+}
+
+[menu-group-items] {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    overflow: auto hidden;
+    // Padding/margin to compensate the scrollbar
+    padding-bottom: 2px;
+    margin-bottom: -2px;
+
+    &[justify='end'] {
+        justify-content: safe flex-end;
+    }
+    &[justify='space-between'] {
+        justify-content: space-between;
+    }
+}

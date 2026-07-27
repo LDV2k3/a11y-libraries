@@ -1,0 +1,214 @@
+@mixin menu-base-styles {
+    overflow-y: auto;
+    background-color: var(--menu-background);
+    padding: var(--menu-padding, 0.3rem);
+    border: var(--menu-border);
+    border-radius: var(--menu-border-radius, 7px);
+    box-shadow: var(--menu-box-shadow);
+}
+
+:host {
+    position: fixed;
+    user-select: none;
+    opacity: 0;
+    overscroll-behavior: contain;
+    z-index: var(--menu-zindex, 9999);
+
+    transition-property: opacity, transform;
+    transition-timing-function: ease-in-out;
+    transition-duration: var(--animate-ms, 150ms);
+
+    @media (prefers-reduced-motion: reduce) {
+        transition-duration: 0ms;
+    }
+
+    --icon-size: var(--menu-icon-size, 20px);
+    --a11y-menu-item-gap-size: var(--menu-item-gap-size, 15px);
+    --a11y-menu-line-height: var(--menu-line-height, 1.4);
+    --a11y-menu-border-color: var(--menu-border-color, var(--a11y-border-color));
+
+    --a11y-menu-itm-top: var(--menu-item-padding-block, 0.35rem);
+    --a11y-menu-itm-bottom: var(--menu-item-padding-block, 0.35rem);
+    --a11y-menu-itm-left: var(--menu-item-padding-inline, 1rem);
+    --a11y-menu-itm-right: var(--menu-item-padding-inline, 1rem);
+
+    --a11y-menu-shortcut-color: var(--menu-shortcut-text-color, var(--a11y-text-color-secondary));
+
+    &[loading] {
+        pointer-events: none;
+    }
+
+    // Animations
+    &[animate='top-bottom'] {
+        transform: translate(0, -10px);
+    }
+    &[animate='bottom-top'] {
+        transform: translate(0, 10px);
+    }
+    &[animate='left-right'] {
+        transform: translate(-10px, 0);
+    }
+    &[animate='right-left'] {
+        transform: translate(10px, 0);
+    }
+    &[animate='scale-up'] {
+        transform: scale(0.9);
+    }
+    &[animate='scale-down'] {
+        transform: scale(1.1);
+    }
+    &[animate='mobile'] {
+        transform: translateY(100%);
+    }
+
+    // Fade in
+    &[fade] {
+        opacity: 1;
+
+        &[loading] {
+            // Having the transform property constantly applied
+            // interferes with the tooltip's fixed position.
+            // We have it only when "loading".
+            transform: translate(0, 0) scale(1);
+        }
+    }
+
+    --menu-background: var(--menu-bg-color, var(--a11y-bg-color));
+    --menu-border: var(--menu-border-size, 1px) solid var(--a11y-menu-border-color);
+    --menu-box-shadow: var(--menu-shadow, var(--a11y-shadow)) var(--menu-shadow-color, var(--a11y-shadow-color));
+
+    &:focus,
+    &:focus-visible {
+        outline: none;
+    }
+
+    &:not([mobile]) {
+        @include menu-base-styles;
+    }
+
+    ::ng-deep a11y-icon {
+        svg {
+            fill: currentColor;
+        }
+    }
+}
+
+// To hide more than one separators together
+[role='separator'] + [role='separator'],
+// To hide the last separator after a group that does not follow another item, info-item or group
+[menu-group] + [role='separator']:not(:has(~ [menu-item], ~ [menu-item-info], ~ [menu-group])),
+// To hide the separator if it is the first/last child (not mobile)
+:host > [role='separator']:first-child,
+:host > [role='separator']:last-child,
+// To hide the separator if it is the first/last child (mobile)
+:host > [menu-body] > [role='separator']:first-child,
+:host > [menu-body] > [role='separator']:last-child {
+    display: none;
+}
+
+// Mobile
+:host[mobile] {
+    $around-space: 7.5%;
+    inset: auto calc(#{$around-space} / 2) calc(#{$around-space} / 4);
+    width: calc(100dvw - #{$around-space});
+    max-height: calc(100dvh - #{$around-space} / 2);
+    overflow: initial;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition-duration: 250ms;
+    --menu-item-padding-block: 10px;
+    --menu-item-padding-inline: 20px;
+    --menu-item-font-size: 20px;
+
+    [menu-header] {
+        font-size: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        gap: 2rem;
+    }
+
+    [menu-actions] {
+        display: flex;
+        align-self: end;
+        gap: 1rem;
+        transition-property: opacity, transform;
+        transition-duration: 200ms;
+        transition-timing-function: ease-in-out;
+        transition-delay: 25ms;
+    }
+
+    [menu-action],
+    [menu-label] {
+        padding: 0.3rem 1rem;
+        border-radius: 7px;
+    }
+
+    [menu-action] {
+        height: 50px;
+        aspect-ratio: 1;
+        position: relative;
+
+        &::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-color: currentColor;
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+        }
+    }
+
+    [action-back]::before {
+        mask-image: url('data:image/svg+xml,<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g><path fill-rule="evenodd" clip-rule="evenodd" d="M11.7071 4.29289C12.0976 4.68342 12.0976 5.31658 11.7071 5.70711L6.41421 11H20C20.5523 11 21 11.4477 21 12C21 12.5523 20.5523 13 20 13H6.41421L11.7071 18.2929C12.0976 18.6834 12.0976 19.3166 11.7071 19.7071C11.3166 20.0976 10.6834 20.0976 10.2929 19.7071L3.29289 12.7071C3.10536 12.5196 3 12.2652 3 12C3 11.7348 3.10536 11.4804 3.29289 11.2929L10.2929 4.29289C10.6834 3.90237 11.3166 3.90237 11.7071 4.29289Z" fill="currentColor"></path></g></svg>');
+        mask-size: 80%;
+    }
+    [action-close]::before {
+        mask-image: url('data:image/svg+xml,<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g><g id="Menu / Close_SM"><path id="Vector" d="M16 16L12 12M12 12L8 8M12 12L16 8M12 12L8 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></g></g></svg>');
+    }
+
+    [menu-label] {
+        display: flex;
+        align-items: center;
+        text-align: end;
+        line-height: 1.2;
+    }
+
+    [menu-label],
+    [menu-action] {
+        background-color: var(--menu-background);
+        border: var(--menu-border);
+        box-shadow: var(--menu-box-shadow);
+        color: var(--menu-item-text-color, var(--a11y-text-color));
+    }
+
+    [menu-body] {
+        @include menu-base-styles;
+    }
+
+    // Not last menu
+    &:not(:last-of-type) {
+        pointer-events: none;
+        filter: brightness(0.55);
+
+        [menu-body] * {
+            opacity: 0.7;
+        }
+
+        [menu-actions] {
+            z-index: -1;
+            opacity: 0;
+            transform: translateY(calc(100% + 1rem));
+        }
+    }
+
+    // Apply to the 3 previous menus dynamically
+    @for $i from 2 through 4 {
+        // nth-last-of-type(2) is the first background menu, (3) is the next, etc.
+        &:nth-last-of-type(#{$i}) {
+            // Calculates a progressive scale: 0.925, 0.85, 0.775 ...
+            transform: scale(calc(1 - ((#{$i} - 1) * 0.075)));
+        }
+    }
+}

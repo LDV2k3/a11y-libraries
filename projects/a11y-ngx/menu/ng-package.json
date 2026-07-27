@@ -1,0 +1,21 @@
+{
+    "$schema": "../../../node_modules/ng-packagr/ng-package.schema.json",
+    "dest": "../../../dist/@a11y-ngx/menu",
+    "lib": {
+        "entryFile": "src/public-api.ts",
+        "umdId": "a11yNGx.menu",
+        "umdModuleIds": {
+            "@a11y-ngx/menu": "a11yNGx.menu",
+            "@a11y-ngx/overlay-base": "a11yNGx.overlayBase",
+            "@a11y-ngx/keyboard-navigation": "a11yNGx.keyboardNavigation",
+            "@a11y-ngx/theme": "a11yNGx.theme",
+            "@a11y-ngx/icon": "a11yNGx.icon"
+        }
+    },
+    "allowedNonPeerDependencies": [
+        "@a11y-ngx/overlay-base",
+        "@a11y-ngx/keyboard-navigation",
+        "@a11y-ngx/theme",
+        "@a11y-ngx/icon"
+    ]
+}

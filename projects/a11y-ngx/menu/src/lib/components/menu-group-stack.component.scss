@@ -1,0 +1,9 @@
+[menu-group-label] {
+    color: var(--menu-item-text-color, var(--a11y-text-color));
+    padding-block: var(--a11y-menu-itm-top) 0;
+    padding-inline: var(--a11y-menu-itm-left) var(--a11y-menu-itm-right);
+    opacity: 0.7;
+    font-size: 0.9rem;
+    letter-spacing: 0.1rem;
+    text-transform: uppercase;
+}
