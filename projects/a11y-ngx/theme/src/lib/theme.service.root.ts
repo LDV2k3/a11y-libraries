@@ -1,15 +1,17 @@
-import { Injectable, Inject, OnDestroy } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { PLATFORM_ID, Injectable, inject, OnDestroy } from '@angular/core';
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 
 import { THEME_STYLES } from './theme.styles';
-
-import type { Theme } from './theme.type';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeRootService implements OnDestroy {
     private rootConfigAlreadyProvided: boolean = false;
 
-    theme: Theme | undefined = undefined;
+    private globalTheme: 'light' | 'dark' | undefined = undefined;
+
+    get theme(): 'light' | 'dark' | undefined {
+        return this.globalTheme;
+    }
 
     /**
      * @description
@@ -19,15 +21,17 @@ export class ThemeRootService implements OnDestroy {
         return this.rootConfigAlreadyProvided;
     }
 
-    constructor(@Inject(DOCUMENT) private document: Document | null) {
+    private readonly document: Document = inject(DOCUMENT);
+    private readonly platformId = inject(PLATFORM_ID);
+
+    constructor() {
         this.appendStyles();
+
+        if (!isPlatformBrowser(this.platformId)) return;
+        this.saveTheme();
     }
 
     ngOnDestroy(): void {
-        // Ignores the SSR guard in coverage reports
-        /* istanbul ignore next */
-        if (!this.document) return;
-
         this.document.getElementById('a11y-theme')?.remove();
     }
 
@@ -35,9 +39,36 @@ export class ThemeRootService implements OnDestroy {
      * @description
      * Initializes the Theme.
      */
-    initRootConfig(theme: Theme): void {
+    initRootConfig(theme: 'light' | 'dark' | null): void {
         this.rootConfigAlreadyProvided = true;
-        this.theme = theme;
+        this.saveTheme(theme);
+    }
+
+    /**
+     * @description
+     * Establishes the Theme (given => storage => auto).
+     */
+    saveTheme(newTheme?: 'light' | 'dark' | null): void {
+        const theme =
+            newTheme === null
+                ? 'auto'
+                : ((newTheme ?? localStorage.getItem('a11yTheme') ?? 'auto') as 'light' | 'dark' | 'auto');
+
+        if (theme !== 'auto') {
+            this.globalTheme = theme;
+            try {
+                localStorage.setItem('a11yTheme', theme);
+            } catch {
+                /* blocked storage (private mode, policies, etc) */
+            }
+        } else {
+            this.globalTheme = undefined;
+            try {
+                localStorage.removeItem('a11yTheme');
+            } catch {
+                /* blocked storage (private mode, policies, etc) */
+            }
+        }
     }
 
     /**
@@ -45,9 +76,7 @@ export class ThemeRootService implements OnDestroy {
      * Adds a new `<style>` tag with all the basic (light & dark) styles for the @a11y-ngx ecosystem.
      */
     private appendStyles(): void {
-        // Ignores the SSR guard in coverage reports
-        /* istanbul ignore next */
-        if (!this.document) return;
+        if (this.document.getElementById('a11y-theme')) return;
 
         const styleTag: HTMLStyleElement = this.document.createElement('style');
 

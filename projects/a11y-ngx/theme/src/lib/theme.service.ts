@@ -1,21 +1,26 @@
-import { Injectable, Optional, SkipSelf } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 
 import { ThemeRootService } from './theme.service.root';
 
 import { ERROR_SERVICE_PROVIDED_MORE_THAN_ONCE } from './theme.errors';
 
-import type { Theme } from './theme.type';
-
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-    get theme(): Theme | undefined {
+    /** @description The current theme. */
+    get theme(): 'light' | 'dark' | undefined {
         return this.rootService.theme;
     }
 
-    constructor(
-        private rootService: ThemeRootService,
-        @Optional() @SkipSelf() private parentService: ThemeService | null
-    ) {
+    /** @description Sets the desired theme. */
+    set theme(newTheme: 'light' | 'dark' | 'auto' | undefined) {
+        const theme: 'light' | 'dark' | null = !newTheme || newTheme === 'auto' ? null : newTheme;
+        this.rootService.saveTheme(theme);
+    }
+
+    private readonly rootService: ThemeRootService = inject(ThemeRootService);
+    private readonly parentService: ThemeService | null = inject(ThemeService, { optional: true, skipSelf: true });
+
+    constructor() {
         if (this.parentService) throw Error(ERROR_SERVICE_PROVIDED_MORE_THAN_ONCE('ThemeService'));
     }
 }

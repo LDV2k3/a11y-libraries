@@ -1,26 +1,25 @@
-import { Provider } from '@angular/core';
+import { ENVIRONMENT_INITIALIZER, Provider, inject } from '@angular/core';
 
 import { ThemeRootService } from './theme.service.root';
 
-import {
-    THEME_CONFIG_INJECTOR,
-    ThemeDummyConfigService,
-    initThemeRootConfigFactory,
-} from './theme.module.providers.private';
-
-import type { Theme } from './theme.type';
+import { ERROR_ROOT_CONFIG_CALLED_MORE_THAN_ONCE } from './theme.errors';
 
 /**
  * @description
  * Provides Theme globally (usable in standalone apps).
  */
-export function provideA11yTheme(theme: Theme): Provider[] {
+export function provideA11yTheme(theme: 'light' | 'dark' | 'auto'): Provider[] {
     return [
-        { provide: THEME_CONFIG_INJECTOR, useValue: theme },
         {
-            provide: ThemeDummyConfigService,
-            useFactory: initThemeRootConfigFactory,
-            deps: [ThemeRootService, THEME_CONFIG_INJECTOR],
+            provide: ENVIRONMENT_INITIALIZER,
+            useValue: () => {
+                const service: ThemeRootService = inject(ThemeRootService);
+
+                if (service.isRootConfigAlreadyProvided) throw new Error(ERROR_ROOT_CONFIG_CALLED_MORE_THAN_ONCE());
+
+                if (theme !== 'auto') service.initRootConfig(theme);
+            },
+            multi: true,
         },
     ];
 }

@@ -8,9 +8,13 @@ This library manages the basic global theme state (Light & Dark) and exposes a c
 >
 > ♿ **Contrast Compliance:** All active text and background color combinations strictly adhere to the WCAG AA minimum contrast ratio of 4.5:1. As per WCAG guidelines, "disabled" tokens intentionally use a lower contrast to visually communicate inactivity.
 
-![Angular support from version 12 up to version 21](https://img.shields.io/badge/Angular-v12_to_v21-darkgreen?logo=angular)
+## Documentation & Live Examples
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0 to ensure compatibility with a wide range of Angular versions. It has been tested up to v21.
+> Explore the API references, interactive configurations, and live examples on the official [Theme Showroom page](https://a11y-ngx.dev/theme).
+
+![Angular support from version 14 up to version 22](https://img.shields.io/badge/Angular-v14_to_v22-darkgreen?logo=angular)
+
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.2.0 to ensure compatibility with a wide range of Angular versions. It has been tested up to v22.
 
 ## Changelog
 
@@ -54,7 +58,7 @@ This will inject the base CSS tokens into the DOM and set the active theme state
 
 Both the method and the provider accept a single parameter `theme` of type `'light'` or `'dark'`.
 
-**On Angular v12 - v14:**
+**Via Module:**
 
 ```typescript
 import { A11yThemeModule } from '@a11y-ngx/theme';
@@ -67,7 +71,7 @@ import { A11yThemeModule } from '@a11y-ngx/theme';
 export class AppModule {}
 ```
 
-**On Angular v15+:**
+**Via Provider:**
 
 ```typescript
 import { provideA11yTheme } from '@a11y-ngx/theme';
@@ -126,7 +130,7 @@ When the lib is initialized, it injects the following CSS variables globally. Ot
 | Variable | Light | Dark |
 | :------- | :---: | :--: |
 | `--a11y-bg-color` | `rgb(255 255 255 / 98%)` | `rgb(31 31 31 / 98%)` |
-| `--a11y-text-color` | `#222` | `#fff` |
+| `--a11y-text-color` | `#222` | `#f0f0f0` |
 | `--a11y-text-color-secondary` | `#5f5f5f` | `#bcbcbc` |
 | `--a11y-border-color` | `#656565` | `#666` |
 | `--a11y-shadow-color` | `#444` | `#444` |
@@ -135,7 +139,7 @@ When the lib is initialized, it injects the following CSS variables globally. Ot
 | `--a11y-hover-bg-color` | `#ddd` | `#393939` |
 | `--a11y-hover-text-color` | `var(--a11y-text-color-light)` | `var(--a11y-text-color-dark)` |
 | `--a11y-disabled-bg-color` | `transparent` | `transparent` |
-| `--a11y-disabled-text-color` | `#949494` | `#7a7a7a` |
+| `--a11y-disabled-text-color` | `#949494` | `#6d6d6d` |
 | `--a11y-disabled-hover-bg-color` | `var(--a11y-hover-bg-color-light)` | `var(--a11y-hover-bg-color-dark)` |
 
 **Generic Tokens:**
@@ -164,11 +168,16 @@ import { ThemeService } from '@a11y-ngx/theme';
 @Component({
     // ...
     host: {
+        '[class.a11y-theme]': 'true',
         '[attr.theme]': 'themeService.theme ?? null',
     },
 })
 export class MyComponent {
-    protected themeService = inject(ThemeService);
+    protected readonly themeService = inject(ThemeService);
+
+    onThemeChanged(theme: 'light' | 'dark'): void {
+        this.themeService.theme = theme;
+    }
     ...
 }
 ```
@@ -177,6 +186,8 @@ export class MyComponent {
 
 ```css
 :host {
+    color-scheme: light dark;
+
     &[theme='light'] {
         color-scheme: light;
     }
