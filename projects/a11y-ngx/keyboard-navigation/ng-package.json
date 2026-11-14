@@ -2,7 +2,6 @@
     "$schema": "../../../node_modules/ng-packagr/ng-package.schema.json",
     "dest": "../../../dist/@a11y-ngx/keyboard-navigation",
     "lib": {
-        "entryFile": "src/public-api.ts",
-        "umdId": "a11yNGx.keyboardNavigation"
+        "entryFile": "src/public-api.ts"
     }
 }

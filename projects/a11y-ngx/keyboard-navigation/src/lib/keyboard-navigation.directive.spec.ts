@@ -3,6 +3,7 @@ import { By } from '@angular/platform-browser';
 import { NgModule, Component, ViewChild } from '@angular/core';
 
 import { A11yKeyboardNavigationModule } from './keyboard-navigation.module';
+import { KeyboardNavigationService } from './keyboard-navigation.service';
 import { KeyboardNavigationDirective } from './keyboard-navigation.directive';
 
 import { ERROR_ITEMS_NOT_PROVIDED, ERROR_KEYS_NOT_PROVIDED } from './keyboard-navigation.errors';
@@ -99,8 +100,19 @@ describe('Keyboard Navigation', () => {
         component.config = config;
         fixture.detectChanges();
     };
-    const sendKey = (code: KeyboardNavigationKey, repeat: boolean = false): void => {
-        hostEl.dispatchEvent(new KeyboardEvent('keydown', { code, repeat }));
+    const sendKey = (
+        code: KeyboardNavigationKey | 'NumpadEnter',
+        repeat: boolean = false,
+        modifiers?: Partial<{
+            altKey: boolean;
+            ctrlKey: boolean;
+            metaKey: boolean;
+            shiftKey: boolean;
+            isComposing: boolean;
+            keyCode: 229;
+        }>
+    ): void => {
+        hostEl.dispatchEvent(new KeyboardEvent('keydown', { code, repeat, ...modifiers }));
     };
     const expectedNav = (
         key: KeyboardNavigationKey,
@@ -114,14 +126,12 @@ describe('Keyboard Navigation', () => {
     ): KeyboardNavigationEvent => ({ key, action, itemFrom, itemTo, indexFrom, indexTo, pathFrom, pathTo });
     const lastNav = (): KeyboardNavigationEvent => spyOnNavigate.calls.mostRecent().args[0];
 
-    beforeEach(fakeAsync(() => {
+    beforeEach(async () => {
         TestBed.configureTestingModule({
             declarations: [KeyNavTestComponent],
             imports: [KeyNavTestModule],
         }).compileComponents();
-    }));
 
-    beforeEach(() => {
         fixture = TestBed.createComponent(KeyNavTestComponent);
         component = fixture.componentInstance;
         hostEl = fixture.debugElement.query(By.css('div')).nativeElement;
@@ -179,6 +189,45 @@ describe('Keyboard Navigation', () => {
         expect(component.keyNav.items).toEqual([]);
         expect(component.keyNav.current).toEqual({ index: -1, path: [] });
         expect(component.keyNav.config).toEqual(NAVIGATION_DEFAULT);
+    });
+
+    describe('Check Modifier keys', () => {
+        let service: KeyboardNavigationService;
+
+        beforeEach(() => {
+            service = component.keyNav['service'];
+            setItems(NAV_SIMPLE);
+        });
+
+        it('should NOT update the last navigated state when using Alt key', () => {
+            sendKey('ArrowDown', false, { altKey: true });
+            expect(service['lastNavigate']).toBeNull();
+        });
+
+        it('should NOT update the last navigated state when using Meta key', () => {
+            sendKey('ArrowDown', false, { metaKey: true });
+            expect(service['lastNavigate']).toBeNull();
+        });
+
+        it('should NOT update the last navigated state when "Composing"', () => {
+            sendKey('ArrowDown', false, { isComposing: true });
+            expect(service['lastNavigate']).toBeNull();
+        });
+
+        it('should NOT update the last navigated state when "keyCode" is "229"', () => {
+            sendKey('ArrowDown', false, { keyCode: 229 });
+            expect(service['lastNavigate']).toBeNull();
+        });
+
+        it('should update the last navigated state when using Ctrl key', () => {
+            sendKey('ArrowDown', false, { ctrlKey: true });
+            expect(lastNav()).toEqual(expectedNav('ArrowDown', 'next', undefined, 'a', -1, 0, [], []));
+        });
+
+        it('should update the last navigated state when using Shift key', () => {
+            sendKey('ArrowDown', false, { shiftKey: true });
+            expect(lastNav()).toEqual(expectedNav('ArrowDown', 'next', undefined, 'a', -1, 0, [], []));
+        });
     });
 
     describe('Check "validatePath()" method', () => {
@@ -293,6 +342,52 @@ describe('Keyboard Navigation', () => {
         });
     });
 
+    it('should navigate through the items when invoking "executeKey()" method', () => {
+        setItems(NAV_NESTED);
+        setConfig({ allowSelectFirstChild: true });
+        const service: KeyboardNavigationService = component.keyNav['service'];
+
+        expect(service.executeKey('End')).toEqual(expectedNav('End', 'last', undefined, NAV_NESTED[3], -1, 3, [], []));
+
+        expect(service.executeKey('ArrowUp')).toEqual(
+            expectedNav('ArrowUp', 'previous', NAV_NESTED[3], NAV_NESTED[2], 3, 2, [], [])
+        );
+
+        expect(service.executeKey('ArrowRight')).toEqual(
+            expectedNav('ArrowRight', 'open', NAV_NESTED[2], NAV_NESTED[2].children[0], 2, 0, [], [2])
+        );
+
+        expect(service.executeKey('ArrowLeft')).toEqual(
+            expectedNav('ArrowLeft', 'close', NAV_NESTED[2].children[0], NAV_NESTED[2], 0, 2, [2], [])
+        );
+
+        expect(service.executeKey('Home')).toEqual(
+            expectedNav('Home', 'first', NAV_NESTED[2], NAV_NESTED[0], 2, 0, [], [])
+        );
+
+        // Same event
+        expect(service.executeKey('Home')).toBeNull();
+
+        expect(service.executeKey('Enter')).toEqual(
+            expectedNav('Enter', 'open', NAV_NESTED[0], NAV_NESTED[0].children[0], 0, 0, [], [0])
+        );
+
+        expect(service.executeKey('Escape')).toEqual(
+            expectedNav('Escape', 'close', NAV_NESTED[0].children[0], NAV_NESTED[0], 0, 0, [0], [])
+        );
+
+        expect(service.executeKey('ArrowDown')).toEqual(
+            expectedNav('ArrowDown', 'next', NAV_NESTED[0], NAV_NESTED[1], 0, 1, [], [])
+        );
+
+        expect(service.executeKey('Enter')).toEqual(
+            expectedNav('Enter', 'open', NAV_NESTED[1], NAV_NESTED[1], 1, 1, [], [])
+        );
+
+        expect(service.executeKey('PageUp')).toBeNull(); // Not available
+        expect(service.executeKey('PageDown')).toBeNull(); // Not available
+    });
+
     it('should emit only one time for each action for a strategy with no loop', () => {
         setItems(NAV_SIMPLE);
         setConfig({ type: 'tree' });
@@ -346,15 +441,15 @@ describe('Keyboard Navigation', () => {
         sendKey('ArrowLeft'); // close
 
         sendKey('ArrowDown'); // 'b'
-        sendKey('ArrowRight'); // open
+        sendKey('Enter'); // open
         expect(lastNav()).toEqual(
-            expectedNav('ArrowRight', 'open', CUSTOM_NAV_NESTED[1], CUSTOM_NAV_NESTED[1], 1, 1, [], [])
+            expectedNav('Enter', 'open', CUSTOM_NAV_NESTED[1], CUSTOM_NAV_NESTED[1], 1, 1, [], [])
         );
 
         sendKey('End'); // 'd'
-        sendKey('ArrowRight'); // open
+        sendKey('NumpadEnter'); // open
         expect(lastNav()).toEqual(
-            expectedNav('ArrowRight', 'open', CUSTOM_NAV_NESTED[3], CUSTOM_NAV_NESTED[3], 3, 3, [], [])
+            expectedNav('Enter', 'open', CUSTOM_NAV_NESTED[3], CUSTOM_NAV_NESTED[3], 3, 3, [], [])
         );
     });
 
@@ -381,11 +476,14 @@ describe('Keyboard Navigation', () => {
                 sendKey('ArrowDown');
                 expect(spyOnNavigate).toHaveBeenCalledTimes(6);
 
+                sendKey('NumpadEnter');
+                expect(spyOnNavigate).toHaveBeenCalledTimes(7);
+
                 sendKey('PageUp'); // Not available
-                expect(spyOnNavigate).toHaveBeenCalledTimes(6);
+                expect(spyOnNavigate).toHaveBeenCalledTimes(7);
 
                 sendKey('PageDown'); // Not available
-                expect(spyOnNavigate).toHaveBeenCalledTimes(6);
+                expect(spyOnNavigate).toHaveBeenCalledTimes(7);
             });
 
             it('should navigate through all items using arrow down and loop', () => {
@@ -1396,8 +1494,8 @@ describe('Keyboard Navigation', () => {
             sendKey('ArrowDown'); // 'b'
             expect(lastNav()).toEqual(expectedNav('ArrowDown', 'next', NAV_NESTED[0], NAV_NESTED[1], 0, 1, [], []));
 
-            sendKey('ArrowRight');
-            expect(lastNav()).toEqual(expectedNav('ArrowRight', 'open', NAV_NESTED[1], NAV_NESTED[1], 1, 1, [], []));
+            sendKey('NumpadEnter');
+            expect(lastNav()).toEqual(expectedNav('Enter', 'open', NAV_NESTED[1], NAV_NESTED[1], 1, 1, [], []));
 
             sendKey('ArrowDown'); // 'c'
             expect(lastNav()).toEqual(expectedNav('ArrowDown', 'next', NAV_NESTED[1], NAV_NESTED[2], 1, 2, [], []));
@@ -1408,8 +1506,8 @@ describe('Keyboard Navigation', () => {
             sendKey('ArrowDown'); // 'd'
             expect(lastNav()).toEqual(expectedNav('ArrowDown', 'next', NAV_NESTED[2], NAV_NESTED[3], 2, 3, [], []));
 
-            sendKey('ArrowRight');
-            expect(lastNav()).toEqual(expectedNav('ArrowRight', 'open', NAV_NESTED[3], NAV_NESTED[3], 3, 3, [], []));
+            sendKey('Enter');
+            expect(lastNav()).toEqual(expectedNav('Enter', 'open', NAV_NESTED[3], NAV_NESTED[3], 3, 3, [], []));
         });
     });
 
@@ -1456,8 +1554,8 @@ describe('Keyboard Navigation', () => {
             sendKey('ArrowDown'); // 'b'
             expect(lastNav()).toEqual(expectedNav('ArrowDown', 'next', itemA, itemB, 0, 1, [], []));
 
-            sendKey('ArrowRight'); // 'b'
-            expect(lastNav()).toEqual(expectedNav('ArrowRight', 'open', itemB, itemB, 1, 1, [], []));
+            sendKey('NumpadEnter'); // 'b'
+            expect(lastNav()).toEqual(expectedNav('Enter', 'open', itemB, itemB, 1, 1, [], []));
 
             sendKey('ArrowDown'); // 'c'
             expect(lastNav()).toEqual(expectedNav('ArrowDown', 'next', itemB, itemC, 1, 2, [], []));
@@ -1468,8 +1566,8 @@ describe('Keyboard Navigation', () => {
             sendKey('ArrowDown'); // 'c-1'
             expect(lastNav()).toEqual(expectedNav('ArrowDown', 'next', itemC0, itemC1, 0, 1, [2], [2]));
 
-            sendKey('ArrowRight'); // 'c-1-0'
-            expect(lastNav()).toEqual(expectedNav('ArrowRight', 'open', itemC1, itemC10, 1, 0, [2], [2, 1]));
+            sendKey('Enter'); // 'c-1-0'
+            expect(lastNav()).toEqual(expectedNav('Enter', 'open', itemC1, itemC10, 1, 0, [2], [2, 1]));
 
             sendKey('ArrowDown'); // 'c-1-0'
             expect(lastNav()).toEqual(expectedNav('ArrowDown', 'next', itemC10, itemC10, 0, 0, [2, 1], [2, 1]));

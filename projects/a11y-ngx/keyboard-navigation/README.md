@@ -15,9 +15,13 @@ It centralizes all keyboard interaction logic (Arrow keys, Home/End, Enter, Esca
 
 **The core idea is simple:** provide the engine an array of flat or nested items and, as the user interacts with the _allowed_ keys for the desired navigation type, the engine emits the relevant data the user is navigating _from_ and _to_ (e.g. moving to the previous item, opening an item, etc.).
 
-![Angular support from version 12 up to version 21](https://img.shields.io/badge/Angular-v12_to_v21-darkgreen?logo=angular)
+## Documentation & Live Examples
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0 to ensure compatibility with a wide range of Angular versions. It has been tested up to v21.
+> Explore the API references, interactive configurations, and live examples on the official [Keyboard Navigation Showroom page](https://a11y-ngx.dev/keyboard-navigation).
+
+![Angular support from version 14 up to version 22](https://img.shields.io/badge/Angular-v14_to_v22-darkgreen?logo=angular)
+
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.2.0 to ensure compatibility with a wide range of Angular versions. It has been tested up to v22.
 
 ## Changelog
 
@@ -38,6 +42,7 @@ See the complete [changelog](https://github.com/LDV2k3/a11y-libraries/blob/maste
   - [Allow Select First Child](#allow-select-first-child)
   - [Allow Repeated Events](#allow-repeated-events)
 - [The Navigation State](#the-navigation-state)
+- [The Modifier Keys](#the-modifier-keys)
 - [The Strategies](#the-strategies)
   - [How the Strategy Works](#how-the-strategy-works)
   - [The Strategy: Loop](#the-strategy-loop)
@@ -251,6 +256,18 @@ This allows you to react to navigation changes, update UI focus, track user posi
   | `pathTo` | `number[]` | The current path |
 
 See also [how the Strategy works](#how-the-strategy-works) to better understand how "item", "index" and "path" are established.
+
+## The Modifier Keys
+
+KeyNav only handles **unmodified** keys: arrow keys, `Home`, `End`, `Enter`, `Space` and `Escape`.
+
+If any of `Alt` or `Meta` is pressed (or an IME composition is in progress), the event is ignored: KeyNav will not execute any action nor call `preventDefault()`.
+
+This means that `(Alt / Cmd) + ArrowLeft` does nothing in KeyNav, even if there is a previous item to navigate to, allowing the browser to handle its own shortcuts (in this case, navigating back in the history).
+
+Hijacking these would break expected behavior for keyboard and assistive technology users.
+
+> This early return will happen when using the [manageKeyDown() method](#the-service-managekeydown-method).
 
 ## The Strategies
 
@@ -1035,7 +1052,7 @@ import { A11yKeyboardNavigationModule, KeyboardNavigationEvent } from '@a11y-ngx
     ...
     imports: [A11yKeyboardNavigationModule],
 })
-export class MyRadioComponent {
+export class MyVolumeComponent {
     // An array from 0 to 100 => [0, 1, 2, ..., 99, 100]
     volumeSlider: number[] = Array.from({ length: 101 }, (_, i) => i);
     // Initial value 70

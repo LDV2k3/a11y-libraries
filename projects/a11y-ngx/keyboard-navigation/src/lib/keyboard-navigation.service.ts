@@ -38,7 +38,14 @@ export class KeyboardNavigationService {
      * Handles throttling to prevent rapid repeated events.
      */
     manageKeyDown<T = unknown>(event: KeyboardEvent): KeyboardNavigationEvent<T> | null {
+        if (event.altKey || event.metaKey || event.isComposing || event.keyCode === 229) return null;
+
         const { repeat, code } = event;
+        const keyCode: KeyboardNavigationKey = this.resolveKey(code as KeyboardNavigationKey);
+        const action: KeyboardNavigationAction | null = this.resolveAction(keyCode);
+        if (!action) return null;
+
+        event.preventDefault();
         const { throttleMs } = this.config;
 
         // Throttle rapid key repeat events
@@ -52,10 +59,7 @@ export class KeyboardNavigationService {
             }
         }
 
-        const navigateTo: KeyboardNavigationEvent<T> | null = this.executeKey<T>(code as KeyboardNavigationKey);
-        if (!navigateTo) return null;
-
-        event.preventDefault();
+        const navigateTo: KeyboardNavigationEvent<T> | null = this.applyAction<T>(keyCode, action);
         return navigateTo;
     }
 
@@ -67,13 +71,46 @@ export class KeyboardNavigationService {
      * - Prevents duplicate events from being emitted.
      */
     executeKey<T = unknown>(key: KeyboardNavigationKey): KeyboardNavigationEvent<T> | null {
+        const keyCode: KeyboardNavigationKey = this.resolveKey(key);
+        const action: KeyboardNavigationAction | null = this.resolveAction(keyCode);
+        if (!action) return null;
+
+        return this.applyAction<T>(keyCode, action);
+    }
+
+    /**
+     * @description
+     * Normalizes aliased keys to their canonical form so strategies only need
+     * to declare one binding per logical key (e.g. `NumpadEnter` → `Enter`).
+     */
+    private resolveKey(key: KeyboardNavigationKey): KeyboardNavigationKey {
+        if ((key as string) === 'NumpadEnter') return 'Enter';
+        return key;
+    }
+
+    /**
+     * @description
+     * Looks up the action bound to a key in the active strategy.
+     *
+     * Returns `null` when the strategy doesn't handle the key.
+     */
+    private resolveAction(key: KeyboardNavigationKey): KeyboardNavigationAction | null {
+        return this.keys[key] ?? null;
+    }
+
+    /**
+     * @description
+     * - Applies the action from the key/action executed.
+     * - Prevents duplicate events from being emitted.
+     */
+    private applyAction<T = unknown>(
+        key: KeyboardNavigationKey,
+        action: KeyboardNavigationAction
+    ): KeyboardNavigationEvent<T> | null {
         if (!this.currentItems.length) {
             console.warn(ERROR_ITEMS_NOT_PROVIDED());
             return null;
         }
-
-        const action: KeyboardNavigationAction | undefined = this.keys[key];
-        if (!action) return null;
 
         const indexFrom: number = this.currentIndex;
         const itemFrom: T | undefined = this.currentItems[indexFrom] as T | undefined;

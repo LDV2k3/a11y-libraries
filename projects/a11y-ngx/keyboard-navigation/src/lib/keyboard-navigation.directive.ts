@@ -1,4 +1,4 @@
-import { Directive, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Directive, Input, Output, EventEmitter, OnInit, inject } from '@angular/core';
 
 import { KeyboardNavigationService } from './keyboard-navigation.service';
 
@@ -55,7 +55,7 @@ export class KeyboardNavigationDirective<T = unknown> implements OnInit {
         KeyboardNavigationEvent<T>
     >();
 
-    constructor(private service: KeyboardNavigationService) {}
+    private readonly service: KeyboardNavigationService = inject(KeyboardNavigationService);
 
     ngOnInit(): void {
         this.service.init();
