@@ -11,7 +11,7 @@
 
 ### 🔧 Changed
 
-- Upgraded Angular peer dependency to `>=14.2.0`.
+- Updated Angular peer dependency range to `v14.2.0` - `v22.x`.
 
 ### 🐛 Fixed
 
