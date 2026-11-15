@@ -6,9 +6,13 @@ An Angular core utility library designed to normalize icon rendering across UI c
 >
 > ✨ Its primary purpose is to be consumed by **other UI component libraries** that need icons (like accessible Menus, Tree views, or Dropdowns). It provides library authors with a standardized, decoupled way to accept any icon format from the end-user, delegating the rendering strategy to the host application without forcing a specific icon pack.
 
-![Angular support from version 12 up to version 21](https://img.shields.io/badge/Angular-v12_to_v21-darkgreen?logo=angular)
+## Documentation & Live Examples
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0 to ensure compatibility with a wide range of Angular versions. It has been tested up to v21.
+> Explore the API references, interactive configurations, and live examples on the official [Icon Showroom page](https://a11y-ngx.dev/icon).
+
+![Angular support from version 14 up to version 22](https://img.shields.io/badge/Angular-v14_to_v22-darkgreen?logo=angular)
+
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.2.0 to ensure compatibility with a wide range of Angular versions. It has been tested up to v22.
 
 ## Changelog
 
@@ -95,7 +99,7 @@ The strategy defines the _default wrapper_ for that string:
 
 ## The Global Config
 
-Use the `rootConfig()` method or `provideA11yIcon` to establish the global behavior for your icons across the entire application.
+Use the `rootConfig()` method or `provideA11yIcon()` to establish the global behavior for your icons across the entire application.
 
 > ⚠️ **IMPORTANT: ❗❗ DO NOT use it on a library or a low-level module/component within your app**, since this method is meant to be called **only once** at a root level on the **main app**.
 >
@@ -114,10 +118,9 @@ See [how to configure the Global Strategy](#configure-the-global-strategy).
 
 If you are using the [Image Strategy](#image-strategy) to load local or external images, you can define a `basePath` in your global configuration object. This prefix will be automatically prepended to all your icon strings, keeping your HTML templates clean and avoiding repetitive folder paths.
 
-**On Angular v12 - v14:**
+**Via Module:**
 
 ```typescript
-import { MatIcon } from '@angular/material/icon';
 import { A11yIconModule } from '@a11y-ngx/icon';
 
 @NgModule({
@@ -132,7 +135,7 @@ import { A11yIconModule } from '@a11y-ngx/icon';
 export class AppModule {}
 ```
 
-**On Angular v15+:**
+**Via Provider:**
 
 ```typescript
 import { provideA11yIcon } from '@a11y-ngx/icon';
@@ -182,7 +185,7 @@ The core of this library is the `<a11y-icon>` component. It acts as a universal 
 
 > 💡 **Icon Sizing:**
 >
-> By default, the component sets the icon size to `1rem` using a CSS variable. You can easily override this behavior by redefining the `--icon-size` variable at any level of your DOM tree.
+> By default, the component sets the icon size to `1em` using a CSS variable. You can easily override this behavior by redefining the `--icon-size` variable at any level of your DOM tree.
 >
 > 1. **Global Override:**<br />
 > Set it in your global stylesheet to change the default size for the entire application.
@@ -283,7 +286,7 @@ You can configure the strategy globally or locally (custom).
 
 Accepts a single parameter `config` of type [`IconConfig`](#the-global-config).
 
-**On Angular v12 - v14:**
+**Via Module:**
 
 ```typescript
 import { MatIcon } from '@angular/material/icon';
@@ -303,7 +306,7 @@ import { A11yIconModule } from '@a11y-ngx/icon';
 export class AppModule {}
 ```
 
-**On Angular v15+:**
+**Via Provider:**
 
 ```typescript
 import { MatIcon } from '@angular/material/icon';
@@ -349,7 +352,7 @@ export class MyComponent {}
 
 #### Provide via Dependency Injection
 
-**On Angular v12 - v14:**
+**The _Old Way_:**
 
 ```typescript
 import { provideCustomA11yIcon } from '@a11y-ngx/icon';
@@ -366,7 +369,7 @@ import { provideCustomA11yIcon } from '@a11y-ngx/icon';
 export class MyComponent {}
 ```
 
-**On Angular v15+:**
+**The _New Way_:**
 
 ```typescript
 import { provideCustomA11yIcon } from '@a11y-ngx/icon';

@@ -4,8 +4,8 @@
     justify-content: center;
     flex-shrink: 0;
 
-    width: var(--icon-size, 1rem);
-    height: var(--icon-size, 1rem);
+    width: var(--icon-size, 1em);
+    height: var(--icon-size, 1em);
     font-size: var(--icon-size, inherit);
 
     ::ng-deep {

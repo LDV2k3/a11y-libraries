@@ -7,23 +7,11 @@ import { CommonModule } from '@angular/common';
 import { A11yIconModule } from './icon.module';
 import { IconComponent } from './icon.component';
 
-import {
-    ERROR_ROOT_CONFIG_CALLED_MORE_THAN_ONCE,
-    ERROR_SERVICE_PROVIDED_MORE_THAN_ONCE,
-    ERROR_WRONG_TOKEN,
-} from './icon.errors';
+import { ERROR_WRONG_TOKEN } from './icon.errors';
 
-import { initIconRootConfigFactory } from './icon.module.providers.private';
 import { ICON_CUSTOM_STRATEGY, provideA11yIcon, provideCustomA11yIcon } from './icon.module.providers';
 
-import { IconService } from './icon.service';
-
 import type { Icon, IconCustomStrategy, IconDefaultComponent, IconGlobalStrategy } from './icon.type';
-
-@Component({ providers: [IconService] })
-class TestIconDuplicatedServiceComponent {
-    constructor(private service: IconService) {}
-}
 
 @Component({
     selector: 'a11y-test-icon',
@@ -133,6 +121,22 @@ describe('A11y Icon', () => {
         expect(component.iconComp.iconType).toEqual('string');
         setIcon(undefined as unknown as Icon);
         expect(component.iconComp.iconType).toEqual('');
+    });
+
+    it('should NOT remove the icon when the label is updated', () => {
+        component.label = 'the label';
+        fixture.detectChanges();
+        getDebugEl();
+        expect(a11yEl.attributes['aria-label']).toBe('the label');
+
+        setIcon({ component: TestIconComponent, content: 'home' });
+        getTestIcon();
+        expect(testIcon.nativeElement.textContent).toEqual('home');
+
+        component.label = 'the new label';
+        fixture.detectChanges();
+        expect(a11yEl.attributes['aria-label']).toBe('the new label');
+        expect(testIcon.nativeElement.textContent).toEqual('home');
     });
 
     describe('Should check the type "string"', () => {
@@ -392,10 +396,10 @@ describe('A11y Icon', () => {
         });
 
         it('should throw an error when checking for the token', () => {
-            const spyOnConsoleWarn = spyOn(console, 'error');
+            spyOn(console, 'error');
 
             setIcon('home.png');
-            expect(spyOnConsoleWarn).toHaveBeenCalledWith(ERROR_WRONG_TOKEN());
+            expect(console.error).toHaveBeenCalledWith(ERROR_WRONG_TOKEN());
         });
     });
 
@@ -521,32 +525,6 @@ describe('A11y Icon', () => {
                 expect(image.attributes.src).toEqual(imageSrc);
             });
         });
-
-        describe('Should check the "rootConfig()" method not being called twice', () => {
-            let service!: IconService;
-
-            beforeEach(() => {
-                TestBed.resetTestingModule();
-                TestBed.configureTestingModule({
-                    imports: [
-                        A11yIconModule.rootConfig({
-                            strategy: {
-                                component: TestIconComponent,
-                                mainEntry: 'input',
-                                inputName: 'icon',
-                            },
-                        }),
-                    ],
-                });
-                service = TestBed.inject(IconService);
-            });
-
-            it('should throw the error if invoked more than once', () => {
-                expect(() => initIconRootConfigFactory(service, { strategy: 'image' })).toThrowError(
-                    ERROR_ROOT_CONFIG_CALLED_MORE_THAN_ONCE()
-                );
-            });
-        });
     });
 
     describe('Should check the "provideCustomA11yIcon" function', () => {
@@ -606,22 +584,6 @@ describe('A11y Icon', () => {
                 setIcon({ component: TestIconComponent });
                 expect(component.iconComp['iconStrategyImage']).toBe(false);
             });
-        });
-    });
-
-    describe('Should check the service provided more than once error', () => {
-        beforeEach(() => {
-            TestBed.resetTestingModule();
-            TestBed.configureTestingModule({
-                declarations: [TestIconDuplicatedServiceComponent],
-                providers: [IconService],
-            });
-        });
-
-        it('should throw error when provided more than once', () => {
-            expect(() => TestBed.createComponent(TestIconDuplicatedServiceComponent)).toThrowError(
-                ERROR_SERVICE_PROVIDED_MORE_THAN_ONCE('IconService')
-            );
         });
     });
 });

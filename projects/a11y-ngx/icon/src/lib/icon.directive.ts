@@ -1,12 +1,4 @@
-import {
-    Directive,
-    Input,
-    Inject,
-    ComponentRef,
-    ViewContainerRef,
-    ComponentFactoryResolver,
-    ComponentFactory,
-} from '@angular/core';
+import { Directive, Input, inject, ComponentRef, ViewContainerRef } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 
 import type { IconInputComponent } from './icon.type';
@@ -26,11 +18,8 @@ export class IconDynamicComponentDirective {
     private data!: IconInputComponent;
     private componentRef!: ComponentRef<unknown>;
 
-    constructor(
-        private vcr: ViewContainerRef,
-        private cfr: ComponentFactoryResolver,
-        @Inject(DOCUMENT) private document: Document
-    ) {}
+    private readonly vcr: ViewContainerRef = inject(ViewContainerRef);
+    private readonly document: Document = inject(DOCUMENT);
 
     /**
      * @description
@@ -41,11 +30,9 @@ export class IconDynamicComponentDirective {
 
         const { component, content } = this.data;
 
-        const factory: ComponentFactory<unknown> = this.cfr.resolveComponentFactory(component);
-
         const projectableNodes: Text[][] = content?.length ? [[this.document.createTextNode(content)]] : [];
 
-        this.componentRef = this.vcr.createComponent(factory, undefined, undefined, projectableNodes);
+        this.componentRef = this.vcr.createComponent(component, { projectableNodes });
     }
 
     /**
@@ -56,19 +43,6 @@ export class IconDynamicComponentDirective {
         const { inputs } = this.data;
         if (!inputs) return;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const componentRefSignals: any = this.componentRef as any;
-        // We check if we can access to the "setInput" method in newer versions of Angular (v14+)
-        /* istanbul ignore if: modern Angular (v14+) feature detection */
-        if (typeof componentRefSignals.setInput === 'function') {
-            Object.keys(inputs).forEach((key) => componentRefSignals.setInput(key, inputs[key]));
-            return;
-        }
-
-        // We assign the inputs the old way
-        const instance: Record<string, unknown> = this.componentRef.instance as Record<string, unknown>;
-        Object.keys(inputs).forEach((key) => (instance[key] = inputs[key]));
-
-        this.componentRef.changeDetectorRef.markForCheck();
+        Object.keys(inputs).forEach((key) => this.componentRef.setInput(key, inputs[key]));
     }
 }

@@ -1,6 +1,6 @@
 {
     "name": "@a11y-ngx/icon",
-    "version": "1.0.1",
+    "version": "2.0.0",
     "description": "A polymorphic icon wrapper that enables your Angular libraries to accept and render any icon format (HTML, images, Components, or TemplateRefs).",
     "keywords": [
         "icon",
@@ -14,7 +14,7 @@
         "accessibility",
         "angular"
     ],
-    "homepage": "https://github.com/LDV2k3/a11y-libraries/tree/master/projects/a11y-ngx/icon#readme",
+    "homepage": "https://a11y-ngx.dev/icon",
     "bugs": {
         "url": "https://github.com/LDV2k3/a11y-libraries/issues",
         "email": "lucho.development@gmail.com"
@@ -26,8 +26,8 @@
         "url": "https://github.com/LDV2k3/"
     },
     "peerDependencies": {
-        "@angular/common": ">=12.2.0 <22.0.0",
-        "@angular/core": ">=12.2.0 <22.0.0"
+        "@angular/common": ">=14.2.0 <23.0.0",
+        "@angular/core": ">=14.2.0 <23.0.0"
     },
     "dependencies": {
         "tslib": "^2.3.0"

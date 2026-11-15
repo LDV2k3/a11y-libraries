@@ -1,11 +1,9 @@
-import { Injectable, Optional, SkipSelf } from '@angular/core';
-
-import { ERROR_SERVICE_PROVIDED_MORE_THAN_ONCE } from './icon.errors';
+import { Injectable } from '@angular/core';
 
 import type { IconConfig } from './icon.type';
 
 @Injectable({ providedIn: 'root' })
-export class IconService {
+export class IconRootService {
     private rootConfigAlreadyProvided: boolean = false;
 
     readonly config: IconConfig = {};
@@ -16,10 +14,6 @@ export class IconService {
      */
     get isRootConfigAlreadyProvided(): boolean {
         return this.rootConfigAlreadyProvided;
-    }
-
-    constructor(@Optional() @SkipSelf() private parentService: IconService | null) {
-        if (this.parentService) throw Error(ERROR_SERVICE_PROVIDED_MORE_THAN_ONCE('IconService'));
     }
 
     /**

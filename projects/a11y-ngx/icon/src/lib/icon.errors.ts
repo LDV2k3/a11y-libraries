@@ -11,15 +11,6 @@ export const ERROR_ROOT_CONFIG_CALLED_MORE_THAN_ONCE = (): string => {
     return formatConsoleMsg(msg);
 };
 
-export const ERROR_SERVICE_PROVIDED_MORE_THAN_ONCE = (serviceClass: string): string => {
-    const msg: string = `
-        ${libName}:
-        ${serviceClass} is a singleton and has been provided more than once.
-        Please remove the service from any 'providers' array you may have added it to.
-    `;
-    return formatConsoleMsg(msg);
-};
-
 export const ERROR_WRONG_TOKEN = (): string => {
     const msg: string = `
         ${libName}:

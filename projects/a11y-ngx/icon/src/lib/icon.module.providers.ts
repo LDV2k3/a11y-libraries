@@ -1,8 +1,8 @@
-import { Provider, InjectionToken } from '@angular/core';
+import { ENVIRONMENT_INITIALIZER, Provider, InjectionToken, inject } from '@angular/core';
 
-import { IconService } from './icon.service';
+import { IconRootService } from './icon.service.root';
 
-import { ICON_GLOBAL_CONFIG, IconDummyConfigService, initIconRootConfigFactory } from './icon.module.providers.private';
+import { ERROR_ROOT_CONFIG_CALLED_MORE_THAN_ONCE } from './icon.errors';
 
 import type { IconCustomStrategy, IconConfig } from './icon.type';
 
@@ -14,11 +14,16 @@ export const ICON_CUSTOM_STRATEGY = new InjectionToken<IconCustomStrategy>('A11y
  */
 export function provideA11yIcon(config: IconConfig): Provider[] {
     return [
-        { provide: ICON_GLOBAL_CONFIG, useValue: config },
         {
-            provide: IconDummyConfigService,
-            useFactory: initIconRootConfigFactory,
-            deps: [IconService, ICON_GLOBAL_CONFIG],
+            provide: ENVIRONMENT_INITIALIZER,
+            useValue: () => {
+                const service: IconRootService = inject(IconRootService);
+
+                if (service.isRootConfigAlreadyProvided) throw new Error(ERROR_ROOT_CONFIG_CALLED_MORE_THAN_ONCE());
+
+                service.initRootConfig(config);
+            },
+            multi: true,
         },
     ];
 }

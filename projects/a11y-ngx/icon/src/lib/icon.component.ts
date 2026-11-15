@@ -2,8 +2,7 @@ import {
     Component,
     Input,
     OnChanges,
-    Inject,
-    Optional,
+    inject,
     SimpleChanges,
     ChangeDetectionStrategy,
     ChangeDetectorRef,
@@ -14,7 +13,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ERROR_WRONG_TOKEN } from './icon.errors';
 import { ICON_CUSTOM_STRATEGY } from './icon.module.providers';
 
-import { IconService } from './icon.service';
+import { IconRootService } from './icon.service.root';
 
 import type { IconType, IconDefaultEntryInput } from './icon.type.private';
 import type {
@@ -49,10 +48,9 @@ import type {
     styleUrls: ['./icon.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: {
-        ngSkipHydration: '', // To work on SSR with hydration
-        '[attr.role]': `label ? 'img' : null`,
-        '[attr.aria-label]': 'label ?? null',
-        '[attr.aria-hidden]': '!label ? true : null',
+        '[attr.role]': `iconLabel ? 'img' : null`,
+        '[attr.aria-label]': 'iconLabel || null',
+        '[attr.aria-hidden]': '!iconLabel ? true : null',
     },
 })
 export class IconComponent implements OnChanges {
@@ -61,6 +59,9 @@ export class IconComponent implements OnChanges {
 
     /** @description The icon's type. */
     iconType: IconType | '' = '';
+
+    /** @description To use within the host to set the role/aria-label. */
+    protected iconLabel: string = '';
 
     /** @description The main strategy. */
     private iconStrategy: IconCustomStrategy | null = null;
@@ -118,21 +119,27 @@ export class IconComponent implements OnChanges {
         return 'component';
     }
 
-    constructor(
-        @Optional()
-        @Inject(ICON_CUSTOM_STRATEGY)
-        private customStrategy: IconCustomStrategy | null,
-        private service: IconService,
-        private sanitizer: DomSanitizer,
-        private cdr: ChangeDetectorRef
-    ) {
+    private readonly customStrategy: IconCustomStrategy | null = inject(ICON_CUSTOM_STRATEGY, { optional: true });
+    private readonly service: IconRootService = inject(IconRootService);
+    private readonly sanitizer: DomSanitizer = inject(DomSanitizer);
+    private readonly cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
+
+    constructor() {
         this.iconStrategy = this.customStrategy ?? this.service.config.strategy ?? null;
     }
 
-    ngOnChanges({ icon: iconChange }: SimpleChanges): void {
-        const icon: Icon | undefined = iconChange?.currentValue;
+    ngOnChanges({ icon: iconChange, label: iconLabel }: SimpleChanges): void {
+        if (iconLabel) {
+            this.iconLabel = iconLabel.currentValue !== undefined ? String(iconLabel.currentValue) : '';
+            this.cdr.markForCheck();
+        }
+
+        if (!iconChange) return;
+
+        const icon: Icon | undefined = iconChange.currentValue;
         if (!icon) {
             this.iconType = '';
+            this.cdr.markForCheck();
             return;
         }
 
