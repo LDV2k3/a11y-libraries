@@ -1,4 +1,4 @@
-import { Injectable, ComponentRef } from '@angular/core';
+import { Injectable, ComponentRef, inject } from '@angular/core';
 
 import type { KeyboardNavigationKey } from '@a11y-ngx/keyboard-navigation';
 
@@ -14,7 +14,8 @@ import type { MenuPosition } from './menu.type';
 
 @Injectable({ providedIn: 'root' })
 export class MenuDirectorPrivateService {
-    constructor(private factory: MenuFactoryService, private service: MenuService) {}
+    private readonly factory: MenuFactoryService = inject(MenuFactoryService);
+    private readonly service: MenuService = inject(MenuService);
 
     /**
      * @description

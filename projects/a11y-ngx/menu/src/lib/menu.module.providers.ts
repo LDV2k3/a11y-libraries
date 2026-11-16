@@ -1,18 +1,9 @@
-import { Provider, InjectionToken } from '@angular/core';
+import { ENVIRONMENT_INITIALIZER, Provider, inject } from '@angular/core';
 
 import { MenuRootService } from './menu.service.root';
-
-import {
-    MenuDummyConfigService,
-    MenuDummyConfigCustomService,
-    initMenuRootConfigFactory,
-    initMenuCustomConfigFactory,
-} from './menu.module.providers.private';
+import { ERROR_ROOT_CONFIG_CALLED_MORE_THAN_ONCE } from './menu.errors';
 
 import type { MenuConfig, MenuCustomConfig } from './menu.type';
-
-export const MENU_CONFIG_INJECTOR = new InjectionToken<MenuConfig>('A11y Menu Root Config');
-export const MENU_CUSTOM_CONFIG_INJECTOR = new InjectionToken<MenuCustomConfig>('A11y Menu Custom Configs');
 
 /**
  * @description
@@ -20,26 +11,38 @@ export const MENU_CUSTOM_CONFIG_INJECTOR = new InjectionToken<MenuCustomConfig>(
  */
 export function provideA11yMenu(config: MenuConfig): Provider[] {
     return [
-        { provide: MENU_CONFIG_INJECTOR, useValue: config },
         {
-            provide: MenuDummyConfigService,
-            useFactory: initMenuRootConfigFactory,
-            deps: [MenuRootService, MENU_CONFIG_INJECTOR],
+            provide: ENVIRONMENT_INITIALIZER,
+            useValue: () => {
+                const service: MenuRootService = inject(MenuRootService);
+
+                if (service.isRootConfigAlreadyProvided) throw new Error(ERROR_ROOT_CONFIG_CALLED_MORE_THAN_ONCE());
+
+                service.initRootConfig(config);
+            },
+            multi: true,
         },
     ];
 }
 
 /**
  * @description
- * Provides Menu custom feature (usable in standalone libs/components).
+ * Provides Menu custom feature (usable in routes or NgModules (EnvironmentInjector)).
  */
 export function provideA11yMenuFeature(config: MenuCustomConfig): Provider[] {
     return [
-        { provide: MENU_CUSTOM_CONFIG_INJECTOR, useValue: config, multi: true },
         {
-            provide: MenuDummyConfigCustomService,
-            useFactory: initMenuCustomConfigFactory,
-            deps: [MenuRootService, MENU_CUSTOM_CONFIG_INJECTOR],
+            provide: ENVIRONMENT_INITIALIZER,
+            useValue: () => inject(MenuRootService).initCustomConfig(config),
+            multi: true,
         },
     ];
+}
+
+/**
+ * @description
+ * Provides Menu custom feature (usable in standalone directives/components (Injection Context)).
+ */
+export function injectA11yMenuFeature(config: MenuCustomConfig): void {
+    inject(MenuRootService).initCustomConfig(config);
 }

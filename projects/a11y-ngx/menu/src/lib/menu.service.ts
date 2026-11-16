@@ -1,5 +1,5 @@
-import { Injectable, Inject, Optional, SkipSelf, ComponentRef, TemplateRef } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { PLATFORM_ID, Injectable, inject, ComponentRef, TemplateRef } from '@angular/core';
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { isObservable, Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -210,16 +210,17 @@ export class MenuService {
     private menuFeatureConfig: Partial<MenuMainConfig> | undefined = undefined;
     private menuInstanceConfig: Partial<MenuMainConfig> | undefined = undefined;
 
-    constructor(
-        private rootService: MenuRootService,
-        private privateService: MenuPrivateService,
-        private mobileService: MobileService,
-        private announcerService: LiveAnnouncerService,
+    private readonly rootService: MenuRootService = inject(MenuRootService);
+    private readonly privateService: MenuPrivateService = inject(MenuPrivateService);
+    private readonly mobileService: MobileService = inject(MobileService);
+    private readonly announcerService: LiveAnnouncerService = inject(LiveAnnouncerService);
 
-        @Inject(DOCUMENT) private document: Document,
-        @Inject(WINDOW) private window: Window,
-        @Optional() @SkipSelf() private parentService: MenuService | null
-    ) {
+    private readonly document: Document = inject(DOCUMENT);
+    private readonly window: Window = inject(WINDOW);
+    private readonly platformId = inject(PLATFORM_ID);
+    private readonly parentService: MenuService | null = inject(MenuService, { optional: true, skipSelf: true });
+
+    constructor() {
         if (this.parentService) throw Error(ERROR_SERVICE_PROVIDED_MORE_THAN_ONCE('MenuService'));
     }
 
@@ -762,6 +763,9 @@ export class MenuService {
      * Kills the listeners when the root menu gets destroyed.
      */
     private killListeners(): void {
+        // Prevents error when directive gets destroyed via SSR/Hydration
+        if (!isPlatformBrowser(this.platformId)) return;
+
         const { closeOnWindowBlur, closeOnClickOutside, closeOnScrollOutside } = this.config;
 
         if (closeOnWindowBlur) this.window.removeEventListener('blur', this.onWindowBlur);

@@ -4,6 +4,7 @@ import {
     OnInit,
     AfterViewInit,
     OnDestroy,
+    inject,
     ChangeDetectionStrategy,
     ViewChildren,
     QueryList,
@@ -107,8 +108,7 @@ import type { Menu, MenuGroup, MenuItem, MenuItemSelectable, MenuItemInfo, MenuI
                 <ng-container
                     *ngTemplateOutlet="
                         groupItemTemplate;
-                        context: { $implicit: group.items, idx, groupComp: groupInlineComp };
-                        injector
+                        context: { $implicit: group.items, idx, groupComp: groupInlineComp }
                     "></ng-container>
             </a11y-menu-group-inline>
         </ng-template>
@@ -255,16 +255,12 @@ export class MenuComponent extends OverlayBase implements OnInit, AfterViewInit,
     /** @description Establishes the current animation. */
     protected attrAnimate: MenuAnimate | 'mobile' | null = null;
 
-    constructor(
-        private hostElement: ElementRef<HTMLElement>,
-        private menuService: MenuService,
-        private privateService: MenuPrivateService,
-        private mobileService: MobileService,
-        private themeService: ThemeService,
-        private cdr: ChangeDetectorRef
-    ) {
-        super();
-    }
+    private readonly hostElement: ElementRef<HTMLElement> = inject(ElementRef);
+    private readonly menuService: MenuService = inject(MenuService);
+    private readonly privateService: MenuPrivateService = inject(MenuPrivateService);
+    private readonly mobileService: MobileService = inject(MobileService);
+    private readonly themeService: ThemeService = inject(ThemeService);
+    private readonly cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
 
     ngOnInit(): void {
         const {

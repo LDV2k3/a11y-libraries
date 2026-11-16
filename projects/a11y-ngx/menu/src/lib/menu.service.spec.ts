@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { Component, ComponentRef, QueryList } from '@angular/core';
+import { PLATFORM_ID, Component, ComponentRef, inject, QueryList } from '@angular/core';
 
 import { WINDOW } from './menu.module.providers.private';
 
@@ -57,9 +57,9 @@ describe('MenuService', () => {
     });
 
     describe('when provided more than once', () => {
-        @Component({ providers: [MenuService] })
+        @Component({ template: '', providers: [MenuService] })
         class TestMenuDuplicatedServiceComponent {
-            constructor(private service: MenuService) {}
+            private service: MenuService = inject(MenuService);
         }
 
         beforeEach(() => {
@@ -487,6 +487,29 @@ describe('MenuService', () => {
         describe('Listeners', () => {
             const initMenu = (config?: Partial<MenuMainConfig>): void =>
                 service.initRootMenuData(new DOMRect(1, 1), [], 'test-menu-listeners', config);
+
+            describe('Server Side Rendering (SSR)', () => {
+                beforeEach(() => {
+                    TestBed.resetTestingModule();
+                    TestBed.configureTestingModule({ providers: [{ provide: PLATFORM_ID, useValue: 'server' }] });
+                    service = TestBed.inject(MenuService);
+                });
+
+                it('should stop (early return) and NOT remove the listeners when platform is NOT browser', () => {
+                    spyOn(document, 'removeEventListener');
+
+                    service.destroyMenu();
+                    expect(document.removeEventListener).not.toHaveBeenCalledWith(
+                        'scroll',
+                        service['onDocumentScroll'],
+                        { capture: true }
+                    );
+                    expect(document.removeEventListener).not.toHaveBeenCalledWith(
+                        'pointerdown',
+                        service['onDocumentMouseDown']
+                    );
+                });
+            });
 
             describe('"On Scroll Outside" Listener (Desktop only)', () => {
                 let mobileService: MobileService;

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 
@@ -29,7 +29,8 @@ export class MenuItemInfoComponent implements OnInit, OnDestroy {
 
     private readonly destroy$: Subject<void> = new Subject<void>();
 
-    constructor(private menuService: MenuService, private cdr: ChangeDetectorRef) {}
+    private readonly menuService: MenuService = inject(MenuService);
+    private readonly cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
 
     ngOnInit(): void {
         const initClassNames = (): void => {

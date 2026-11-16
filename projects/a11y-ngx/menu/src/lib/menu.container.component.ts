@@ -1,9 +1,9 @@
 import {
     Component,
-    Inject,
     OnInit,
     OnDestroy,
     ViewChild,
+    inject,
     ChangeDetectionStrategy,
     ViewContainerRef,
 } from '@angular/core';
@@ -39,12 +39,10 @@ export class MenuContainerComponent implements OnInit, OnDestroy {
 
     private readonly destroy$: Subject<void> = new Subject<void>();
 
-    constructor(
-        private directorPrivate: MenuDirectorPrivateService,
-        private service: MenuService,
-        protected mobileService: MobileService,
-        @Inject(KeyboardNavigationService) private keyNav: KeyboardNavigationService
-    ) {}
+    private readonly directorPrivate: MenuDirectorPrivateService = inject(MenuDirectorPrivateService);
+    private readonly service: MenuService = inject(MenuService);
+    protected readonly mobileService: MobileService = inject(MobileService);
+    private readonly keyNav: KeyboardNavigationService = inject(KeyboardNavigationService);
 
     ngOnInit(): void {
         // Subscribes to when the root menu gets destroyed to destroy the container
@@ -126,14 +124,7 @@ export class MenuContainerComponent implements OnInit, OnDestroy {
 
         // Get the navigation from the KeyNav Service
         const navigateTo: KeyboardNavigationEvent<MenuItem> | null = this.keyNav.manageKeyDown(event);
-
-        if (!navigateTo) {
-            // To prevent bubbling for when the Service does not return repeated events
-            // and these keys fire movement within the page
-            if (code.startsWith('Arrow') || code === 'Home' || code === 'End') this.eventPrevent(event);
-
-            return;
-        }
+        if (!navigateTo) return;
 
         this.eventPrevent(event);
         this.executeNavigation(navigateTo);

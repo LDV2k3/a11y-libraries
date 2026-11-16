@@ -3,7 +3,7 @@ import {
     Input,
     OnInit,
     OnDestroy,
-    Inject,
+    inject,
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     ComponentRef,
@@ -54,7 +54,7 @@ import type {
             *ngIf="showIcon"
             [icon]="itemIsBusy && iconDefaultLoader ? iconDefaultLoader : item.icon"></a11y-icon>
         <span *ngIf="isLabelNormal" menu-item-label>{{ item.label }}</span>
-        <span menu-item-caret *ngIf="item.submenu?.length; else shortcutTemplate">&nbsp;</span>
+        <span menu-item-caret class="a11y-caret" *ngIf="item.submenu?.length; else shortcutTemplate">&nbsp;</span>
 
         <ng-template #shortcutTemplate>
             <span menu-item-shortcut *ngIf="showShortcut" [innerHTML]="shortcut?.visual ?? '&nbsp'"></span>
@@ -221,15 +221,13 @@ export class MenuItemComponent implements OnInit, OnDestroy {
 
     private readonly destroy$: Subject<void> = new Subject<void>();
 
-    constructor(
-        private hostElement: ElementRef<HTMLElement>,
-        private menuService: MenuService,
-        private privateService: MenuPrivateService,
-        private mobileService: MobileService,
-        private announcerService: LiveAnnouncerService,
-        private cdr: ChangeDetectorRef,
-        @Inject(KeyboardNavigationService) private keyNav: KeyboardNavigationService
-    ) {}
+    private readonly hostElement: ElementRef<HTMLElement> = inject(ElementRef);
+    private readonly menuService: MenuService = inject(MenuService);
+    private readonly privateService: MenuPrivateService = inject(MenuPrivateService);
+    private readonly mobileService: MobileService = inject(MobileService);
+    private readonly announcerService: LiveAnnouncerService = inject(LiveAnnouncerService);
+    private readonly cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
+    private readonly keyNav: KeyboardNavigationService = inject(KeyboardNavigationService);
 
     ngOnInit(): void {
         this.itemPath = [...this.path, this.idx];

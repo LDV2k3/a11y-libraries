@@ -14,7 +14,7 @@ export const ERROR_SERVICE_PROVIDED_MORE_THAN_ONCE = (serviceClass: string): str
 export const ERROR_ROOT_CONFIG_CALLED_MORE_THAN_ONCE = (): string => {
     const msg: string = `
         ${libName}:
-        A11yMobileModule.rootConfig() has been called more than once.
+        A11yMobileModule.rootConfig() or provideA11yMobile() has been called more than once.
         Please, use this method just one time at a root level to establish the global config for Mobile used in your project.
     `;
     return formatConsoleMsg(msg);

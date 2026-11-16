@@ -1,4 +1,5 @@
 import { TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
+import { PLATFORM_ID } from '@angular/core';
 
 import { MenuFactoryService } from './menu.factory.service';
 import { MenuService } from './menu.service';
@@ -13,10 +14,11 @@ describe('MenuFactoryService', () => {
 
     describe('"createContainer()" method', () => {
         it('should abort when there is no document', () => {
-            spyOn(window, 'clearTimeout');
+            TestBed.resetTestingModule();
+            TestBed.configureTestingModule({ providers: [{ provide: PLATFORM_ID, useValue: 'server' }] });
+            service = TestBed.inject(MenuFactoryService);
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (service as any).document = null;
+            spyOn(window, 'clearTimeout');
 
             service.createContainer();
             expect(window.clearTimeout).not.toHaveBeenCalled();

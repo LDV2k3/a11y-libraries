@@ -157,6 +157,8 @@ export type MenuMainConfig = Omit<
         focusItemWhenOpen: 'first' | 'last' | undefined;
         /** @description To make the label of the groups (stacked layouts) visible. @default true */
         showGroupLabels: boolean;
+        /** @description Shows a caret on the menu trigger. @default false */
+        showCaret: boolean;
         /**
          * @description
          * The desired position and alignment to open the main menu.

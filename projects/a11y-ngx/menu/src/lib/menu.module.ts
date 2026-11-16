@@ -19,7 +19,6 @@ import { MenuTooltipComponent } from './components/menu-tooltip.component';
 import { MenuItemCheckComponent } from './components/menu-item-check.component';
 import { MenuSeparatorComponent } from './components/menu-separator.component';
 
-import { MenuDummyConfigService, MenuDummyConfigCustomService } from './menu.module.providers.private';
 import { provideA11yMenu, provideA11yMenuFeature } from './menu.module.providers';
 
 import type { MenuCustomConfig, MenuConfig } from './menu.type';
@@ -41,11 +40,6 @@ import type { MenuCustomConfig, MenuConfig } from './menu.type';
     imports: [CommonModule, A11yThemeModule, A11yMobileModule, A11yLiveAnnouncerModule, A11yIconModule],
 })
 export class A11yMenuModule {
-    constructor(
-        private dummyService: MenuDummyConfigService,
-        private dummyServiceCustom: MenuDummyConfigCustomService
-    ) {}
-
     /**
      * @description
      * This method is meant to be used on the main application to override the global default configuration.

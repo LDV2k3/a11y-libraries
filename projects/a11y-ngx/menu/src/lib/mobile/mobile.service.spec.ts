@@ -1,5 +1,5 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { PLATFORM_ID, Component } from '@angular/core';
+import { PLATFORM_ID, Component, inject } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 
 import { A11yMobileModule } from './mobile.module';
@@ -8,7 +8,6 @@ import { provideA11yMobile } from './mobile.module.providers';
 import * as ERRORS from './mobile.errors';
 
 import { MobileService } from './mobile.service';
-import { MobileDummyConfigService } from './mobile.module.providers.private';
 
 type TestMediaQueryList = {
     matches: boolean;
@@ -47,9 +46,9 @@ describe('MobileService', () => {
     });
 
     describe('when provided more than once', () => {
-        @Component({ providers: [MobileService] })
+        @Component({ template: '', providers: [MobileService] })
         class TestMobileDuplicatedServiceRootComponent {
-            constructor(private service: MobileService) {}
+            private service: MobileService = inject(MobileService);
         }
 
         beforeEach(() => {
@@ -108,9 +107,6 @@ describe('MobileService', () => {
         it('should initialize with a custom breakpoint provided via provideA11yMobile() provider', () => {
             TestBed.resetTestingModule();
             TestBed.configureTestingModule({ providers: [provideA11yMobile({ breakpoint: 1000 })] });
-            // Needed so the provider can work properly,
-            // in a real world scenario the main lib has to import the A11yMobileModule
-            TestBed.inject(MobileDummyConfigService);
             service = TestBed.inject(MobileService);
 
             expect(window.matchMedia).toHaveBeenCalledWith('(max-width: 1000px)');

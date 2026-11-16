@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef } from '@angular/core';
 
 @Component({
     selector: 'a11y-live-announcer',
@@ -7,19 +7,18 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/
     host: {
         class: 'a11y-visually-hidden',
         'aria-atomic': 'true',
-        '[attr.aria-hidden]': 'ariaLiveHidden',
         '[attr.aria-live]': `ariaLivePolite ? 'polite' : 'assertive'`,
     },
 })
 export class LiveAnnouncerComponent {
     ariaLiveMessage: string = '';
 
-    protected ariaLiveHidden: boolean = true;
     protected ariaLivePolite: boolean = true;
 
     private ariaLiveTimeout!: ReturnType<typeof setTimeout>;
 
-    constructor(private cdr: ChangeDetectorRef) {}
+    private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
+    private readonly cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
 
     /**
      * @description
@@ -28,8 +27,10 @@ export class LiveAnnouncerComponent {
     announce(message: string, doItPolite: boolean): void {
         clearTimeout(this.ariaLiveTimeout);
 
+        const host: HTMLElement = this.host.nativeElement;
+
         this.ariaLivePolite = doItPolite;
-        this.ariaLiveHidden = false;
+        host.removeAttribute('aria-hidden');
         this.cdr.detectChanges();
 
         setTimeout(() => {
@@ -39,7 +40,7 @@ export class LiveAnnouncerComponent {
 
         this.ariaLiveTimeout = setTimeout(() => {
             this.ariaLivePolite = true;
-            this.ariaLiveHidden = true;
+            host.setAttribute('aria-hidden', 'true');
             this.cdr.detectChanges();
         }, 3000);
     }

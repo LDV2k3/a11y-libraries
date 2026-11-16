@@ -16,9 +16,13 @@ It's built with WCAG 2.1/2.2 AA compliance in mind:
 >
 > 🛑 It is **not** a navigation menu. If your goal is simply to route users across different pages of your website, use a semantic HTML `<nav>` with standard links instead.
 
-![Angular support from version 12 up to version 21](https://img.shields.io/badge/Angular-v12_to_v21-darkgreen?logo=angular)
+## Documentation & Live Examples
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.0 to ensure compatibility with a wide range of Angular versions. It has been tested up to v21.
+> Explore the API references, interactive configurations, and live examples on the official [Menu Showroom page](https://a11y-ngx.dev/menu).
+
+![Angular support from version 14 up to version 22](https://img.shields.io/badge/Angular-v14_to_v22-darkgreen?logo=angular)
+
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.2 to ensure compatibility with a wide range of Angular versions. It has been tested up to v22.
 
 ## Changelog
 
@@ -35,6 +39,7 @@ See the complete [changelog](https://github.com/LDV2k3/a11y-libraries/blob/maste
     - [The General Config](#the-general-config)
       - [The Menu Label](#the-menu-label)
       - [Show Group Labels](#show-group-labels)
+      - [Show Caret](#show-caret)
       - [The Class Names](#the-class-names)
       - [Allow Navigate Disabled Items](#allow-navigate-disabled-items)
       - [The Throttle](#the-throttle)
@@ -186,7 +191,7 @@ Use the module's `rootConfig()` method or `provideA11yMenu()` to establish and o
 >
 > On a library or sub-module, check [How to Build a Custom Menu Wrapper section](#advanced-usage-building-a-custom-menu-wrapper).
 
-**On Angular v12 - v14:**
+**Via Module:**
 
 ```typescript
 import { A11yMenuModule } from '@a11y-ngx/menu';
@@ -202,7 +207,7 @@ import { A11yMenuModule } from '@a11y-ngx/menu';
 export class AppModule {}
 ```
 
-**On Angular v15+:**
+**Via Provider:**
 
 ```typescript
 import { provideA11yMenu } from '@a11y-ngx/menu';
@@ -231,6 +236,7 @@ Defines the fundamental setup of the menu, including essential accessibility lab
 | :------- | :--- | :-----: | :---------- |
 | `menuLabel` | `string` | `undefined` | See [the Menu Label](#the-menu-label) |
 | `showGroupLabels` | `boolean` | `true` | See [Show Group Labels](#show-group-labels) |
+| `showCaret` | `boolean` | `false` | See [Show Caret](#show-caret) |
 | `className` | `string` or `string[]` | `undefined` | See [the Class Names](#the-class-names) |
 | `allowNavigateDisabled` | `boolean` | `true` | See [Allow Navigate Disabled Items](#allow-navigate-disabled-items) |
 | `throttleMs` | `number` | `50` | See [the Throttle](#the-throttle) |
@@ -265,6 +271,18 @@ When a group of stacked items is created and a label is assigned to it, that lab
 - **Property:** `showGroupLabels`
 - **Type:** `boolean`
 - **Default:** `true`
+
+##### Show Caret
+
+Appends a visual caret indicator to the trigger.
+
+- **Property:** `showCaret`
+- **Type:** `boolean`
+- **Default:** `false`
+
+> 💡 When `showCaret` is enabled, a `<span class="a11y-caret"></span>` element is automatically appended to the trigger. Please provide your own CSS to style and position it according to your design system.
+>
+> It uses `mask-image` for display, so consider using `background-color` to change its color.
 
 ##### The Class Names
 
@@ -533,7 +551,7 @@ You can configure the theme at three different levels:
 
 If you are using multiple `@a11y-ngx` libraries, you can set the theme once for the entire ecosystem using either the module or the provider. This prevents you from having to configure the theme individually for each library you install.
 
-**On Angular v12 - v14:**
+**Via Module:**
 
 ```typescript
 import { A11yThemeModule } from '@a11y-ngx/theme';
@@ -546,7 +564,7 @@ import { A11yThemeModule } from '@a11y-ngx/theme';
 export class AppModule {}
 ```
 
-**On Angular v15+:**
+**Via Provider:**
 
 ```typescript
 import { provideA11yTheme } from '@a11y-ngx/theme';
@@ -615,17 +633,17 @@ The library uses CSS Variables. This provides a cleaner, CSS-native way to custo
 | `--menu-border-color` | `#656565` | `#666` |
 | `--menu-shadow-color` | `#444` | `#444` |
 | `--menu-item-bg-color` | `transparent` | `transparent` |
-| `--menu-item-text-color` | `#222` | `#fff` |
+| `--menu-item-text-color` | `#222` | `#f0f0f0` |
 | `--menu-item-hover-bg-color` | `#ddd` | `#393939` |
-| `--menu-item-hover-text-color` | `#222` | `#fff` |
+| `--menu-item-hover-text-color` | `#222` | `#f0f0f0` |
 | `--menu-item-disabled-bg-color` | `transparent` | `transparent` |
-| `--menu-item-disabled-text-color` | `#949494` | `#7a7a7a` |
+| `--menu-item-disabled-text-color` | `#949494` | `#6d6d6d` |
 | `--menu-item-disabled-hover-bg-color` | `#ddd` | `#393939` |
 | `--menu-item-focus-color` | `#7d7d7d` | `#828282` |
 | `--menu-shortcut-text-color` | `#5f5f5f` | `#bcbcbc` |
 | `--menu-separator-border-color` | `#656565` | `#666` |
 | `--menu-tooltip-bg-color` | `#ddd` | `#393939` |
-| `--menu-tooltip-text-color` | `#222` | `#fff` |
+| `--menu-tooltip-text-color` | `#222` | `#f0f0f0` |
 | `--menu-tooltip-border-color` | `#7d7d7d` | `#828282` |
 | `--menu-panel-bg-color` | `#e5e5e5` | `#333333` |
 | `--menu-panel-text-color` | `currentColor` | `currentColor` |
@@ -1731,12 +1749,15 @@ This method generates an isolated configuration to ensure your custom component 
 
 Accepts a single parameter `config` of type [`MenuCustomConfig`](#the-menucustomconfig-object).
 
-**On Angular v12 - v14:**
+**Via Module:**
+
+For `NgModule`-based features declaring non-standalone components or directives that rely on `A11yMenuModule`.
 
 ```typescript
 import { A11yMenuModule } from '@a11y-ngx/menu';
 
 @NgModule({
+    ...,
     imports: [
         A11yMenuModule.customConfig({
             selector: 'a11y-menu.my-context-menu',
@@ -1748,12 +1769,15 @@ import { A11yMenuModule } from '@a11y-ngx/menu';
 export class MyContextMenuModule {}
 ```
 
-**On Angular v15+:**
+**Via Provider:**
+
+For `NgModule` or route-level features without importing the full `A11yMenuModule`.
 
 ```typescript
 import { provideA11yMenuFeature } from '@a11y-ngx/menu';
 
-export const contextMenuProviders = {
+@NgModule({
+    ...,
     providers: [
         provideA11yMenuFeature({
             selector: 'a11y-menu.my-context-menu',
@@ -1761,7 +1785,33 @@ export const contextMenuProviders = {
             offsetSubmenu: 5,
         }),
     ],
-};
+})
+export class MyContextMenuModule {};
+```
+
+**Via Injection Context:**
+
+For standalone directives and components to self-register their configuration without a wrapper `NgModule`.
+
+```typescript
+import { injectA11yMenuFeature } from '@a11y-ngx/menu';
+
+@Directive({
+    selector: '[myContextMenu]',
+    standalone: true,
+    ...,
+})
+export class MyContextMenuDirective {
+    ...,
+
+    constructor() {
+        injectA11yMenuFeature({
+            selector: 'a11y-menu.my-context-menu',
+            className: 'my-context-menu',
+            offsetSubmenu: 5,
+        });
+    }
+}
 ```
 
 ### The `MenuCustomConfig` Object
@@ -1773,7 +1823,7 @@ This object accepts all the properties from [`MenuConfig`](#global-configuration
 | `selector` | `string` | `undefined` | See [the Selector](#the-selector) |
 | `closeOnClickOutside` | `boolean` | `true` | See [Close On Click Outside](#close-on-click-outside) |
 | `closeOnTab` | `boolean` | `true` | See [Close On Tab](#close-on-tab) |
-| `positionsAllowed` | `OverlayPositionsAllowedInput` | `'auto'` | See [the Positions Allowed](#the-positions-allowed) |
+| `positionsAllowed` | `OverlayBasePositionsAllowed` | `'auto'` | See [the Positions Allowed](#the-positions-allowed) |
 | `focusItemWhenOpen` | `'first'`, `'last'` or `undefined` | `undefined` | See [Focus Item When Open](#focus-item-when-open) |
 
 #### The Selector
@@ -1810,7 +1860,7 @@ Determines whether the menu should automatically close when the user presses the
 Defines the allowed fallback positions when there is not enough viewport space to render the menu in its primary direction.
 
 - **Property:** `positionsAllowed` ⭕ _(optional)_
-- **Type:** `OverlayPositionsAllowedInput`
+- **Type:** `OverlayBasePositionsAllowed`
 - **Default:** `'auto'` 👉 Meaning that all positions are allowed (top, bottom, left and right)
 
 > 💡 Please refer to [The Positions Allowed Input](https://www.npmjs.com/package/@a11y-ngx/overlay-base#the-positions-allowed-input) within the Overlay Base Library for more details.
@@ -1883,7 +1933,7 @@ A11yMenuModule.customConfig({
 **The Context Menu Directive:**
 
 ```typescript
-import { Directive, Input, Output, OnDestroy, EventEmitter } from '@angular/core';
+import { Directive, Input, Output, inject, OnDestroy, EventEmitter } from '@angular/core';
 import { merge, Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 
@@ -1903,7 +1953,8 @@ export class MyContextMenuDirective implements OnDestroy {
 
     private readonly destroy$: Subject<void> = new Subject<void>();
 
-    constructor(private menuService: MenuService, private menuDirector: MenuDirectorService) {}
+    private readonly menuService: MenuService = inject(MenuService);
+    private readonly menuDirector: MenuDirectorService = inject(MenuDirectorService);
 
     ngOnDestroy(): void {
         // We destroy the entire menu when host gets removed from the DOM
@@ -1952,7 +2003,7 @@ export class MyContextMenuDirective implements OnDestroy {
 
 ```typescript
 // Your context menu items
-myContextMenuItems: Menu = [
+readonly myContextMenuItems: Menu = [
     {
         label: 'Reload',
         value: 'reload',
@@ -2000,7 +2051,7 @@ By default, when the menu detects a small viewport, it automatically becomes a b
 
 > 💡 **Customizing the Breakpoint:** The drawer triggers at `768px` by default. You can override this globally by passing a custom pixel value to the configuration object during your app setup:
 >
-> **On Angular v12 - v14:**
+> **Via Module:**
 >
 > ```typescript
 > import { A11yMobileModule } from '@a11y-ngx/menu';
@@ -2013,7 +2064,7 @@ By default, when the menu detects a small viewport, it automatically becomes a b
 > export class AppModule {}
 > ```
 >
-> **On Angular v15+:**
+> **Via Provider:**
 >
 > ```typescript
 > import { provideA11yMobile } from '@a11y-ngx/menu';

@@ -1,13 +1,13 @@
 import {
+    PLATFORM_ID,
     Injectable,
-    Inject,
-    Injector,
-    ComponentFactoryResolver,
+    inject,
     ComponentRef,
     ApplicationRef,
     EmbeddedViewRef,
+    createComponent,
 } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 
 import { MenuService } from './menu.service';
 import { MobileService } from './mobile/mobile.service';
@@ -23,22 +23,19 @@ export class MenuFactoryService {
     private destroyContainerTimeout!: ReturnType<typeof setTimeout>;
     private destroyMs: number = 0;
 
-    constructor(
-        private componentFactoryResolver: ComponentFactoryResolver,
-        private appRef: ApplicationRef,
-        private injector: Injector,
-        private service: MenuService,
-        private mobileService: MobileService,
+    private readonly appRef: ApplicationRef = inject(ApplicationRef);
+    private readonly service: MenuService = inject(MenuService);
+    private readonly mobileService: MobileService = inject(MobileService);
 
-        @Inject(DOCUMENT) private document: Document | null
-    ) {}
+    private readonly document: Document = inject(DOCUMENT);
+    private readonly platformId = inject(PLATFORM_ID);
 
     /**
      * @description
      * Creates the container for menus and attaches it to the body.
      */
     createContainer(): void {
-        if (!this.document) return;
+        if (!isPlatformBrowser(this.platformId)) return;
 
         clearTimeout(this.destroyContainerTimeout);
 
@@ -47,9 +44,7 @@ export class MenuFactoryService {
 
         if (!this.containerRef) {
             // Creates the Container component reference
-            this.containerRef = this.componentFactoryResolver
-                .resolveComponentFactory(MenuContainerComponent)
-                .create(this.injector);
+            this.containerRef = createComponent(MenuContainerComponent, { environmentInjector: this.appRef.injector });
 
             // Attaches the view to the app.
             this.appRef.attachView(this.containerRef.hostView);
@@ -90,9 +85,9 @@ export class MenuFactoryService {
         isRoot: boolean = false
     ): ComponentRef<MenuComponent> {
         // Creates the Menu component reference
-        const menuRef: ComponentRef<MenuComponent> = this.componentFactoryResolver
-            .resolveComponentFactory(MenuComponent)
-            .create((this.containerRef as ComponentRef<MenuContainerComponent>).injector);
+        const menuRef: ComponentRef<MenuComponent> = (
+            this.containerRef as ComponentRef<MenuContainerComponent>
+        ).instance.container.createComponent(MenuComponent);
 
         // Assigns the data to the Menu component instance
         const { items, path, label, config: customConfig = {} } = content;
@@ -120,9 +115,6 @@ export class MenuFactoryService {
             initialScale,
             allowScrollListener,
         });
-
-        // Inserts the component within the container
-        (this.containerRef as ComponentRef<MenuContainerComponent>).instance.container.insert(menuRef.hostView);
 
         // Pushes a new state into the window's history (mobile only)
         this.mobileService.pushMobileState();

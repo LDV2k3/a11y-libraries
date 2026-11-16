@@ -1,12 +1,12 @@
 import { ComponentFixture, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { Component, ElementRef, Input, NgModule, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, Input, NgModule, ViewChild } from '@angular/core';
 import { DOCUMENT, CommonModule } from '@angular/common';
 import { of } from 'rxjs';
 import { delay } from 'rxjs/operators';
 
 import { provideA11yIcon } from '@a11y-ngx/icon';
-import { provideA11yTheme, Theme } from '@a11y-ngx/theme';
+import { provideA11yTheme } from '@a11y-ngx/theme';
 
 import { A11yMenuModule } from './menu.module';
 import { provideA11yMenu, provideA11yMenuFeature } from './menu.module.providers';
@@ -53,7 +53,7 @@ class MenuTestFeatureComponent {
 
     @ViewChild('trigger', { static: true }) trigger!: ElementRef<HTMLButtonElement>;
 
-    constructor(private director: MenuDirectorService) {}
+    private director: MenuDirectorService = inject(MenuDirectorService);
 
     openFeatureMenu(): void {
         this.director.createRootMenu(this.trigger.nativeElement, [{ label: 'item1' }], '.a11y-theme-menu', this.config);
@@ -366,57 +366,6 @@ describe('Menu Integration', () => {
                     const item: HTMLElement = getItem(getMenu(0), 1);
                     mouseEnterItem(item);
                     expect(item.getAttribute('active-item')).toEqual('');
-                })
-            );
-        });
-
-        describe('Repeated key event prevention', () => {
-            const commonPreventKeysExpect = (event: KeyboardEvent): void => {
-                spyOn(event, 'stopImmediatePropagation');
-                spyOn(event, 'preventDefault');
-                container.dispatchEvent(event);
-
-                expect(event.stopImmediatePropagation).toHaveBeenCalled();
-                expect(event.preventDefault).toHaveBeenCalled();
-            };
-
-            it(
-                'should call preventDefault and stopImmediatePropagation on repeated "End" key press',
-                autoFlush(() => {
-                    openMenu();
-                    sendKey('End');
-
-                    // We create the custom event for the second pressing
-                    const endEvent = new KeyboardEvent('keydown', { code: 'End', bubbles: true, cancelable: true });
-                    commonPreventKeysExpect(endEvent);
-                })
-            );
-
-            it(
-                'should call preventDefault and stopImmediatePropagation on repeated "Home" key press',
-                autoFlush(() => {
-                    openMenu();
-                    sendKey('Home');
-
-                    // We create the custom event for the second pressing
-                    const homeEvent = new KeyboardEvent('keydown', { code: 'Home', bubbles: true, cancelable: true });
-                    commonPreventKeysExpect(homeEvent);
-                })
-            );
-
-            it(
-                'should call preventDefault and stopImmediatePropagation on repeated "ArrowLeft" key press',
-                autoFlush(() => {
-                    openMenu();
-                    sendKey('ArrowLeft');
-
-                    // We create the custom event for the second pressing
-                    const arrowEvent = new KeyboardEvent('keydown', {
-                        code: 'ArrowLeft',
-                        bubbles: true,
-                        cancelable: true,
-                    });
-                    commonPreventKeysExpect(arrowEvent);
                 })
             );
         });
@@ -4142,7 +4091,12 @@ describe('Menu Integration', () => {
         let componentFeature: MenuTestFeatureComponent;
         let fixtureFeature: ComponentFixture<MenuTestFeatureComponent>;
 
-        beforeEach(() => TestBed.resetTestingModule());
+        beforeEach(() => {
+            localStorage.removeItem('a11yTheme');
+            TestBed.resetTestingModule();
+        });
+
+        type Theme = 'light' | 'dark';
 
         const setupThemeTestBed = (
             config: {

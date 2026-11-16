@@ -1,4 +1,4 @@
-import { PLATFORM_ID, Injectable, Inject, OnDestroy, Optional, SkipSelf } from '@angular/core';
+import { PLATFORM_ID, Injectable, OnDestroy, inject } from '@angular/core';
 import { Subject } from 'rxjs';
 
 import { WINDOW } from './mobile.module.providers.private';
@@ -47,13 +47,13 @@ export class MobileService implements OnDestroy {
     /** @description To _announce_ when the mobile breakpoint changed. @note `true` when is mobile, `false` when is desktop. */
     readonly mobileStateChanged$: Subject<boolean> = new Subject<boolean>();
 
-    constructor(
-        private rootService: MobileRootService,
-        @Inject(PLATFORM_ID) private platformId: string,
-        @Inject(DOCUMENT) private document: Document,
-        @Inject(WINDOW) private window: Window,
-        @Optional() @SkipSelf() private parentService: MobileService | null
-    ) {
+    private readonly rootService: MobileRootService = inject(MobileRootService);
+    private readonly document: Document = inject(DOCUMENT);
+    private readonly window: Window = inject(WINDOW);
+    private readonly platformId = inject(PLATFORM_ID);
+    private readonly parentService: MobileService | null = inject(MobileService, { optional: true, skipSelf: true });
+
+    constructor() {
         this.isPlatformBrowser = isPlatformBrowser(this.platformId);
         if (!this.isPlatformBrowser) return;
 

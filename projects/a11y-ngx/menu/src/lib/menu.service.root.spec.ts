@@ -4,7 +4,7 @@ import { MenuRootService } from './menu.service.root';
 
 import * as ERRORS from './menu.errors';
 
-import type { MenuConfig, MenuCustomConfig } from './menu.type';
+import type { MenuConfig } from './menu.type';
 
 describe('MenuRootService', () => {
     let service: MenuRootService;
@@ -16,44 +16,35 @@ describe('MenuRootService', () => {
 
     describe('when saving a custom config', () => {
         it('should throw an error for a non-allowed selector', () => {
-            expect(() => service.initCustomConfigs([{ selector: 'a11y-menu', className: '' }])).toThrowError(
+            expect(() => service.initCustomConfig({ selector: 'a11y-menu', className: '' })).toThrowError(
                 ERRORS.ERROR_INIT_CUSTOM_CONFIG_SELECTOR_NOT_ALLOWED()
             );
         });
 
-        it('should abort for undefined configs', () => {
-            spyOn(service, 'updateConfig');
-            service.initCustomConfigs(undefined as unknown as MenuCustomConfig[]);
-            expect(service.updateConfig).not.toHaveBeenCalled();
-        });
-
         it('should throw an error for a selector with no length', () => {
             spyOn(console, 'warn');
-            service.initCustomConfigs([{ selector: ' ', className: '' }]);
+            service.initCustomConfig({ selector: ' ', className: '' });
             expect(console.warn).toHaveBeenCalledWith(ERRORS.ERROR_INIT_CUSTOM_CONFIG_SELECTOR_EMPTY());
         });
 
         it('should throw an error for an undefined selector', () => {
             spyOn(console, 'warn');
-            service.initCustomConfigs([{ selector: undefined as unknown as string, className: '' }]);
+            service.initCustomConfig({ selector: undefined as unknown as string, className: '' });
             expect(console.warn).toHaveBeenCalledWith(ERRORS.ERROR_INIT_CUSTOM_CONFIG_SELECTOR_EMPTY());
         });
 
-        it('should throw an error for a selector that has already been provided', () => {
-            spyOn(console, 'warn');
-            service.initCustomConfigs([
-                { selector: 'test-menu-selector', className: '' },
-                { selector: 'test-menu-selector', className: '' },
-            ]);
-            expect(console.warn).toHaveBeenCalledWith(
-                ERRORS.ERROR_INIT_CUSTOM_CONFIG_SELECTOR_ALREADY_PROVIDED('test-menu-selector')
-            );
+        it('should stop (early return) when a selector has already been provided', () => {
+            spyOn(service, 'updateConfig');
+            service.initCustomConfig({ selector: 'test-menu-selector', className: '' });
+            expect(service.updateConfig).toHaveBeenCalledTimes(1);
+            service.initCustomConfig({ selector: 'test-menu-selector', className: '' });
+            expect(service.updateConfig).toHaveBeenCalledTimes(1);
         });
 
         it('should throw an error for a selector that does not exist', () => {
             spyOn(console, 'warn');
 
-            service.initCustomConfigs([{ selector: 'test-menu-selector', className: '' }]);
+            service.initCustomConfig({ selector: 'test-menu-selector', className: '' });
             service.updateConfig('test-menu-selector-unexisting', { className: '' });
 
             expect(console.warn).toHaveBeenCalledWith(
@@ -88,7 +79,7 @@ describe('MenuRootService', () => {
 
     describe('when getting a custom config', () => {
         const config = { selector: 'selector-a', className: 'selector-a', closeOnTab: false };
-        beforeEach(() => service.initCustomConfigs([config]));
+        beforeEach(() => service.initCustomConfig(config));
 
         it('should return the saved config for the given selector', () => {
             expect(service.getFeatureConfig('selector-a')).toEqual(config);

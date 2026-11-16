@@ -66,14 +66,6 @@ export const ERROR_INIT_CUSTOM_CONFIG_SELECTOR_EMPTY = (): string => {
     return formatConsoleMsg(msg);
 };
 
-export const ERROR_INIT_CUSTOM_CONFIG_SELECTOR_ALREADY_PROVIDED = (selector: string): string => {
-    const msg: string = `
-        ${libName}:
-        The selector "${selector}" was already provided, this instance will be ignored.
-    `;
-    return formatConsoleMsg(msg);
-};
-
 export const ERROR_UPDATE_CONFIG_SELECTOR_UNEXISTING = (selector: string): string => {
     const msg: string = `
         ${libName}:

@@ -1,5 +1,5 @@
 import { TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
-import { PLATFORM_ID, Component, ApplicationRef, ComponentRef } from '@angular/core';
+import { PLATFORM_ID, Component, ApplicationRef, ComponentRef, inject } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 
 import { LiveAnnouncerService } from './announcer.service';
@@ -48,9 +48,9 @@ describe('LiveAnnouncerService', () => {
      */
 
     describe('when provided more than once', () => {
-        @Component({ providers: [LiveAnnouncerService] })
+        @Component({ template: '', providers: [LiveAnnouncerService] })
         class TestAnnouncerDuplicatedServiceComponent {
-            constructor(private service: LiveAnnouncerService) {}
+            private service: LiveAnnouncerService = inject(LiveAnnouncerService);
         }
 
         beforeEach(() => {
@@ -80,7 +80,7 @@ describe('LiveAnnouncerService', () => {
                 service.announce('test');
                 tickAt(75);
                 expect(announcer.getAttribute('aria-live')).toEqual('polite');
-                expect(announcer.getAttribute('aria-hidden')).toEqual('false');
+                expect(announcer.getAttribute('aria-hidden')).toBeNull();
 
                 tickAt(100 + 3000);
                 expect(announcer.getAttribute('aria-live')).toEqual('polite');
@@ -105,7 +105,7 @@ describe('LiveAnnouncerService', () => {
                 service.interrupt('test');
                 tickAt(75);
                 expect(announcer.getAttribute('aria-live')).toEqual('assertive');
-                expect(announcer.getAttribute('aria-hidden')).toEqual('false');
+                expect(announcer.getAttribute('aria-hidden')).toBeNull();
 
                 tickAt(100 + 3000);
                 expect(announcer.getAttribute('aria-live')).toEqual('polite');

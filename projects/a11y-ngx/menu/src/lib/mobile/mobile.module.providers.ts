@@ -1,12 +1,8 @@
-import { Provider } from '@angular/core';
+import { ENVIRONMENT_INITIALIZER, Provider, inject } from '@angular/core';
 
 import { MobileRootService } from './mobile.service.root';
 
-import {
-    MOBILE_CONFIG_INJECTOR,
-    MobileDummyConfigService,
-    initMobileRootConfigFactory,
-} from './mobile.module.providers.private';
+import { ERROR_ROOT_CONFIG_CALLED_MORE_THAN_ONCE } from './mobile.errors';
 
 import type { MobileConfig } from './mobile.type';
 
@@ -16,11 +12,16 @@ import type { MobileConfig } from './mobile.type';
  */
 export function provideA11yMobile(config: MobileConfig): Provider[] {
     return [
-        { provide: MOBILE_CONFIG_INJECTOR, useValue: config },
         {
-            provide: MobileDummyConfigService,
-            useFactory: initMobileRootConfigFactory,
-            deps: [MobileRootService, MOBILE_CONFIG_INJECTOR],
+            provide: ENVIRONMENT_INITIALIZER,
+            useValue: () => {
+                const service: MobileRootService = inject(MobileRootService);
+
+                if (service.isRootConfigAlreadyProvided) throw new Error(ERROR_ROOT_CONFIG_CALLED_MORE_THAN_ONCE());
+
+                service.initRootConfig(config);
+            },
+            multi: true,
         },
     ];
 }

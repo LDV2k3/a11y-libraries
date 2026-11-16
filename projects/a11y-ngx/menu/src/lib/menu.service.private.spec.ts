@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { PLATFORM_ID } from '@angular/core';
 
 import { MenuPrivateService } from './menu.service.private';
 import { MobileService } from './mobile/mobile.service';
@@ -15,18 +16,18 @@ describe('MenuPrivateService', () => {
         service = TestBed.inject(MenuPrivateService);
     });
 
-    describe(`Window's navigator (SSR)`, () => {
-        it('should fallback to null and set isMac to false if window is NOT defined', () => {
+    describe('Server Side Rendering (SSR)', () => {
+        it('should fallback to null and set "isMac" to false if platform is NOT browser', () => {
             TestBed.resetTestingModule();
-            TestBed.configureTestingModule({ providers: [MenuPrivateService, { provide: WINDOW, useValue: null }] });
+            TestBed.configureTestingModule({ providers: [{ provide: PLATFORM_ID, useValue: 'server' }] });
             service = TestBed.inject(MenuPrivateService);
 
             expect(service['isMac']).toBeFalse();
         });
 
-        it('should fallback to empty string and set isMac to false if navigator is undefined', () => {
+        it('should fallback to empty string and set "isMac" to false if navigator is undefined', () => {
             TestBed.resetTestingModule();
-            TestBed.configureTestingModule({ providers: [MenuPrivateService, { provide: WINDOW, useValue: {} }] });
+            TestBed.configureTestingModule({ providers: [{ provide: WINDOW, useValue: {} }] });
             service = TestBed.inject(MenuPrivateService);
 
             expect(service['isMac']).toBeFalse();

@@ -1,12 +1,13 @@
 import {
+    PLATFORM_ID,
     Injectable,
-    Injector,
-    Inject,
-    ComponentFactoryResolver,
+    inject,
     ComponentRef,
     ApplicationRef,
     EmbeddedViewRef,
+    createComponent,
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 import { MobileService } from './mobile/mobile.service';
 import { WINDOW } from './menu.module.providers.private';
@@ -26,17 +27,19 @@ export class MenuPrivateService {
 
     private readonly isMac: boolean;
 
-    constructor(
-        private componentFactoryResolver: ComponentFactoryResolver,
-        private appRef: ApplicationRef,
-        private injector: Injector,
-        private mobileService: MobileService,
-        @Inject(WINDOW) private window: Window | null
-    ) {
-        if (this.window) {
-            const userAgent: string = this.window.navigator?.userAgent ?? '';
-            this.isMac = /(macintosh|iphone|ipad|ipod)/i.test(userAgent);
-        } else this.isMac = false;
+    private readonly appRef: ApplicationRef = inject(ApplicationRef);
+    private readonly mobileService: MobileService = inject(MobileService);
+    private readonly window: Window = inject(WINDOW);
+    private readonly platformId = inject(PLATFORM_ID);
+
+    constructor() {
+        if (!isPlatformBrowser(this.platformId)) {
+            this.isMac = false;
+            return;
+        }
+
+        const userAgent: string = this.window.navigator?.userAgent ?? '';
+        this.isMac = /(macintosh|iphone|ipad|ipod)/i.test(userAgent);
     }
 
     /**
@@ -132,9 +135,9 @@ export class MenuPrivateService {
         shortcut?: MenuItemShortcutConfig
     ): ComponentRef<MenuTooltipComponent> {
         // Creates the Tooltip component reference
-        const tooltipRef: ComponentRef<MenuTooltipComponent> = this.componentFactoryResolver
-            .resolveComponentFactory(MenuTooltipComponent)
-            .create(this.injector);
+        const tooltipRef: ComponentRef<MenuTooltipComponent> = createComponent(MenuTooltipComponent, {
+            environmentInjector: this.appRef.injector,
+        });
 
         // Config the Tooltip instance
         tooltipRef.instance.trigger = trigger;

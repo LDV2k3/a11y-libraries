@@ -1,15 +1,12 @@
 import {
     PLATFORM_ID,
     Injectable,
-    Inject,
-    Injector,
+    inject,
     OnDestroy,
-    Optional,
-    SkipSelf,
-    ComponentFactoryResolver,
     ComponentRef,
     ApplicationRef,
     EmbeddedViewRef,
+    createComponent,
 } from '@angular/core';
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 
@@ -21,14 +18,15 @@ import { LiveAnnouncerComponent } from './announcer.component';
 export class LiveAnnouncerService implements OnDestroy {
     private announcerRef!: ComponentRef<LiveAnnouncerComponent>;
 
-    constructor(
-        private componentFactoryResolver: ComponentFactoryResolver,
-        private appRef: ApplicationRef,
-        private injector: Injector,
-        @Inject(PLATFORM_ID) private platformId: string,
-        @Inject(DOCUMENT) private document: Document,
-        @Optional() @SkipSelf() private parentService: LiveAnnouncerService | null
-    ) {
+    private readonly appRef: ApplicationRef = inject(ApplicationRef);
+    private readonly document: Document = inject(DOCUMENT);
+    private readonly platformId = inject(PLATFORM_ID);
+    private readonly parentService: LiveAnnouncerService | null = inject(LiveAnnouncerService, {
+        optional: true,
+        skipSelf: true,
+    });
+
+    constructor() {
         if (this.parentService) throw Error(ERROR_SERVICE_PROVIDED_MORE_THAN_ONCE('LiveAnnouncerService'));
 
         this.createAnnouncer();
@@ -76,9 +74,7 @@ export class LiveAnnouncerService implements OnDestroy {
         if (!isPlatformBrowser(this.platformId)) return;
 
         // Creates the Live Announcer component reference
-        this.announcerRef = this.componentFactoryResolver
-            .resolveComponentFactory(LiveAnnouncerComponent)
-            .create(this.injector);
+        this.announcerRef = createComponent(LiveAnnouncerComponent, { environmentInjector: this.appRef.injector });
 
         // Attaches the view to the app.
         this.appRef.attachView(this.announcerRef.hostView);

@@ -166,29 +166,6 @@ describe('MenuContainerComponent', () => {
                     expect(service.navigateFrom).not.toHaveBeenCalled();
                 });
             });
-
-            ['Home', 'End', 'ArrowLeft', 'ArrowRight'].forEach((code) => {
-                it(`should prevent and stop on second pressing of "${code}" key`, () => {
-                    setItems([{ label: 'item1' }, { label: 'item2' }]);
-
-                    let event: KeyboardEvent;
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    spyOn<any>(component, 'executeNavigation');
-
-                    event = new KeyboardEvent('keydown', { code });
-                    container.dispatchEvent(event);
-                    expect(component['executeNavigation']).toHaveBeenCalled();
-
-                    event = new KeyboardEvent('keydown', { code, cancelable: true });
-                    spyOn(event, 'preventDefault');
-                    spyOn(event, 'stopImmediatePropagation');
-
-                    container.dispatchEvent(event);
-                    expect(event.preventDefault).toHaveBeenCalled();
-                    expect(event.stopImmediatePropagation).toHaveBeenCalled();
-                    expect(component['executeNavigation']).toHaveBeenCalledTimes(1);
-                });
-            });
         });
 
         describe('Allow Navigation', () => {

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 
 import {
-    ERROR_INIT_CUSTOM_CONFIG_SELECTOR_ALREADY_PROVIDED,
     ERROR_INIT_CUSTOM_CONFIG_SELECTOR_EMPTY,
     ERROR_INIT_CUSTOM_CONFIG_SELECTOR_NOT_ALLOWED,
     ERROR_UPDATE_CONFIG_SELECTOR_UNEXISTING,
@@ -58,27 +57,24 @@ export class MenuRootService {
      * @description
      * Initializes the custom (feature level) configurations.
      */
-    initCustomConfigs(userCustomConfigs: MenuCustomConfig[]): void {
-        userCustomConfigs?.forEach((userConfig) => {
-            const selector: string = userConfig.selector?.trim() ?? '';
+    initCustomConfig(userConfig: MenuCustomConfig): void {
+        const selector: string = userConfig.selector?.trim() ?? '';
 
-            if (this.selectorNotAllowed(selector)) {
-                throw new Error(ERROR_INIT_CUSTOM_CONFIG_SELECTOR_NOT_ALLOWED());
-            }
+        if (this.customConfigsInitiated.includes(selector)) return;
 
-            if (!selector.length) {
-                console.warn(ERROR_INIT_CUSTOM_CONFIG_SELECTOR_EMPTY());
-                return;
-            } else if (this.customConfigsInitiated.includes(selector)) {
-                console.warn(ERROR_INIT_CUSTOM_CONFIG_SELECTOR_ALREADY_PROVIDED(selector));
-                return;
-            }
+        if (this.selectorNotAllowed(selector)) {
+            throw new Error(ERROR_INIT_CUSTOM_CONFIG_SELECTOR_NOT_ALLOWED());
+        }
 
-            this.customConfigsInitiated.push(selector);
-            this.configs[selector] = {};
+        if (!selector.length) {
+            console.warn(ERROR_INIT_CUSTOM_CONFIG_SELECTOR_EMPTY());
+            return;
+        }
 
-            this.updateConfig(selector, userConfig);
-        });
+        this.customConfigsInitiated.push(selector);
+        this.configs[selector] = {};
+
+        this.updateConfig(selector, userConfig);
     }
 
     /**

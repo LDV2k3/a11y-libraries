@@ -1,4 +1,4 @@
-import { Injectable, ComponentRef, TemplateRef } from '@angular/core';
+import { Injectable, inject, ComponentRef, TemplateRef } from '@angular/core';
 
 import { MenuDirectorPrivateService } from './menu.director.service.private';
 import { MenuService } from './menu.service';
@@ -10,7 +10,8 @@ import type { Menu } from './menu.type';
 
 @Injectable({ providedIn: 'root' })
 export class MenuDirectorService {
-    constructor(private service: MenuService, private directorPrivate: MenuDirectorPrivateService) {}
+    private readonly service: MenuService = inject(MenuService);
+    private readonly directorPrivate: MenuDirectorPrivateService = inject(MenuDirectorPrivateService);
 
     /**
      * @description

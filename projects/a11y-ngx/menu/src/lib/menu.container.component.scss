@@ -3,6 +3,7 @@
     &[aria-modal] {
         position: fixed;
         inset: 0;
+        z-index: calc(var(--menu-zindex, 9999) - 1);
         max-width: 100dvw;
         max-height: 100dvh;
         background: rgb(0 0 0 / 75%);

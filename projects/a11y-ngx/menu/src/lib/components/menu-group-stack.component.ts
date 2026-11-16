@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 
 import { MenuService } from '../menu.service';
 
@@ -35,7 +35,7 @@ export class MenuGroupStackComponent implements OnInit {
     /** @description The group class names. */
     protected groupClassNames: string[] = [];
 
-    constructor(private menuService: MenuService) {}
+    private readonly menuService: MenuService = inject(MenuService);
 
     ngOnInit(): void {
         const { items, showLabel, label = '', className } = this.group;

@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, OnInit, ElementRef } from '@angular/core';
+import { Component, Input, ViewChild, OnInit, inject, ElementRef } from '@angular/core';
 
 import { MenuService } from '../menu.service';
 
@@ -119,7 +119,7 @@ export class MenuGroupInlineComponent implements OnInit {
     protected groupClassNames: string[] = [];
     readonly groupItemsGridStyles: Partial<CSSStyleDeclaration> = {};
 
-    constructor(private menuService: MenuService) {}
+    private readonly menuService: MenuService = inject(MenuService);
 
     ngOnInit(): void {
         const {

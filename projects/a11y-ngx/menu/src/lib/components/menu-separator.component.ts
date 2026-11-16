@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef } from '@angular/core';
+import { Component, OnInit, inject, ElementRef } from '@angular/core';
 
 @Component({
     selector: 'a11y-menu-separator',
@@ -10,7 +10,7 @@ import { Component, OnInit, ElementRef } from '@angular/core';
     },
 })
 export class MenuSeparatorComponent implements OnInit {
-    constructor(private hostElement: ElementRef<HTMLElement>) {}
+    private readonly hostElement: ElementRef<HTMLElement> = inject(ElementRef);
 
     protected orientation: 'horizontal' | 'vertical' = 'horizontal';
 

@@ -8,6 +8,8 @@ import { MenuDirective } from './menu.directive';
 import { MenuService } from './menu.service';
 import { MobileService } from './mobile/mobile.service';
 
+import { provideA11yMenu } from './menu.module.providers';
+
 import { WINDOW } from './menu.module.providers.private';
 import * as ERRORS from './menu.errors';
 
@@ -142,8 +144,8 @@ describe('MenuDirective', () => {
         flush();
     };
 
-    beforeEach(async () => {
-        await TestBed.configureTestingModule({ imports: [MenuTestModule] }).compileComponents();
+    beforeEach(() => {
+        TestBed.configureTestingModule({ imports: [MenuTestModule] });
 
         fixture = TestBed.createComponent(MenuTestComponent);
         component = fixture.componentInstance;
@@ -190,6 +192,65 @@ describe('MenuDirective', () => {
                 expect(trigger.getAttribute('aria-expanded')).toEqual('false');
                 tick(16);
             }));
+        });
+    });
+
+    describe('Show Caret', () => {
+        beforeEach(() => {
+            setItems([{ label: 'item1' }]);
+            component.showTrigger = false;
+            fixture.detectChanges();
+        });
+
+        it('should NOT render the caret (default)', () => {
+            component.showTrigger = true;
+            fixture.detectChanges();
+
+            const caret = getTrigger().querySelector('span.a11y-caret');
+            expect(caret).toBeNull();
+        });
+
+        it('should render the caret', () => {
+            component.config = { showCaret: true };
+            component.showTrigger = true;
+            fixture.detectChanges();
+
+            const caret = getTrigger().querySelector('span.a11y-caret');
+            expect(caret).toBeTruthy();
+        });
+
+        describe('When configured within the module', () => {
+            beforeEach(() => {
+                TestBed.resetTestingModule();
+                TestBed.configureTestingModule({
+                    imports: [MenuTestModule],
+                    providers: [provideA11yMenu({ showCaret: true })],
+                });
+
+                fixture = TestBed.createComponent(MenuTestComponent);
+                component = fixture.componentInstance;
+
+                setItems([{ label: 'item1' }]);
+                component.showTrigger = false;
+                fixture.detectChanges();
+            });
+
+            it('should NOT render the caret when overridden from instance', () => {
+                component.config = { showCaret: false };
+                component.showTrigger = true;
+                fixture.detectChanges();
+
+                const caret = getTrigger().querySelector('span.a11y-caret');
+                expect(caret).toBeNull();
+            });
+
+            it('should render the caret (default)', () => {
+                component.showTrigger = true;
+                fixture.detectChanges();
+
+                const caret = getTrigger().querySelector('span.a11y-caret');
+                expect(caret).toBeTruthy();
+            });
         });
     });
 

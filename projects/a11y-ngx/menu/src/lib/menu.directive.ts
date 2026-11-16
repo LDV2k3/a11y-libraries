@@ -4,10 +4,12 @@ import {
     Output,
     AfterViewInit,
     OnDestroy,
+    inject,
     EventEmitter,
     ElementRef,
     TemplateRef,
     ChangeDetectorRef,
+    Renderer2,
 } from '@angular/core';
 import { Subject, merge } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
@@ -55,12 +57,11 @@ export class MenuDirective implements AfterViewInit, OnDestroy {
 
     private readonly destroy$: Subject<void> = new Subject<void>();
 
-    constructor(
-        private hostElement: ElementRef<HTMLButtonElement>,
-        private service: MenuService,
-        private director: MenuDirectorService,
-        private cdr: ChangeDetectorRef
-    ) {}
+    private readonly hostElement: ElementRef<HTMLButtonElement> = inject(ElementRef);
+    private readonly service: MenuService = inject(MenuService);
+    private readonly director: MenuDirectorService = inject(MenuDirectorService);
+    private readonly r2: Renderer2 = inject(Renderer2);
+    private readonly cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
 
     ngAfterViewInit(): void {
         const nativeElement: HTMLElement = this.nativeElement;
@@ -73,6 +74,19 @@ export class MenuDirective implements AfterViewInit, OnDestroy {
         if (!isButton) {
             console.error(ERROR_NO_BUTTON_HOST(nativeElement));
             return;
+        }
+
+        if (this.config.showCaret ?? this.service.config.showCaret) {
+            // To avoid SSR / Hydration duplicate caret issue
+            const hasCaret: Element | null = nativeElement.querySelector('.a11y-caret');
+
+            if (!hasCaret) {
+                const caret: HTMLSpanElement = this.r2.createElement('span');
+                this.r2.addClass(caret, 'a11y-caret');
+                this.r2.addClass(caret, 'a11y-caret-down');
+                this.r2.setAttribute(caret, 'aria-hidden', 'true');
+                this.r2.appendChild(nativeElement, caret);
+            }
         }
 
         this.attrAriaHasPopup = 'menu';

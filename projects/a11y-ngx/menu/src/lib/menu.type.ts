@@ -40,6 +40,7 @@ export const MENU_CONFIG_DEFAULT: Pick<OverlayBaseConfig, 'fluidAlignment' | 'ke
     allowNavigateDisabled: true,
     focusItemWhenOpen: undefined,
     showGroupLabels: true,
+    showCaret: false,
     alignMenuItemsWithTrigger: false,
     animate: 'none',
     animateMs: 150,

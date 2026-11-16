@@ -3,6 +3,7 @@ import {
     Input,
     OnInit,
     OnDestroy,
+    inject,
     ChangeDetectionStrategy,
     ElementRef,
     ChangeDetectorRef,
@@ -43,9 +44,8 @@ export class MenuTooltipComponent extends OverlayBase implements OnInit, OnDestr
     protected attrShow: boolean = false;
     protected attrFade: boolean = false;
 
-    constructor(private hostElement: ElementRef<HTMLElement>, private cdr: ChangeDetectorRef) {
-        super();
-    }
+    private readonly hostElement: ElementRef<HTMLElement> = inject(ElementRef);
+    private readonly cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
 
     ngOnInit(): void {
         this.attrShow = true;
